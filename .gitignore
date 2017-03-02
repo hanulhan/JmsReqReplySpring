@@ -1,0 +1,12 @@
+.project
+/.project
+.classpath
+.settings
+target/
+**/target
+**/*.bak
+**/*.versionBackup
+**/nbproject
+desktop.ini
+.DS_Store
+
