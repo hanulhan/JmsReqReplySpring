@@ -20,11 +20,5 @@
     ">
     
     
-    <bean id="bean_ReqReplyConsumer"        class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer"  scope="prototype" >
-        
-    </bean>
-    
-    <bean id="bean_ReqReplyPollingProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyPollingProducer"  scope="prototype" >
-    </bean>
    
 </beans>

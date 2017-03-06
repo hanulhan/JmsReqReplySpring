@@ -23,21 +23,25 @@
     <!--    springTest-jmsReqReply.xml   -->
 
     <import resource="classpath*:/spring/spring_amq_message_broker.xml" />
-    <import resource="classpath:/spring/spring_jmsReqReply.xml" />
 
     <bean id="brokerSettingsBean" class="com.acentic.cloudservices.messagebroker.BrokerSettings" >
         <property name="jmxServiceURL"   value="${jms.broker.service.url}" />
-        <property name="mBeanObjectName" value="${jms.broker.mbean.objectName}" />
-        <property name="brokerURL"       value= "${jms.broker.url}" />
-        <property name="sendTimeout"     value= "${jms.broker.send.timeout}" />
+<!--        <property name="mBeanObjectName" value="${jms.broker.mbean.objectName}" />-->
+        <property name="brokerURL"       value="${jms.broker.url}" />
+<!--        <property name="sendTimeout"     value="${jms.broker.send.timeout}" />-->
         <property name="queueNameList">
             <list>
-                <value>${statistics.queue.name}</value>
+                <value>vmReqTopic</value>
             </list>
         </property>
     </bean>
 
-    <bean id="bean_vmReqProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyPollingProducer" scope="singleton" >
+    <bean id="bean_vmReqTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
+        <description>The Topic to send requests to the systems</description>
+        <constructor-arg value="vmReqTopic" />
+    </bean>
+
+    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyPollingProducer" scope="prototype" >
         <description>
             Message Producer to send Requests to the VM-Req Topic
             and awaiting the Respnse
@@ -47,20 +51,6 @@
     </bean>
 
 
-    <bean id="bean_vmReqTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
-        <description>The Topic to send requests to the systems</description>
-        <constructor-arg value="vmReqTopic" />
-    </bean>
 
-    <bean   id="bean_restServiceStatisticsProducer" class="com.acentic.cloudservices.statistics.beans.StatisticsProducerThread" scope="singleton" >
-        <property name="serviceName"    value="#{bean_StatisticsServiceName.STATISTIC_REST_SERVICE}" />
-        <property name="statisticsSettings" ref="statisticsSettingsBean" />
-        <property name="jmsTemplate"     ref="bean_jmsQueueTemplate" />
-        <property name="delay"           value="1000" />
-        <property name="threadSleeptime" value="1" />
-    </bean>
 
-    
-    
-    
 </beans>

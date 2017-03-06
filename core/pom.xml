@@ -11,12 +11,38 @@
     <name>JmsReqReply :: Spring :: core</name>
     <packaging>jar</packaging>
     <properties>
+        <rmi.registry.port>1099</rmi.registry.port>
+        <jmx.rmi.server.port>1098</jmx.rmi.server.port>
+        
+        <jms.broker.name>broker.acentic</jms.broker.name>
+        <jms.broker.send.timeout>5000</jms.broker.send.timeout>
+
+        <jms.broker.url>tcp://192.168.21.10:61616</jms.broker.url>
+        <jms.broker.service.url>service:jmx:rmi:///jndi/rmi://${jms.broker.remote.ip}:${jmx.rmi.server.port}/jmxrmi</jms.broker.service.url>        
+        <jms.broker.mbean.objectName></jms.broker.mbean.objectName>
+        
+        <jms.broker.send.timeout></jms.broker.send.timeout>
+          
+        
+
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.acentic.cloudservices</groupId>
             <version>1.1.61</version>
             <artifactId>message-broker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
