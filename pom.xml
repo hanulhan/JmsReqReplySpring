@@ -10,8 +10,8 @@
     
     <modules>
         <module>core</module>
-        <module>producer</module>
-        <module>consumer</module>
+        <module>client</module>
+        <module>server</module>
     </modules>
 
     <properties>
@@ -36,11 +36,21 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
+                <type>jar</type>
                 <version>${version.org.springframework}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jms</artifactId>
+                <type>jar</type>
+                <version>${version.org.springframework}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <type>jar</type>
+<!--                <scope>compile</scope>-->
                 <version>${version.org.springframework}</version>
             </dependency>
             <dependency>
