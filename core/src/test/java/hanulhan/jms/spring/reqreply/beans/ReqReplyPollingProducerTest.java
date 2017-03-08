@@ -6,6 +6,7 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyProducerCallback;
+import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +32,11 @@ public class ReqReplyPollingProducerTest implements ApplicationContextAware {
 
     @Test
     public void doTest() {
-        ReqReplyProducerCallback myReqReply= (ReqReplyProducerCallback) applicationContext.getBean("bean_vmReqReplyProducer");
+        ReqReplyPollingProducer myReqReply= (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer");
+        String myResponse= null;
+        myResponse= myReqReply.sendAndAwaitingResponse("My Message", "AAAA");
+        Assert.assertTrue("No Respnse", myResponse == null);
+                
     }
 
     @Override

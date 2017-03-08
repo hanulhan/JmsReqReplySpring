@@ -21,6 +21,10 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
     private ApplicationContext applicationContext;
     private JmsTemplate jmsTemplate;
     private Destination destination;
+
+    public ReqReplyPollingProducer() {
+    }
+    
     
     
     public String sendAndAwaitingResponse(String aMessageText, String aSystemIdent) {
