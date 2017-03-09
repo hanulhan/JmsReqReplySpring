@@ -11,6 +11,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.jms.core.MessageCreator;
 
 /**
@@ -19,42 +21,41 @@ import org.springframework.jms.core.MessageCreator;
  */
 public class ReqMessageCreator implements MessageCreator {
 
-    private final String correlationId;
-    private final Destination replyTo;
+    private Destination tempDest;
+    
+    private String correlationId;
     private TextMessage txtMessage;
     private String ident;
     private final String messageText;
+    private static final Logger LOGGER = Logger.getLogger(ReqMessageCreator.class);
 
-    public ReqMessageCreator(String aMsg, Destination aReplyTo) {
-        this.correlationId = createRandomString();
+    public ReqMessageCreator(String aMsg, String aCorrelationId, String aSystemIdent) {
+        this.correlationId = aCorrelationId;
         this.messageText= aMsg;
-        this.replyTo= aReplyTo;
-        
-    }
+        this.ident= aSystemIdent;
 
-    private String createRandomString() {
-        Random random;
-        random = new Random(System.currentTimeMillis());
-        long randomLong = random.nextLong();
-        return Long.toHexString(randomLong);
     }
 
     @Override
-    public Message createMessage(Session sn) throws JMSException {
-        txtMessage= sn.createTextMessage(messageText);
+    public Message createMessage(Session aSession) throws JMSException {
+        LOGGER.log(Level.TRACE, "ReqMessageCreator:createMessage()");
+        tempDest= aSession.createTemporaryQueue();
+        LOGGER.log(Level.DEBUG, "Creating tempQueue [" + tempDest.toString() + "]");
+        txtMessage= aSession.createTextMessage(messageText);
         txtMessage.setJMSCorrelationID(correlationId);
-        txtMessage.setStringProperty(ident, ident);
-        txtMessage.setJMSReplyTo(replyTo);
+        txtMessage.setStringProperty(ReqReplySettings.PROPERTY_NAME_IDENT, ident);
+        txtMessage.setJMSReplyTo(tempDest);
         return txtMessage;
     }
 
-    public String getCorrelationId() {
-        return correlationId;
+    public Destination getTempDest() {
+        return tempDest;
     }
 
     public String getMessageText() {
         return messageText;
     }
+
 
     
 }

@@ -7,6 +7,7 @@ package hanulhan.jms.spring.reqreply.client;
 
 import com.opensymphony.xwork2.ActionSupport;
 import hanulhan.jms.spring.reqreply.beans.ReqReplyPollingProducer;
+import javax.jms.JMSException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -55,7 +56,11 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSendMessage()");
 
         msgText= "Message " + msgCount + " from Client " + clientId;
-        msgResponse= reqReplyProducer.sendAndAwaitingResponse(msgText, ident);
+        try {
+            msgResponse = reqReplyProducer.sendAndAwaitingResponse(msgText, ident);
+        } catch (JMSException jMSException) {
+            LOGGER.log(Level.ERROR, jMSException);
+        }
 
         return SUCCESS;
     }
