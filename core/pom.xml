@@ -29,7 +29,6 @@
     <dependencies>
         <dependency>
             <groupId>com.acentic.cloudservices</groupId>
-            <version>1.1.61</version>
             <artifactId>message-broker</artifactId>
         </dependency>
         <dependency>

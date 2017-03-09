@@ -1,0 +1,42 @@
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation  ="http://www.springframework.org/schema/beans 
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://activemq.apache.org/schema/core
+                            http://activemq.apache.org/schema/core/activemq-core.xsd">    
+    
+    
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"></bean>
+
+    <broker brokerName="${jms.broker.name}" dataDirectory="${jms.broker.data.directory}" useJmx="true" xmlns="http://activemq.apache.org/schema/core">
+
+        <managementContext>
+            <managementContext createConnector="true" connectorPort="${rmi.registry.port}" rmiServerPort="${jmx.rmi.server.port}"></managementContext>
+        </managementContext>
+
+        <persistenceAdapter>
+            <kahaDB directory="${jms.broker.data.directory}/kahadb"></kahaDB>
+        </persistenceAdapter>
+
+        <systemUsage>
+            <systemUsage>
+                <memoryUsage>
+                    <memoryUsage limit="128 mb"></memoryUsage>
+                </memoryUsage>
+                <storeUsage>
+                    <storeUsage limit="1 gb"></storeUsage>
+                </storeUsage>
+                <tempUsage>
+                    <tempUsage limit="100 mb"></tempUsage>
+                </tempUsage>
+            </systemUsage>
+        </systemUsage>
+
+        <transportConnectors>
+            <transportConnector name="openwire" uri="tcp://127.0.0.1:61616"></transportConnector>
+        </transportConnectors>
+
+    </broker>
+
+</beans>

@@ -34,7 +34,6 @@ public class ReqReplyProducerCallback implements ProducerCallback {
     // internal Stuff
     private static final Logger LOGGER = Logger.getLogger(ReqReplyProducerCallback.class);
     private final String correlationId;
-    private final Destination replyTo;
     private TextMessage txtMessage;
 
     // Settings
@@ -42,11 +41,11 @@ public class ReqReplyProducerCallback implements ProducerCallback {
     private int waitForResponseMilliSec;
 
     public ReqReplyProducerCallback(Destination aDestination, String aMessageText, String aSystemIdent) {
+        LOGGER.log(Level.TRACE, "ReqReplyProducerCallback:ReqReplyProducerCallback()");
         this.systemIdent = aSystemIdent;
         this.messageText = aMessageText;
         this.destination = aDestination;
         this.correlationId = createRandomString();
-        this.replyTo = null;
 
         waitForAckMilliSec = 1000;
         waitForResponseMilliSec = 1000;
@@ -64,10 +63,12 @@ public class ReqReplyProducerCallback implements ProducerCallback {
         int myMilliSeconds;
         int myTotalMsgCount, myCurrentMsgCount;
 
+        LOGGER.log(Level.TRACE, "ReqReplyProducerCallback:doInJms()");
         txtMessage = session.createTextMessage(messageText);
         txtMessage.setJMSCorrelationID(correlationId);
         txtMessage.setStringProperty("systemIdent", systemIdent);
-        txtMessage.setJMSReplyTo(replyTo);
+        txtMessage.setJMSReplyTo(tempDest);
+        LOGGER.log(Level.TRACE, "Set ReplyTo: " + tempDest.toString());
 
         producer.send(this.destination, txtMessage);
         LOGGER.log(Level.TRACE, "Send Message (" + this.correlationId + "): " + messageText);

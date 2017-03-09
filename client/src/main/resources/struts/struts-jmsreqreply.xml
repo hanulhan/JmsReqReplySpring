@@ -1,0 +1,27 @@
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<!-- Author: uhansen -->
+<struts>
+<!--    <constant  name="struts.custom.i18n.resources" value="i18n/statistics" />-->
+
+    <package name="jmsReqReply" namespace="/jmsReqReply" extends="default">
+
+<!--        <action name="doAccessRestStatistics" class="bean_StatisticsActionsClass" method="doAccessRestStatistics">
+            <param name="roles">ROLE_SYSTEM_SUPER_ADMIN</param>
+            <result name="success">/statistics/statistics-rest.jsp</result>
+        </action>-->
+        
+        
+        <action name="doSendMessage" class="bean_ReqReplyActions"  method="doSendMessage">
+            <result name="success" type="json">
+                <param name="ignoreHierarchy">false</param>
+                <param name="includeProperties">msgText, msgResponse</param>
+            </result>
+        </action>
+    
+
+    </package>	
+</struts>
+

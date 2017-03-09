@@ -7,6 +7,8 @@ package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyProducerCallback;
 import javax.jms.Destination;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -21,14 +23,18 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
     private ApplicationContext applicationContext;
     private JmsTemplate jmsTemplate;
     private Destination destination;
+    static final Logger LOGGER= Logger.getLogger(ReqReplyPollingProducer.class);
 
     public ReqReplyPollingProducer() {
+        LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:ReqReplyPollingProducer()");
     }
     
     
     
     public String sendAndAwaitingResponse(String aMessageText, String aSystemIdent) {
         String myResponse;
+        LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:sendAndAwaitingResponse()");
+        
         ReqReplyProducerCallback  myReqReplyProducer= new ReqReplyProducerCallback(destination, aMessageText, aSystemIdent);
         
         myResponse= (String)jmsTemplate.execute(myReqReplyProducer);
@@ -40,6 +46,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
     }
 
     public void setDestination(Destination destination) {
+        LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:setDestination()");
         this.destination = destination;
     }
     

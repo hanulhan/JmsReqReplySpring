@@ -15,16 +15,41 @@
     </modules>
 
     <properties>
+        <rmi.registry.port>1099</rmi.registry.port>
+        <jmx.rmi.server.port>1098</jmx.rmi.server.port>
+        
+        <jms.broker.name>broker-vm-uli</jms.broker.name>
+        <jms.broker.send.timeout>5000</jms.broker.send.timeout>
+
+        <jms.broker.url>tcp://192.168.21.10:61616</jms.broker.url>
+        <jms.broker.service.url>service:jmx:rmi:///jndi/rmi://${jms.broker.remote.ip}:${jmx.rmi.server.port}/jmxrmi</jms.broker.service.url>        
+        <jms.broker.mbean.objectName></jms.broker.mbean.objectName>
+        
+        <jms.broker.send.timeout></jms.broker.send.timeout>
+
+        <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                DEPENDENCY VERSION
+        +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+
+        <!-- Spring -->
         <version.org.springframework>3.0.5.RELEASE</version.org.springframework>
 
+        <!-- JACKSON -->
+        <version.jackson>2.2.3</version.jackson>
+
+        <!-- Struts -->
+        <version.org.apache.struts>2.3.16.3</version.org.apache.struts>
 
         <!-- AcitiveMQ, jms -->
         <version.org.apache.activemq>5.7.0</version.org.apache.activemq>
         <version.org.apache.geronimo.specs>1.1.1</version.org.apache.geronimo.specs>
+        
+        <!-- CloudServices  -->
+        <version.com.acentic.cloudservices>1.1.62</version.com.acentic.cloudservices>
         
         <!-- Logging -->
         <version.log4j>1.2.16</version.log4j>
@@ -33,6 +58,8 @@
     
     <dependencyManagement>
         <dependencies>
+            
+            <!-- SPRING -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
@@ -45,12 +72,11 @@
                 <type>jar</type>
                 <version>${version.org.springframework}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
                 <type>jar</type>
-<!--                <scope>compile</scope>-->
+                <!--                <scope>compile</scope>-->
                 <version>${version.org.springframework}</version>
             </dependency>
             <dependency>
@@ -60,14 +86,30 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- STRUTS -->
             <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-core</artifactId>
-                <version>${version.org.apache.activemq}</version>
+                <groupId>org.apache.struts</groupId>
+                <artifactId>struts2-spring-plugin</artifactId>
+                <version>${version.org.apache.struts}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.struts</groupId>
+                <artifactId>struts2-core</artifactId>
+                <version>${version.org.apache.struts}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.struts</groupId>
+                <artifactId>struts2-json-plugin</artifactId>
+                <version>${version.org.apache.struts}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.struts</groupId>
+                <artifactId>struts2-junit-plugin</artifactId>
+                <version>${version.org.apache.struts}</version>
             </dependency>
 
 
-
+            <!-- JMS    -->
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_1.1_spec</artifactId>
@@ -79,6 +121,14 @@
                 <artifactId>imq</artifactId>
                 <version>4.6-b01</version>
             </dependency>
+
+            <!-- ACTIVE-MQ  -->
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-core</artifactId>
+                <version>${version.org.apache.activemq}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>log4j</groupId>
@@ -96,17 +146,34 @@
                 <groupId>hanulhan.jms.spring.reqreply</groupId>
                 <artifactId>core</artifactId>
                 <version>${project.version}</version>
+                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>hanulhan.jms.spring.reqreply</groupId>
-                <artifactId>consumer</artifactId>
+                <artifactId>web-client</artifactId>
                 <version>${project.version}</version>
+                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>hanulhan.jms.spring.reqreply</groupId>
-                <artifactId>producer</artifactId>
+                <artifactId>server</artifactId>
                 <version>${project.version}</version>
+                <type>jar</type>
             </dependency>			
+
+            <!-- CloudServices  -->
+            <dependency>
+                <groupId>com.acentic.cloudservices</groupId>
+                <artifactId>message-broker</artifactId>
+                <version>${version.com.acentic.cloudservices}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>com.acentic.cloudservices</groupId>
+                <artifactId>webutil</artifactId>
+                <version>${version.com.acentic.cloudservices}</version>
+                <type>war</type>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
