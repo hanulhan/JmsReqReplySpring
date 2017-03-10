@@ -21,42 +21,27 @@
       http://www.springframework.org/schema/task/spring-task-3.0.xsd
 ">
     <!--    springTest-jmsReqReply.xml   -->
+    <import resource="classpath*:/spring/spring_amq_message_broker.xml" />
 
-
-    <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    
+    <bean id="brokerSettingsBean" class="com.acentic.cloudservices.messagebroker.BrokerSettings" >
+        <property name="jmxServiceURL"  value="${jms.broker.service.url}" />
+        <property name="brokerURL"    value= "${jms.broker.url}" />
+        <property name="sendTimeout" value= "0" />
+        <property name="queueNameList">
+            <list>
+                <value>bean_vmReqTopic</value>
+            </list>
+        </property>
+    </bean>
+    
+    
+<!--    <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL" value="${jms.broker.url}" />
         <property name="sendTimeout" value="0" />
     </bean>
 
 
-
-<!--    <bean id="bean_connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-        <description> 
-            The CachingConnectionFactory extends the functionality of SingleConnectionFactory 
-            and adds the caching of Sessions, MessageProducers, and MessageConsumers. 
-            The initial cache size is set to 1, use the property sessionCacheSize 
-            to increase the number of cached sessions. Note that the number of actual 
-            cached sessions will be more than that number as sessions are cached based 
-            on their acknowledgment mode, so there can be up to 4 cached session instances 
-            when sessionCacheSize is set to one, one for each acknowledgment mode. 
-            MessageProducers and MessageConsumers are cached within their owning session 
-            and also take into account the unique properties of the producers 
-            and consumers when caching. MessageProducers are cached based on their 
-            destination. MessageConsumers are cached based on a key composed of the 
-            destination, selector, noLocal delivery flag, and the durable subscription 
-            name (if creating durable consumers).
-            
-            Note that the number of actual cached sessions will be more than that number as sessions 
-            are cached based on their acknowledgment mode, so there can be up to 4 cached session instances 
-            when sessionCacheSize is set to one.
-        </description>
-
-        <constructor-arg ref="bean_amqConnectionFactory" />
-        <property name="reconnectOnException" value="true" />
-        <property name="sessionCacheSize" value="10" />
-    </bean>-->
-        
-                
     <bean id="bean_connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
         <description>
             This SingleConnectionFactory is useful for testing and standalone 
@@ -70,7 +55,7 @@
     <bean id="bean_jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="pubSubDomain" value="false" />
         <property name="connectionFactory" ref="bean_connectionFactory" />
-    </bean>
+    </bean>-->
     
 
 

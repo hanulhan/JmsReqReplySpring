@@ -13,4 +13,14 @@ public class ReqReplySettings {
     public static final String PROPERTY_NAME_COUNT = "count";
     public static final String PROPERTY_NAME_TOTAL_COUNT = "toTalcount";
     public static final String PROPERTY_NAME_IDENT = "systemIdent";
+    private String filterPropertyName;
+
+    public String getFilterPropertyName() {
+        return filterPropertyName;
+    }
+
+    public void setFilterPropertyName(String filterPropertyName) {
+        this.filterPropertyName = filterPropertyName;
+    }
+    
 }

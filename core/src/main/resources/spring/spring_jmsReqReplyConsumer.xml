@@ -19,6 +19,15 @@
         http://www.springframework.org/schema/task/spring-task-3.0.xsd
     ">
     
+
     
-   
+    <bean   id="bean_jmsReqReplyConsumer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer" scope="singleton" >
+        <property name="destination"    value="#{bean_StatisticsServiceName.STATISTIC_REST_SERVICE}" />
+        <property name="jmsTemplate"     ref="bean_jmsTemplate" />
+        <property name="filterPropertyName"  value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
+        <property name="filterPropertyInstance" ref="bean_FilterPropertyInstance" />
+    </bean>
+
+    
+    
 </beans>
