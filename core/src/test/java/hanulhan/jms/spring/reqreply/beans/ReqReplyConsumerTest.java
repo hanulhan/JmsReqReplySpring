@@ -50,7 +50,7 @@ public class ReqReplyConsumerTest implements ApplicationContextAware {
      */
     @Test
     public void testMe() {
-        ReqReplyPollingProducer myReqReply= (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer");
+        ReqReplyPollingProducer myReqReply= (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 5000, 5000);
         String myResponse= null;
         try {
             myResponse = myReqReply.sendAndAwaitingResponse("My Message", "AAAA");

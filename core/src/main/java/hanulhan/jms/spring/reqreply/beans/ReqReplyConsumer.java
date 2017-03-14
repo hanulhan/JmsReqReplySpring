@@ -19,12 +19,13 @@ import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import javax.annotation.PostConstruct;
+import javax.jms.MessageListener;
 
 /**
  *
  * @author uhansen
  */
-public class ReqReplyConsumer implements ApplicationContextAware {
+public class ReqReplyConsumer implements MessageListener {
 
     private ApplicationContext applicationContext;
 
@@ -38,6 +39,7 @@ public class ReqReplyConsumer implements ApplicationContextAware {
 
     // internal
     private static final Logger LOGGER = Logger.getLogger(ReqReplyConsumer.class);
+    private String filterPropertyValue;
 
     @PostConstruct
     public void postConstruct() {
@@ -52,11 +54,9 @@ public class ReqReplyConsumer implements ApplicationContextAware {
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::ReqReplyConsumer()");
     }
     
-    public void receive(String stringMsg)   {
-        LOGGER.log(Level.TRACE, "Received String Message");
-    }
 
-    public void receive(Message aMessage) {
+    @Override
+    public void onMessage(Message aMessage) {
 
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::onReceive()");
         try {
@@ -64,8 +64,9 @@ public class ReqReplyConsumer implements ApplicationContextAware {
                 if (filterPropertyName != null && !filterPropertyName.trim().isEmpty()) {
                     if (aMessage.propertyExists(filterPropertyName)) {
                         LOGGER.log(Level.TRACE, "Filter property in Message: " + aMessage.getStringProperty(filterPropertyName));
+                        filterPropertyValue= aMessage.getStringProperty(filterPropertyName);
                         // Check if the filter-property should be handled
-                        if (filterPropertyInstance.getPropertyFilterActive(filterPropertyName)) {
+                        if (filterPropertyInstance.getPropertyFilterActive(filterPropertyValue)) {
                             handleMessage(aMessage);
                         } else {
                             LOGGER.log(Level.TRACE, "Message received, but fiter property does not fit");
@@ -99,10 +100,10 @@ public class ReqReplyConsumer implements ApplicationContextAware {
                 ReqReplyMessageCreator myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId, false);
                 jmsTemplate.send(myResponseDestination, myResponseCreator);
 
-                String myResponse = filterPropertyInstance.getPropertyFilterResult(filterPropertyName);
+                String myResponse = filterPropertyInstance.getPropertyFilterResult(filterPropertyValue);
 
                 int myMsgCount;
-                myMsgCount = (int) Math.ceil(myResponse.length() / maxMessageLength);
+                myMsgCount = (int) Math.ceil((double)myResponse.length() / maxMessageLength);
 
                 LOGGER.log(Level.TRACE, "Split Response into " + myMsgCount + " pieces");
 
@@ -118,10 +119,10 @@ public class ReqReplyConsumer implements ApplicationContextAware {
                     
                     myResponseCreator = new ReqReplyMessageCreator(myMessagePart, correlationId, false);
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT, myMsgCount);
-                    myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT, i+1);
+                    myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT, i + 1);
                    
                     LOGGER.log(Level.INFO, "Server(" + serverId + ") send response ("
-                            + i+1
+                            + (i + 1)
                             + "/"
                             + myMsgCount
                             + ") index: "
@@ -184,12 +185,6 @@ public class ReqReplyConsumer implements ApplicationContextAware {
 
     public void setMaxMessageLength(Integer maxMessageLength) {
         this.maxMessageLength = maxMessageLength;
-    }
-
-    
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
     }
 
 }

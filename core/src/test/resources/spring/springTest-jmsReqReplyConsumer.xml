@@ -25,7 +25,7 @@
 
     <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
         <property name="destination"        ref="bean_vmReqTopic" />
-        <property name="maxMessageLength"   value="100" />
+        <property name="maxMessageLength"   value="10" />
         <property name="serverId"           value="B2B-1" />
         <property name="filterPropertyName" value="systemIdent" />
     </bean>
@@ -36,8 +36,44 @@
         <property name="sendTimeout" value="0" />
     </bean>
 
-                
-    <bean id="bean_connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+    <bean id="bean_CachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <description> 
+            The CachingConnectionFactory extends the functionality of SingleConnectionFactory 
+            and adds the caching of Sessions, MessageProducers, and MessageConsumers. 
+            The initial cache size is set to 1, use the property sessionCacheSize 
+            to increase the number of cached sessions. Note that the number of actual 
+            cached sessions will be more than that number as sessions are cached based 
+            on their acknowledgment mode, so there can be up to 4 cached session instances 
+            when sessionCacheSize is set to one, one for each acknowledgment mode. 
+            MessageProducers and MessageConsumers are cached within their owning session 
+            and also take into account the unique properties of the producers 
+            and consumers when caching. MessageProducers are cached based on their 
+            destination. MessageConsumers are cached based on a key composed of the 
+            destination, selector, noLocal delivery flag, and the durable subscription 
+            name (if creating durable consumers).
+            
+            Note that the number of actual cached sessions will be more than that number as sessions 
+            are cached based on their acknowledgment mode, so there can be up to 4 cached session instances 
+            when sessionCacheSize is set to one.
+        </description>
+
+        <constructor-arg ref="bean_amqConnectionFactory" />
+        <property name="reconnectOnException" value="true" />
+        <property name="exceptionListener" ref="bean_brokerExceptionListenerBean" /> 
+        <property name="sessionCacheSize" value="10" />
+    </bean>
+
+    <!--    <bean id="bean_PooledJmsConnectionFactory"
+          class="org.apache.activemq.pool.PooledConnectionFactory"
+          init-method="start" destroy-method="stop">
+        <property name="maxConnections" value="15" />
+        <property name="connectionFactory" ref="bean_amqConnectionFactory" />
+        <property name="expiryTimeout" value="-1" />
+        <property name="maximumActive" value="100" />
+    </bean>-->
+                                                
+                                                
+    <bean id="bean_SingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
         <description>
             This SingleConnectionFactory is useful for testing and standalone 
             environments so that the same connection can be used for multiple 
@@ -46,10 +82,13 @@
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
     </bean>
     
-   
-    <bean id="bean_jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-        <property name="pubSubDomain" value="false" />
-        <property name="connectionFactory" ref="bean_connectionFactory" />
+    <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
+    
+    <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
+       
+    <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="pubSubDomain" value="true" />
+        <property name="connectionFactory" ref="bean_DefaultConnectionFactory" />
     </bean>
     
 
@@ -64,24 +103,40 @@
             and awaiting the Respnse
         </description>
         <property name="destination" ref="bean_vmReqTopic"   />
-        <property name="jmsTemplate" ref="bean_jmsTemplate" />
+        <property name="jmsTemplate" ref="bean_jmsTopicTemplate" />
     </bean>
 
     <bean id="bean_FilterPropertyInstance" class="hanulhan.jms.spring.reqreply.beans.ReqReplyFilter">
         <property name="identList">
             <list>
-                <value>"AAAA"</value>
-                <value>"BBBB"</value>
-                <value>"CCCC"</value>
+                <value>AAAA</value>
+                <value>CCCC</value>
+                <value>EEEE</value>
+                <value>GGGG</value>
             </list>
         </property>
     </bean>
 
-    <jms:listener-container connection-factory="bean_connectionFactory" 
+    <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSErrorHandler" />
+
+    <bean id="bean_jmsListenerContainer" 
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+          p:connectionFactory-ref="bean_DefaultConnectionFactory"
+          p:destinationName="vmReqTopic"
+          p:messageListener-ref="bean_jmsReqReplyConsumer"
+          p:pubSubDomain="true"
+          p:errorHandler-ref="bean_jmsErrorHandler"
+          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
+
+<!--              p:subscriptionDurable="true"
+          p:durableSubscriptionName="sampleSubscriber"-->
+
+    
+    <!--    <jms:listener-container connection-factory="bean_SingleConnectionFactory" 
                             container-type="default"
                             acknowledge="auto"
                             destination-type="topic"  >
-        <jms:listener destination="vmReqTopic" pubSubDomain="true" ref="bean_jmsReqReplyConsumer" method="receive"/>
-    </jms:listener-container>    
+        <jms:listener destination="vmReqTopic" ref="bean_jmsReqReplyConsumer" method="receive"/>
+    </jms:listener-container>    -->
     
 </beans>

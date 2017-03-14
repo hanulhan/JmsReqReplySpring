@@ -22,7 +22,7 @@
 
     
     <bean   id="bean_jmsReqReplyConsumer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer" scope="singleton" >
-        <property name="jmsTemplate"            ref="bean_jmsTemplate" />
+        <property name="jmsTemplate"            ref="bean_jmsTopicTemplate" />
         <property name="destination"            value="#{bean_ReqReplySettings.getDestination()}" />
         <property name="filterPropertyName"     value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
         <property name="maxMessageLength"       value="#{bean_ReqReplySettings.getMaxMessageLength()}" />

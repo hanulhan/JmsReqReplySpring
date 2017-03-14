@@ -47,7 +47,7 @@ public class ReqReplyMessageCreator implements MessageCreator {
         LOGGER.log(Level.TRACE, "ReqMessageCreator:createMessage()");
         txtMessage = aSession.createTextMessage(messageText);
         txtMessage.setJMSCorrelationID(correlationId);
-        if (!propertyStringMap.isEmpty()) {
+        if (propertyStringMap != null && !propertyStringMap.isEmpty()) {
             myEntries = propertyStringMap.entrySet().iterator();
             while (myEntries.hasNext()) {
                 Entry thisEntry = (Entry) myEntries.next();
@@ -56,7 +56,7 @@ public class ReqReplyMessageCreator implements MessageCreator {
                 txtMessage.setStringProperty(myKey, myStringValue);
             }
         }
-        if (!propertyIntMap.isEmpty()) {
+        if (propertyIntMap != null && !propertyIntMap.isEmpty()) {
             myEntries = propertyIntMap.entrySet().iterator();
             while (myEntries.hasNext()) {
                 Entry thisEntry = (Entry) myEntries.next();

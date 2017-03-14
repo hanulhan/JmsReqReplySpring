@@ -16,16 +16,32 @@ import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 public class ReqReplyFilter implements ReqReplyFilterInterface {
 
     private List<String> identList= new ArrayList<>();
+
+    public ReqReplyFilter() {
+        super();
+    }
+    
     
     
     @Override
-    public Boolean getPropertyFilterActive(String aPropertyFilterName) {
-        return identList.contains(aPropertyFilterName);
+    public Boolean getPropertyFilterActive(String aPropertyFilterValue) {
+//        return identList.contains(aPropertyFilterValue);
+        for (String temp: identList)    {
+            if (temp.equals(aPropertyFilterValue))  {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public String getPropertyFilterResult(String aPropertyFilterName) {
-        return "Response from " + aPropertyFilterName;
+    public String getPropertyFilterResult(String aPropertyFilterValue) {
+        String myMg= "0123456789";
+        String retValue= new String();
+        for (int i=0; i< 10; i++)   {
+            retValue+= myMg;
+        }
+        return retValue;
     }
 
     public void setIdentList(List<String> identList) {

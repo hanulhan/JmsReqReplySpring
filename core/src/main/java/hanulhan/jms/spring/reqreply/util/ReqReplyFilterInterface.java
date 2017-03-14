@@ -10,6 +10,6 @@ package hanulhan.jms.spring.reqreply.util;
  * @author uhansen
  */
 public interface ReqReplyFilterInterface {
-    public Boolean getPropertyFilterActive(String aPropertyFilterName);
-    public String  getPropertyFilterResult(String aPropertyFilterName);
+    public Boolean getPropertyFilterActive(String aPropertyFilterValue);
+    public String  getPropertyFilterResult(String aPropertyFilterValue);
 }
