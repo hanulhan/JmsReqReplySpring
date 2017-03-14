@@ -13,7 +13,7 @@ import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
  *
  * @author uhansen
  */
-public class ReqReplyFilterRequest implements ReqReplyFilterInterface {
+public class ReqReplyFilter implements ReqReplyFilterInterface {
 
     private List<String> identList= new ArrayList<>();
     
@@ -27,5 +27,10 @@ public class ReqReplyFilterRequest implements ReqReplyFilterInterface {
     public String getPropertyFilterResult(String aPropertyFilterName) {
         return "Response from " + aPropertyFilterName;
     }
+
+    public void setIdentList(List<String> identList) {
+        this.identList = identList;
+    }
+ 
     
 }

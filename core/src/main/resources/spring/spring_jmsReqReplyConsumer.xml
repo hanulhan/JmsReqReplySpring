@@ -22,9 +22,11 @@
 
     
     <bean   id="bean_jmsReqReplyConsumer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer" scope="singleton" >
-        <property name="destination"    value="#{bean_StatisticsServiceName.STATISTIC_REST_SERVICE}" />
-        <property name="jmsTemplate"     ref="bean_jmsTemplate" />
-        <property name="filterPropertyName"  value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
+        <property name="jmsTemplate"            ref="bean_jmsTemplate" />
+        <property name="destination"            value="#{bean_ReqReplySettings.getDestination()}" />
+        <property name="filterPropertyName"     value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
+        <property name="maxMessageLength"       value="#{bean_ReqReplySettings.getMaxMessageLength()}" />
+        <property name="serverId"               value="#{bean_ReqReplySettings.getServerId()}" />
         <property name="filterPropertyInstance" ref="bean_FilterPropertyInstance" />
     </bean>
 

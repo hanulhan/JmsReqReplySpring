@@ -23,9 +23,9 @@ public class ReqMessageCreator implements MessageCreator {
 
     private Destination tempDest;
     
-    private String correlationId;
+    private final String correlationId;
     private TextMessage txtMessage;
-    private String ident;
+    private final String ident;
     private final String messageText;
     private static final Logger LOGGER = Logger.getLogger(ReqMessageCreator.class);
 

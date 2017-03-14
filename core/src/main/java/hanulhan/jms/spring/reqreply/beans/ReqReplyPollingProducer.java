@@ -40,8 +40,8 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
 
     public ReqReplyPollingProducer() {
         LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:ReqReplyPollingProducer()");
-        waitForAckMilliSec = 1000;
-        waitForResponseMilliSec = 1000;
+        waitForAckMilliSec = 2000;
+        waitForResponseMilliSec = 2000;
     }
 
     public String sendAndAwaitingResponse(String aMessageText, String aSystemIdent) throws JMSException {
@@ -72,11 +72,12 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         {   // SEND MESSAGE
             jmsTemplate.send(destination, myReqMessage);
             tempDest = myReqMessage.getTempDest();
-            LOGGER.log(Level.DEBUG, "Send Message [" + myReqMessage.getMessageText() + "] to " + tempDest.toString());
+            LOGGER.log(Level.DEBUG, "Send Message [" + myReqMessage.getMessageText() + "] to " + destination.toString());
         }
 
         {   // RECEIVING
-
+            LOGGER.log(Level.DEBUG, "Waiting for Respionse on: " + tempDest.toString());
+            
             // Wait for ACK
             myResponseMsg = ReceiveTextMessage(tempDest, waitForAckMilliSec);
             if (myResponseMsg != null) {

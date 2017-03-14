@@ -17,7 +17,8 @@
         <jms.broker.name>broker.acentic</jms.broker.name>
         <jms.broker.send.timeout>5000</jms.broker.send.timeout>
 
-        <jms.broker.url>tcp://192.168.21.10:61616</jms.broker.url>
+        <jms.broker.url>tcp://192.168.20.12:61616</jms.broker.url>
+<!--        <jms.broker.url>tcp://localhost:61616</jms.broker.url>-->
         <jms.broker.service.url>service:jmx:rmi:///jndi/rmi://${jms.broker.remote.ip}:${jmx.rmi.server.port}/jmxrmi</jms.broker.service.url>        
         <jms.broker.mbean.objectName></jms.broker.mbean.objectName>
         
