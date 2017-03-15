@@ -21,10 +21,10 @@
       http://www.springframework.org/schema/task/spring-task-3.0.xsd
 ">
     <!--    springTest-jmsReqReply.xml   -->
-    <import resource="classpath*:/spring/spring_amq_message_broker.xml" />
+<!--    <import resource="classpath*:/spring/spring_amq_message_broker.xml" />-->
 
     
-    <bean id="brokerSettingsBean" class="com.acentic.cloudservices.messagebroker.BrokerSettings" >
+<!--    <bean id="brokerSettingsBean" class="com.acentic.cloudservices.messagebroker.BrokerSettings" >
         <property name="jmxServiceURL"  value="${jms.broker.service.url}" />
         <property name="brokerURL"    value= "${jms.broker.url}" />
         <property name="sendTimeout" value= "0" />
@@ -33,11 +33,11 @@
                 <value>bean_vmReqTopic</value>
             </list>
         </property>
-    </bean>
+    </bean>-->
     
     
-<!--    <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${jms.broker.url}" />
+    <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616" />
         <property name="sendTimeout" value="0" />
     </bean>
 
@@ -55,7 +55,7 @@
     <bean id="bean_jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="pubSubDomain" value="false" />
         <property name="connectionFactory" ref="bean_connectionFactory" />
-    </bean>-->
+    </bean>
     
 
 

@@ -5,13 +5,14 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
-import static hanulhan.jms.spring.reqreply.beans.ReqReplyPollingProducerTest.LOGGER;
+import hanulhan.jms.spring.reqreply.util.ReqReplyReturnObject;
+import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import javax.jms.JMSException;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -33,16 +34,16 @@ public class ReqReplyConsumerTest implements ApplicationContextAware {
 
     public ReqReplyConsumerTest() {
 
-//        LOGGER.log(Level.INFO, "StartBroker()");
-//        try {
-//            BrokerService broker = new BrokerService();
-//            broker.setPersistent(false);
-//            broker.setUseJmx(false);
-//            broker.addConnector("tcp://localhost:61616");
-//            broker.start();
-//        } catch (Exception exception) {
-//            LOGGER.log(Level.ERROR, exception);
-//        }
+        LOGGER.log(Level.INFO, "StartBroker()");
+        try {
+            BrokerService broker = new BrokerService();
+            broker.setPersistent(false);
+            broker.setUseJmx(false);
+            broker.addConnector("tcp://localhost:61616");
+            broker.start();
+        } catch (Exception exception) {
+            LOGGER.log(Level.ERROR, exception);
+        }
     }
 
     /**
@@ -50,10 +51,12 @@ public class ReqReplyConsumerTest implements ApplicationContextAware {
      */
     @Test
     public void testMe() {
-        ReqReplyPollingProducer myReqReply= (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 5000, 5000);
-        String myResponse= null;
+        ReqReplyPollingProducer myReqReply= (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 100, 100);
+        ReqReplyReturnObject myResponse;
         try {
-            myResponse = myReqReply.sendAndAwaitingResponse("My Message", "AAAA");
+            myResponse = myReqReply.sendAndAwaitingResponse("My Message", ReqReplySettings.PROPERTY_NAME_IDENT, "AAAA");
+            Assert.assertTrue(myResponse.getStatus().toString(), myResponse.getStatusOK() == true);
+        
         } catch (JMSException jMSException) {
             LOGGER.log(Level.ERROR, jMSException);
         }

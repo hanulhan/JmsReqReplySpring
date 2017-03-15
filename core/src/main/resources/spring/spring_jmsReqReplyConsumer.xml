@@ -27,7 +27,7 @@
         <property name="filterPropertyName"     value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
         <property name="maxMessageLength"       value="#{bean_ReqReplySettings.getMaxMessageLength()}" />
         <property name="serverId"               value="#{bean_ReqReplySettings.getServerId()}" />
-        <property name="filterPropertyInstance" ref="bean_FilterPropertyInstance" />
+        <property name="filterPropertyInstance" ref="bean_FilterPropertyDelegator" />
     </bean>
 
     

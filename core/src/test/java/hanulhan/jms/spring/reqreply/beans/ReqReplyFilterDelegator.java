@@ -13,11 +13,11 @@ import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
  *
  * @author uhansen
  */
-public class ReqReplyFilter implements ReqReplyFilterInterface {
+public class ReqReplyFilterDelegator implements ReqReplyFilterInterface {
 
     private List<String> identList= new ArrayList<>();
 
-    public ReqReplyFilter() {
+    public ReqReplyFilterDelegator() {
         super();
     }
     

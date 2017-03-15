@@ -25,14 +25,14 @@
 
     <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
         <property name="destination"        ref="bean_vmReqTopic" />
-        <property name="maxMessageLength"   value="10" />
+        <property name="maxMessageLength"   value="50" />
         <property name="serverId"           value="B2B-1" />
         <property name="filterPropertyName" value="systemIdent" />
     </bean>
 
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${jms.broker.url}" />
+        <property name="brokerURL" value="tcp://localhost:61616" />
         <property name="sendTimeout" value="0" />
     </bean>
 
@@ -63,16 +63,6 @@
         <property name="sessionCacheSize" value="10" />
     </bean>
 
-    <!--    <bean id="bean_PooledJmsConnectionFactory"
-          class="org.apache.activemq.pool.PooledConnectionFactory"
-          init-method="start" destroy-method="stop">
-        <property name="maxConnections" value="15" />
-        <property name="connectionFactory" ref="bean_amqConnectionFactory" />
-        <property name="expiryTimeout" value="-1" />
-        <property name="maximumActive" value="100" />
-    </bean>-->
-                                                
-                                                
     <bean id="bean_SingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
         <description>
             This SingleConnectionFactory is useful for testing and standalone 
@@ -84,10 +74,11 @@
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
     
+    <!-- Which connectionFactory should be used -->
     <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
        
     <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
-        <property name="pubSubDomain" value="true" />
+        <property name="pubSubDomain" value="false" />
         <property name="connectionFactory" ref="bean_DefaultConnectionFactory" />
     </bean>
     
@@ -106,7 +97,7 @@
         <property name="jmsTemplate" ref="bean_jmsTopicTemplate" />
     </bean>
 
-    <bean id="bean_FilterPropertyInstance" class="hanulhan.jms.spring.reqreply.beans.ReqReplyFilter">
+    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.beans.ReqReplyFilterDelegator">
         <property name="identList">
             <list>
                 <value>AAAA</value>
@@ -132,11 +123,5 @@
           p:durableSubscriptionName="sampleSubscriber"-->
 
     
-    <!--    <jms:listener-container connection-factory="bean_SingleConnectionFactory" 
-                            container-type="default"
-                            acknowledge="auto"
-                            destination-type="topic"  >
-        <jms:listener destination="vmReqTopic" ref="bean_jmsReqReplyConsumer" method="receive"/>
-    </jms:listener-container>    -->
     
 </beans>

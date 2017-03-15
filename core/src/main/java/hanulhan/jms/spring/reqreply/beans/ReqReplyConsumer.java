@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.jms.core.JmsTemplate;
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
+import hanulhan.jms.spring.reqreply.util.ReqReplyReturnObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import javax.annotation.PostConstruct;
 import javax.jms.MessageListener;
@@ -40,6 +41,7 @@ public class ReqReplyConsumer implements MessageListener {
     // internal
     private static final Logger LOGGER = Logger.getLogger(ReqReplyConsumer.class);
     private String filterPropertyValue;
+    private ReqReplyReturnObject myResponse= new ReqReplyReturnObject();
 
     @PostConstruct
     public void postConstruct() {
@@ -98,6 +100,7 @@ public class ReqReplyConsumer implements MessageListener {
 
                 // Send an ACK first
                 ReqReplyMessageCreator myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId, false);
+                myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK);
                 jmsTemplate.send(myResponseDestination, myResponseCreator);
 
                 String myResponse = filterPropertyInstance.getPropertyFilterResult(filterPropertyValue);
@@ -120,6 +123,7 @@ public class ReqReplyConsumer implements MessageListener {
                     myResponseCreator = new ReqReplyMessageCreator(myMessagePart, correlationId, false);
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT, myMsgCount);
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT, i + 1);
+                    myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD);
                    
                     LOGGER.log(Level.INFO, "Server(" + serverId + ") send response ("
                             + (i + 1)

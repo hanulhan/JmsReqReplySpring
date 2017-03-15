@@ -18,7 +18,7 @@
     </logger>    
 
     <logger name="hanulhan.jms.spring">
-        <level value="TRACE" />
+        <level value="DEBUG" />
     </logger>    
 
     <logger name="org.springframework.jms">
