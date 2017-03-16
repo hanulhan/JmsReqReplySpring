@@ -14,10 +14,8 @@ import javax.jms.Destination;
 public class ReqReplySettings {
     public static final String PROPERTY_NAME_COUNT = "MSG_COUNT";
     public static final String PROPERTY_NAME_TOTAL_COUNT = "TOTAL_COUNT";
-    public static final String PROPERTY_NAME_IDENT = "SYSTEM_IDENT";
     public static final String PROPERTY_NAME_MSG_TYPE = "MSG_TYPE";
     public static final String PROPERTY_VALUE_MSG_TYPE_ACK = "MSG_TYPE_ACK";
-    public static final String PROPERTY_VALUE_MSG_TYPE_NACK = "MSG_TYPE_NACK";
     public static final String PROPERTY_VALUE_MSG_TYPE_PAYLOAD = "MSG_TYPE_PAYLOAD";
     
     private Destination destination;

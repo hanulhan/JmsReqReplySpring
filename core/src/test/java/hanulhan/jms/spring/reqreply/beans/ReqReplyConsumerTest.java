@@ -51,10 +51,10 @@ public class ReqReplyConsumerTest implements ApplicationContextAware {
      */
     @Test
     public void testMe() {
-        ReqReplyPollingProducer myReqReply= (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 100, 100);
+        ReqReplyPollingProducer myReqReply= (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 5000, 5000);
         ReqReplyReturnObject myResponse;
         try {
-            myResponse = myReqReply.sendAndAwaitingResponse("My Message", ReqReplySettings.PROPERTY_NAME_IDENT, "AAAA");
+            myResponse = myReqReply.sendAndAwaitingResponse("My Message", "SYSTEM_IDENT", "AAAA");
             Assert.assertTrue(myResponse.getStatus().toString(), myResponse.getStatusOK() == true);
         
         } catch (JMSException jMSException) {

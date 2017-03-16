@@ -12,7 +12,6 @@
 
     
     
-    
     <logger name="org.apache.activemq">
         <level value="INFO" />
     </logger>    

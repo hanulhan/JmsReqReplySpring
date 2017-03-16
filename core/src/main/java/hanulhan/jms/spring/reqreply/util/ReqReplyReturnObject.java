@@ -15,6 +15,9 @@ public class ReqReplyReturnObject {
 
     private ReqReplyStatusCode status;
     private String payload;
+    private String  msgType;
+    private int msgCount;
+    private int totalCount;
 
     public ReqReplyReturnObject() {
         super();
@@ -55,6 +58,30 @@ public class ReqReplyReturnObject {
 
     public Boolean getStatusOK() {
         return status == ReqReplyStatusCode.STATUS_OK;
+    }
+
+    public String getMsgType() {
+        return msgType;
+    }
+
+    public void setMsgType(String msgType) {
+        this.msgType = msgType;
+    }
+
+    public int getMsgCount() {
+        return msgCount;
+    }
+
+    public void setMsgCount(int msgCount) {
+        this.msgCount = msgCount;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
     }
 
 }

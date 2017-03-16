@@ -6,6 +6,7 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyReturnObject;
+import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import javax.jms.JMSException;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.log4j.Level;
@@ -49,7 +50,7 @@ public class ReqReplyPollingProducerTest implements ApplicationContextAware {
         ReqReplyPollingProducer myReqReply = (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer");
         ReqReplyReturnObject myResponse= null;
         try {
-            myResponse = myReqReply.sendAndAwaitingResponse("My Message", "AAAA");
+            myResponse = myReqReply.sendAndAwaitingResponse("My Message", "SYSTEM_IDENT", "AAAA");
             Assert.assertTrue("Error", myResponse.getStatusOK() == true);
             
         } catch (JMSException jMSException) {

@@ -27,7 +27,7 @@
         <property name="destination"        ref="bean_vmReqTopic" />
         <property name="maxMessageLength"   value="50" />
         <property name="serverId"           value="B2B-1" />
-        <property name="filterPropertyName" value="systemIdent" />
+        <property name="filterPropertyName" value="SYSTEM_IDENT" />
     </bean>
 
     

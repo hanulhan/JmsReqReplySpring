@@ -25,7 +25,7 @@ import org.springframework.jms.core.MessageCreator;
 public class ReqReplyMessageCreator implements MessageCreator {
 
     private Destination tempDest;
-    private final String correlationId;
+    private final String messageId;
     private TextMessage txtMessage;
     private Map<String, String> propertyStringMap;
     private Map<String, Integer> propertyIntMap;
@@ -33,8 +33,8 @@ public class ReqReplyMessageCreator implements MessageCreator {
     private Boolean doReply;
     private static final Logger LOGGER = Logger.getLogger(ReqReplyMessageCreator.class);
 
-    public ReqReplyMessageCreator(String aMsg, String aCorrelationId, Boolean aDoReply) {
-        this.correlationId = aCorrelationId;
+    public ReqReplyMessageCreator(String aMsg, String aMessageId, Boolean aDoReply) {
+        this.messageId = aMessageId;
         this.messageText = aMsg;
         doReply= aDoReply;
     }
@@ -46,7 +46,10 @@ public class ReqReplyMessageCreator implements MessageCreator {
 
         LOGGER.log(Level.TRACE, "ReqMessageCreator:createMessage()");
         txtMessage = aSession.createTextMessage(messageText);
-        txtMessage.setJMSCorrelationID(correlationId);
+        
+        txtMessage.setJMSCorrelationID(messageId);
+        
+        
         if (propertyStringMap != null && !propertyStringMap.isEmpty()) {
             myEntries = propertyStringMap.entrySet().iterator();
             while (myEntries.hasNext()) {

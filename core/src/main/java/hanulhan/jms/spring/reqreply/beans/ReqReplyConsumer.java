@@ -5,7 +5,6 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
-import static java.lang.Thread.sleep;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -13,7 +12,6 @@ import javax.jms.TextMessage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.jms.core.JmsTemplate;
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
@@ -71,16 +69,16 @@ public class ReqReplyConsumer implements MessageListener {
                         if (filterPropertyInstance.getPropertyFilterActive(filterPropertyValue)) {
                             handleMessage(aMessage);
                         } else {
-                            LOGGER.log(Level.TRACE, "Message received, but fiter property does not fit");
+                            LOGGER.log(Level.ERROR, "Message received, but fiter property does not fit");
                         }
                     } else {
-                        LOGGER.log(Level.TRACE, "Message received, but no filter property set");
+                        LOGGER.log(Level.ERROR, "Message received, but no filter property set");
                     }
                 } else {
-                    LOGGER.log(Level.TRACE, "No Filter property set");
+                    LOGGER.log(Level.ERROR, "No Filter property set");
                 }
             } else {
-                LOGGER.log(Level.TRACE, "Message received, but not a TextMessage");
+                LOGGER.log(Level.ERROR, "Message received, but not a TextMessage");
             }
         } catch (JMSException jMSException) {
             LOGGER.log(Level.ERROR, jMSException);
@@ -101,6 +99,7 @@ public class ReqReplyConsumer implements MessageListener {
                 // Send an ACK first
                 ReqReplyMessageCreator myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId, false);
                 myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK);
+                myResponseCreator.setStringProperty(filterPropertyName, filterPropertyValue);
                 jmsTemplate.send(myResponseDestination, myResponseCreator);
 
                 String myResponse = filterPropertyInstance.getPropertyFilterResult(filterPropertyValue);
@@ -124,7 +123,8 @@ public class ReqReplyConsumer implements MessageListener {
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT, myMsgCount);
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT, i + 1);
                     myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD);
-                   
+                    myResponseCreator.setStringProperty(filterPropertyName, filterPropertyValue);                   
+                    
                     LOGGER.log(Level.INFO, "Server(" + serverId + ") send response ("
                             + (i + 1)
                             + "/"
