@@ -25,18 +25,23 @@ import org.springframework.jms.core.MessageCreator;
 public class ReqReplyMessageCreator implements MessageCreator {
 
     private Destination tempDest;
-    private final String messageId;
+    private String messageId, correlationId;
     private TextMessage txtMessage;
     private Map<String, String> propertyStringMap;
     private Map<String, Integer> propertyIntMap;
     private final String messageText;
-    private Boolean doReply;
+    private final Boolean doReply;
     private static final Logger LOGGER = Logger.getLogger(ReqReplyMessageCreator.class);
 
-    public ReqReplyMessageCreator(String aMsg, String aMessageId, Boolean aDoReply) {
-        this.messageId = aMessageId;
+    public ReqReplyMessageCreator(String aMsg, String aCorrelationId, Boolean aDoReply) {
+        this.correlationId = aCorrelationId;
         this.messageText = aMsg;
-        doReply= aDoReply;
+        doReply = aDoReply;
+    }
+
+    public ReqReplyMessageCreator(String aMsg, Boolean aDoReply) {
+        this.messageText = aMsg;
+        doReply = aDoReply;
     }
 
     @Override
@@ -46,10 +51,14 @@ public class ReqReplyMessageCreator implements MessageCreator {
 
         LOGGER.log(Level.TRACE, "ReqMessageCreator:createMessage()");
         txtMessage = aSession.createTextMessage(messageText);
-        
-        txtMessage.setJMSCorrelationID(messageId);
-        
-        
+
+        // Use MessageId-Pattern
+        // The MessageId of the Req is set to the correlationId of the response
+        if (!doReply) {
+            // This is a reply
+            txtMessage.setJMSCorrelationID(correlationId);
+        }
+
         if (propertyStringMap != null && !propertyStringMap.isEmpty()) {
             myEntries = propertyStringMap.entrySet().iterator();
             while (myEntries.hasNext()) {
@@ -69,11 +78,12 @@ public class ReqReplyMessageCreator implements MessageCreator {
             }
         }
 
-        if (doReply)    {
+        if (doReply) {
             tempDest = aSession.createTemporaryQueue();
             LOGGER.log(Level.DEBUG, "Creating tempQueue [" + tempDest.toString() + "]");
             txtMessage.setJMSReplyTo(tempDest);
         }
+
         return txtMessage;
     }
 
@@ -98,4 +108,9 @@ public class ReqReplyMessageCreator implements MessageCreator {
     public String getMessageText() {
         return messageText;
     }
+
+    public String getMessageId() throws JMSException {
+        return txtMessage.getJMSMessageID();
+    }
+
 }

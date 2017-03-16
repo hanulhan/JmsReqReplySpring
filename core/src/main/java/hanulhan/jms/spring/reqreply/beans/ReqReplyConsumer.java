@@ -93,7 +93,9 @@ public class ReqReplyConsumer implements MessageListener {
             if (aMessage.getJMSReplyTo() != null) {
                 LOGGER.log(Level.INFO, "Server(" + serverId + ") take the msg and send ACK to " + aMessage.getJMSReplyTo().toString());
 
-                String correlationId = aMessage.getJMSCorrelationID();
+                // Use MessageId-Pattern
+                // The MessageId of the Req is set to the correlationId of the response
+                String correlationId = aMessage.getJMSMessageID();
                 Destination myResponseDestination= aMessage.getJMSReplyTo();
 
                 // Send an ACK first

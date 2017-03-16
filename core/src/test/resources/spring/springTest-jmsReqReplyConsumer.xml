@@ -78,7 +78,7 @@
     <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
        
     <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
-        <property name="pubSubDomain" value="false" />
+        <property name="pubSubDomain" value="true" />
         <property name="connectionFactory" ref="bean_DefaultConnectionFactory" />
     </bean>
     

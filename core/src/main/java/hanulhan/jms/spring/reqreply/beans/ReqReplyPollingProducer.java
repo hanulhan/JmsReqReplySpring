@@ -40,7 +40,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
     static final Logger LOGGER = Logger.getLogger(ReqReplyPollingProducer.class);
     private String filterName;
     private String filterValue;
-    private String correlationId;
+    private String messageId;
 
     public ReqReplyPollingProducer() {
         LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:ReqReplyPollingProducer()");
@@ -58,7 +58,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         TextMessage myResponseMsg;
         Destination tempDest;
         int myReceivedMsgCount, myTotalMsgCount;
-        correlationId = createRandomString();
+//        correlationId = createRandomString();
         String[] myResponseArray = null;
         ReqReplyReturnObject myReturnObj = new ReqReplyReturnObject();
         this.filterName = aFilterName;
@@ -66,14 +66,16 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
 
         LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:sendAndAwaitingResponse()");
 
-        ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessageText, correlationId, true);
-
-        myReqMessage.setStringProperty(filterName, filterValue);
-
         {   // SEND MESSAGE
+            ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessageText, true);
+            myReqMessage.setStringProperty(filterName, filterValue);
+            
             jmsTemplate.send(destination, myReqMessage);
+            
+            messageId = myReqMessage.getMessageId();
+            LOGGER.log(Level.DEBUG, "Sending MessageId: " + messageId);
             tempDest = myReqMessage.getTempDest();
-            LOGGER.log(Level.DEBUG, "Send Message [" + myReqMessage.getMessageText() + "] to " + destination.toString());
+            LOGGER.log(Level.DEBUG, "Send Message [id:" + messageId + "] to " + destination.toString());
         }
 
         {   // RECEIVING
@@ -101,7 +103,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
             myTotalMsgCount = myResponseMsg.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT);
             myResponseArray = new String[myTotalMsgCount];
             myResponseArray[0] = myResponseMsg.getText();
-            
+
             LOGGER.log(Level.TRACE, "Expecting " + myTotalMsgCount + " Messages");
             if (myTotalMsgCount > 1) {
                 // More responses are expected
@@ -116,16 +118,15 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
                     }
                 } while (myReturnObj.getStatusOK() && myReceivedMsgCount < myTotalMsgCount);
 
-                
-                if (!myReturnObj.getStatusOK())  {
+                if (!myReturnObj.getStatusOK()) {
                     LOGGER.log(Level.DEBUG, "Payload incomplete, timeout");
                     return myReturnObj;
                 }
             }
         }
-        
+
         LOGGER.log(Level.DEBUG, "Finished Receiving");
-        
+
         if (myResponseArray != null && myResponseArray.length > 0) {
             for (String temp : myResponseArray) {
                 if (temp != null) {
@@ -146,7 +147,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         try {
             jmsTemplate.setReceiveTimeout(aTimeout);
             myResponseMsg = jmsTemplate.receive(aDestination);
-//            String resSelectorId = "JMSCorrelationID = '"+correlationId+"'";
+//            String resSelectorId = "JMSCorrelationID='"+messageId+"'";
 //            LOGGER.log(Level.DEBUG, "Selector: " + resSelectorId);
 //            myResponseMsg = jmsTemplate.receiveSelected(destination, resSelectorId);
             if (myResponseMsg == null) {
@@ -172,11 +173,11 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
 
     private ReqReplyStatusCode validate(TextMessage aMessage) throws JMSException {
 
-        if (aMessage == null)   {
+        if (aMessage == null) {
             LOGGER.log(Level.ERROR, "Timeout");
             return ReqReplyStatusCode.STATUS_RESPONSE_TIMEOUT;
         }
-        
+
         // Check if Property: "MsgType"  exists
         if (!aMessage.propertyExists(ReqReplySettings.PROPERTY_NAME_MSG_TYPE)) {
             LOGGER.log(Level.ERROR, "PropertyName: MsgType missing in response");
@@ -196,7 +197,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         }
 
         // Check for Correlation match
-        if (!aMessage.getJMSCorrelationID().equals(this.correlationId)) {
+        if (!aMessage.getJMSCorrelationID().equals(this.messageId)) {
             LOGGER.log(Level.ERROR, "MessageId mismatch in response");
             return ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
         }
