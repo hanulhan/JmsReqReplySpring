@@ -5,9 +5,9 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
+import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import java.util.ArrayList;
 import java.util.List;
-import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 
 /**
  *
