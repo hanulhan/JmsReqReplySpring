@@ -97,27 +97,19 @@
         <property name="jmsTemplate" ref="bean_jmsTopicTemplate" />
     </bean>
 
-    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.beans.ReqReplyFilterDelegator">
-        <property name="identList">
-            <list>
-                <value>AAAA</value>
-                <value>CCCC</value>
-                <value>EEEE</value>
-                <value>GGGG</value>
-            </list>
-        </property>
+    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.beans.ReqReplyStressTestFilterDelegator">
     </bean>
 
     <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSErrorHandler" />
 
-    <bean id="bean_jmsListenerContainer" 
+<!--    <bean id="bean_jmsListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
           p:connectionFactory-ref="bean_DefaultConnectionFactory"
           p:destinationName="vmReqTopic"
           p:messageListener-ref="bean_jmsReqReplyConsumer"
           p:pubSubDomain="true"
           p:errorHandler-ref="bean_jmsErrorHandler"
-          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
+          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>-->
 
 <!--              p:subscriptionDurable="true"
           p:durableSubscriptionName="sampleSubscriber"-->

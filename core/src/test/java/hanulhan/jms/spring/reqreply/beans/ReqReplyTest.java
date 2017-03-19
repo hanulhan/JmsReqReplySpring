@@ -5,8 +5,11 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
+import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import hanulhan.jms.spring.reqreply.util.ReqReplyReturnObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
+import java.util.ArrayList;
+import java.util.List;
 import javax.jms.JMSException;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.log4j.Level;
@@ -26,12 +29,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/spring/springTest-jmsReqReply.xml"})
-public class ReqReplyPollingProducerTest implements ApplicationContextAware {
+
+public class ReqReplyTest implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
-    static final Logger LOGGER = Logger.getLogger(ReqReplyPollingProducerTest.class);
+    private static final Logger LOGGER = Logger.getLogger(ReqReplyTest.class);
 
-    public ReqReplyPollingProducerTest() {
+    public ReqReplyTest() {
+
         LOGGER.log(Level.INFO, "StartBroker()");
         try {
             BrokerService broker = new BrokerService();
@@ -42,27 +47,26 @@ public class ReqReplyPollingProducerTest implements ApplicationContextAware {
         } catch (Exception exception) {
             LOGGER.log(Level.ERROR, exception);
         }
-
     }
 
+    /**
+     * Test of onReceive method, of class ReqReplyConsumer.
+     */
     @Test
-    public void doTest() {
-        ReqReplyPollingProducer myReqReply = (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer");
-        ReqReplyReturnObject myResponse= null;
+    public void testMe() {
+        ReqReplyPollingProducer myReqReply= (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 5000, 5000);
+        ReqReplyReturnObject myResponse;
         try {
             myResponse = myReqReply.sendAndAwaitingResponse("My Message", "SYSTEM_IDENT", "AAAA");
-            Assert.assertTrue("Error", myResponse.getStatusOK() == true);
-            
+            Assert.assertTrue(myResponse.getStatus().toString(), myResponse.getStatusOK() == true);
+        
         } catch (JMSException jMSException) {
             LOGGER.log(Level.ERROR, jMSException);
         }
 
+        
     }
 
-//    @Test
-    public void Test2() {
-        Assert.assertTrue("", true);
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
@@ -70,3 +74,5 @@ public class ReqReplyPollingProducerTest implements ApplicationContextAware {
     }
 
 }
+
+
