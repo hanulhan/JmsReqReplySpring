@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package hanulhan.jms.spring.reqreply.beans;
+package hanulhan.jms.spring.reqreply.util;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import java.util.ArrayList;
@@ -13,11 +13,11 @@ import java.util.List;
  *
  * @author uhansen
  */
-public class ReqReplyStressTestFilterDelegator implements ReqReplyFilterInterface {
+public class ReqReplyTestFilterDelegator implements ReqReplyFilterInterface {
 
     private List<String> identList= new ArrayList<>();
 
-    public ReqReplyStressTestFilterDelegator() {
+    public ReqReplyTestFilterDelegator() {
         super();
     }
     

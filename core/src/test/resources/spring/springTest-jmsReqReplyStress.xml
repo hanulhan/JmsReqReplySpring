@@ -13,8 +13,6 @@
       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
       http://www.springframework.org/schema/context 
       http://www.springframework.org/schema/context/spring-context-3.0.xsd
-      http://www.springframework.org/schema/tx 
-      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd      
       http://www.springframework.org/schema/jms
       http://www.springframework.org/schema/jms/spring-jms.xsd
       http://www.springframework.org/schema/task 
@@ -32,7 +30,8 @@
 
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="tcp://localhost:61616" />
+<!--        <property name="brokerURL" value="tcp://localhost:61616" />-->
+        <property name="brokerURL" value="vm://localhost?brokerConfig=xbean:activemq.xml" />
         <property name="sendTimeout" value="0" />
     </bean>
 
@@ -97,19 +96,20 @@
         <property name="jmsTemplate" ref="bean_jmsTopicTemplate" />
     </bean>
 
-    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.beans.ReqReplyStressTestFilterDelegator">
-    </bean>
+    <bean id="bean_HotelList" class="hanulhan.jms.spring.reqreply.util.ReqReplyStressTestHotelList" scope="singleton" />
+
+    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.util.ReqReplyStressTestFilterDelegator" scope="singleton" />
 
     <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSErrorHandler" />
 
-<!--    <bean id="bean_jmsListenerContainer" 
+    <bean id="bean_jmsListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
           p:connectionFactory-ref="bean_DefaultConnectionFactory"
           p:destinationName="vmReqTopic"
           p:messageListener-ref="bean_jmsReqReplyConsumer"
           p:pubSubDomain="true"
           p:errorHandler-ref="bean_jmsErrorHandler"
-          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>-->
+          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
 <!--              p:subscriptionDurable="true"
           p:durableSubscriptionName="sampleSubscriber"-->

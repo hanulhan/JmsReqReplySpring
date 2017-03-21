@@ -91,7 +91,8 @@ public class ReqReplyConsumer implements MessageListener {
         // Handle the Filter property
         try {
             if (aMessage.getJMSReplyTo() != null) {
-                LOGGER.log(Level.INFO, "Server(" + serverId + ") take the msg and send ACK to " + aMessage.getJMSReplyTo().toString());
+                LOGGER.log(Level.INFO, "Server(" + serverId + ") send response for filter " + this.filterPropertyValue);
+//                LOGGER.log(Level.DEBUG, "Server(" + serverId + ") take the msg and send ACK to " + aMessage.getJMSReplyTo().toString());
 
                 // Use MessageId-Pattern
                 // The MessageId of the Req is set to the correlationId of the response
@@ -115,7 +116,7 @@ public class ReqReplyConsumer implements MessageListener {
                 int myEndIndex;
                 for (int i = 0; i < myMsgCount; i++) {
                     myStartIndex = i * maxMessageLength;
-                    myEndIndex   = ((i + 1) * maxMessageLength) -1;
+                    myEndIndex   = ((i + 1) * maxMessageLength);
                     if (myEndIndex > myResponse.length())   {
                         myEndIndex = myResponse.length();
                     }
@@ -127,7 +128,7 @@ public class ReqReplyConsumer implements MessageListener {
                     myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD);
                     myResponseCreator.setStringProperty(filterPropertyName, filterPropertyValue);                   
                     
-                    LOGGER.log(Level.INFO, "Server(" + serverId + ") send response ("
+                    LOGGER.log(Level.DEBUG, "Server(" + serverId + ") send response ("
                             + (i + 1)
                             + "/"
                             + myMsgCount

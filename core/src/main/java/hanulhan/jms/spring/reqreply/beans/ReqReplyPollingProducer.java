@@ -126,11 +126,12 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         }
 
         LOGGER.log(Level.DEBUG, "Finished Receiving");
+        LOGGER.log(Level.INFO, "Client received response for " + aFilterValue);
 
         if (myResponseArray != null && myResponseArray.length > 0) {
             for (String temp : myResponseArray) {
                 if (temp != null) {
-                    myReturnObj.concat(temp);
+                    myReturnObj.concatPayload(temp);
                 }
             }
         }
@@ -161,7 +162,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
             }
 
             myMilliSeconds = (int) ((new Date().getTime() - myStartTime.getTime()));
-            LOGGER.log(Level.INFO, "Client receive TextMessage in " + myMilliSeconds + "ms from " + aDestination.toString());
+            LOGGER.log(Level.DEBUG, "Client receive TextMessage in " + myMilliSeconds + "ms from " + aDestination.toString());
 
         } catch (JmsException jmsException) {
             LOGGER.log(Level.ERROR, jmsException);

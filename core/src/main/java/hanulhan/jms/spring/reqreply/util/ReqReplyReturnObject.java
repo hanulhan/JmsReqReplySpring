@@ -48,12 +48,12 @@ public class ReqReplyReturnObject {
         this.payload = payload;
     }
 
-    public String concat(String str) {
+    public void concatPayload(String str) {
         int otherLen = str.length();
         if (otherLen == 0) {
-            return payload;
+            return;
         }
-        return payload.concat(str);
+        payload+= str;
     }
 
     public Boolean getStatusOK() {

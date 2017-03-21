@@ -97,7 +97,7 @@
         <property name="jmsTemplate" ref="bean_jmsTopicTemplate" />
     </bean>
 
-    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.beans.ReqReplyTestFilterDelegator">
+    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.util.ReqReplyTestFilterDelegator">
         <property name="identList">
             <list>
                 <value>AAAA</value>

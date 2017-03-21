@@ -25,6 +25,8 @@
         <jms.broker.service.url>service:jmx:rmi:///jndi/rmi://${jms.broker.remote.ip}:${jmx.rmi.server.port}/jmxrmi</jms.broker.service.url>        
         <jms.broker.mbean.objectName></jms.broker.mbean.objectName>
         
+        <jms.broker.data.directory>${project.build.directory}/ActiveMQ-Data</jms.broker.data.directory>        
+        
         <jms.broker.send.timeout></jms.broker.send.timeout>
 
         <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -84,6 +86,12 @@
                 <artifactId>spring-test</artifactId>
                 <version>${version.org.springframework}</version> 
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.xbean</groupId>
+                <artifactId>xbean-spring</artifactId>
+                <version>3.4.3</version>
             </dependency>
 
             <!-- STRUTS -->
