@@ -32,11 +32,12 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
     // injected stuff
     private ApplicationContext applicationContext;
     private JmsTemplate jmsTemplate;
-    private Destination destination;
+    private Destination requestDestination;
+    private Destination replyDestination;
 
     // internal
-    private final int waitForAckMilliSec;
-    private final int waitForResponseMilliSec;
+    private final long waitForAckMilliSec;
+    private final long waitForResponseMilliSec;
     static final Logger LOGGER = Logger.getLogger(ReqReplyPollingProducer.class);
     private String filterName;
     private String filterValue;
@@ -56,9 +57,8 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
 
     public ReqReplyReturnObject sendAndAwaitingResponse(String aMessageText, String aFilterName, String aFilterValue) throws JMSException {
         TextMessage myResponseMsg;
-        Destination tempDest;
+
         int myReceivedMsgCount, myTotalMsgCount;
-//        correlationId = createRandomString();
         String[] myResponseArray = null;
         ReqReplyReturnObject myReturnObj = new ReqReplyReturnObject();
         this.filterName = aFilterName;
@@ -67,109 +67,157 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:sendAndAwaitingResponse()");
 
         {   // SEND MESSAGE
-            ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessageText, true);
+            ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessageText, replyDestination);
             myReqMessage.setStringProperty(filterName, filterValue);
-            
-            jmsTemplate.send(destination, myReqMessage);
-            
+
+            jmsTemplate.send(requestDestination, myReqMessage);
+
             messageId = myReqMessage.getMessageId();
-            LOGGER.log(Level.DEBUG, "Sending MessageId: " + messageId);
-            tempDest = myReqMessage.getTempDest();
-            LOGGER.log(Level.DEBUG, "Send Message [id:" + messageId + "] to " + destination.toString());
+            LOGGER.log(Level.INFO, "Sending MessageId: " + messageId);
+            LOGGER.log(Level.DEBUG, "Send Message [id:" + messageId + "] to " + requestDestination.toString());
         }
 
         {   // RECEIVING
-            LOGGER.log(Level.DEBUG, "Waiting for Respionse on: " + tempDest.toString());
+            LOGGER.log(Level.DEBUG, "WAITING FOR ACK on: " + replyDestination.toString());
 
             // Wait for ACK
-            myResponseMsg = ReceiveTextMessage(tempDest, waitForAckMilliSec);
-            myReturnObj.setStatus(validate(myResponseMsg));
-            if (!myReturnObj.getStatusOK()) {
+            if (!AwaitingAck()) {
                 LOGGER.log(Level.DEBUG, "No ACK received within " + waitForAckMilliSec + " ms");
+                myReturnObj.setStatus(ReqReplyStatusCode.STATUS_RESPONSE_TIMEOUT);
                 return myReturnObj;
+            } else {
+                LOGGER.log(Level.DEBUG, "ACK received ");
             }
 
-            // Wait for first data
-            myResponseMsg = ReceiveTextMessage(tempDest, waitForResponseMilliSec);
-            myReturnObj.setStatus(validate(myResponseMsg));
-            if (!myReturnObj.getStatusOK()) {
-                LOGGER.log(Level.DEBUG, "No payload received within " + waitForAckMilliSec + " ms");
-                return myReturnObj;
-            }
-
-            // First data received. Check quantity of total messages
-            myReceivedMsgCount = 1;
-
-            myTotalMsgCount = myResponseMsg.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT);
-            myResponseArray = new String[myTotalMsgCount];
-            myResponseArray[0] = myResponseMsg.getText();
-
-            LOGGER.log(Level.TRACE, "Expecting " + myTotalMsgCount + " Messages");
-            if (myTotalMsgCount > 1) {
-                // More responses are expected
-
-                do {
-                    // wait for respnse 3 and more
-                    myResponseMsg = ReceiveTextMessage(tempDest, waitForResponseMilliSec);
-                    myReturnObj.setStatus(validate(myResponseMsg));
-                    if (myReturnObj.getStatusOK()) {
-                        myResponseArray[myReceivedMsgCount] = myResponseMsg.getText();
-                        myReceivedMsgCount++;
-                    }
-                } while (myReturnObj.getStatusOK() && myReceivedMsgCount < myTotalMsgCount);
-
-                if (!myReturnObj.getStatusOK()) {
-                    LOGGER.log(Level.DEBUG, "Payload incomplete, timeout");
-                    return myReturnObj;
-                }
-            }
+            LOGGER.log(Level.DEBUG, "WAITING FOR RESPONSE on: " + replyDestination.toString());
+            myReturnObj = AwaitingResponse();
         }
-
-        LOGGER.log(Level.DEBUG, "Finished Receiving");
-        LOGGER.log(Level.INFO, "Client received response for " + aFilterValue);
-
-        if (myResponseArray != null && myResponseArray.length > 0) {
-            for (String temp : myResponseArray) {
-                if (temp != null) {
-                    myReturnObj.concatPayload(temp);
-                }
-            }
-        }
-
         return myReturnObj;
     }
 
-    private TextMessage ReceiveTextMessage(Destination aDestination, int aTimeout) {
-
-        int myMilliSeconds;
+    private ReqReplyReturnObject AwaitingResponse() {
+        long myReceiveTimeout;
+        long myMilliSeconds = 0;
         Date myStartTime = new Date();
-        Message myResponseMsg = null;
+        TextMessage myMessage;
+        int myReceivedMsgCount = 0, myTotalMsgCount = 0, myMsgCount;
 
-        try {
-            jmsTemplate.setReceiveTimeout(aTimeout);
-            myResponseMsg = jmsTemplate.receive(aDestination);
-//            String resSelectorId = "JMSCorrelationID='"+messageId+"'";
-//            LOGGER.log(Level.DEBUG, "Selector: " + resSelectorId);
-//            myResponseMsg = jmsTemplate.receiveSelected(destination, resSelectorId);
-            if (myResponseMsg == null) {
-                return null;
-            }
+        String[] myResponseArray = null;
+        ReqReplyReturnObject myReturnObj = new ReqReplyReturnObject();
 
-            // Check if Msg is a TextMessage
-            if (!(myResponseMsg instanceof TextMessage)) {
-                LOGGER.log(Level.ERROR, "Response is not a TextMessage");
-                return null;
+        do {
+            try {
+                myReceiveTimeout = waitForResponseMilliSec - myMilliSeconds;
+                LOGGER.log(Level.DEBUG, "Start over receiving. timeout: " + myReceiveTimeout + " ms");
+                myMessage = ReceiveTextMessage(myReceiveTimeout);
+
+                myReturnObj.setStatus(validate(myMessage));
+                if (myReturnObj.getStatusOK()) {
+                    myReceivedMsgCount++;
+
+                    myMsgCount = myMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT);
+                    if (myResponseArray == null) {
+                        // Its the first Message
+                        myTotalMsgCount = myMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT);
+                        myResponseArray = new String[myTotalMsgCount];
+                    }
+                    LOGGER.log(Level.DEBUG, "Received Message (" + myMsgCount + "/" + myTotalMsgCount + ")");
+                    myResponseArray[myMsgCount - 1] = myMessage.getText();
+                    if (myMsgCount == 8) {
+                        LOGGER.log(Level.DEBUG, "Last Packet");
+                    }
+                } else {
+                    LOGGER.log(Level.DEBUG, "validate not ok");
+                }
+            } catch (JMSException jMSException) {
+                LOGGER.log(Level.ERROR, jMSException);
             }
 
             myMilliSeconds = (int) ((new Date().getTime() - myStartTime.getTime()));
-            LOGGER.log(Level.DEBUG, "Client receive TextMessage in " + myMilliSeconds + "ms from " + aDestination.toString());
+            if (waitForResponseMilliSec - myMilliSeconds < 2) {
+                myMilliSeconds = waitForResponseMilliSec;
+            }
 
-        } catch (JmsException jmsException) {
-            LOGGER.log(Level.ERROR, jmsException);
+            LOGGER.log(Level.DEBUG, "Receive runs since " + myMilliSeconds);
+        } while ((myMilliSeconds < waitForResponseMilliSec) && (myReturnObj.getStatusError() || (myReceivedMsgCount < myTotalMsgCount)));
+
+        if (myReturnObj.getStatusOK() && myReceivedMsgCount == myTotalMsgCount) {
+            if (myResponseArray != null && myResponseArray.length > 0) {
+                for (String temp : myResponseArray) {
+                    if (temp != null) {
+                        myReturnObj.concatPayload(temp);
+                    }
+                }
+            }
+        }
+        return myReturnObj;
+    }
+
+    private TextMessage ReceiveTextMessage(long aTimeout) {
+
+        long myMilliSeconds;
+        Date myStartTime = new Date();
+        Message myResponseMsg = null;
+        TextMessage myTextMsg;
+        String myMsgPayload;
+
+        jmsTemplate.setReceiveTimeout((int) aTimeout);
+        myResponseMsg = jmsTemplate.receive(replyDestination);
+//            String resSelectorId = "JMSCorrelationID='"+messageId+"'";
+//            LOGGER.log(Level.DEBUG, "Selector: " + resSelectorId);
+//            myResponseMsg = jmsTemplate.receiveSelected(destination, resSelectorId);
+        if (myResponseMsg == null) {
             return null;
         }
 
+        // Check if Msg is a TextMessage
+        if (!(myResponseMsg instanceof TextMessage)) {
+            LOGGER.log(Level.ERROR, "Response is not a TextMessage");
+            return null;
+        } else {
+            myTextMsg = (TextMessage) myResponseMsg;
+            try {
+                myMsgPayload = myTextMsg.getText();
+                myMilliSeconds = (int) ((new Date().getTime() - myStartTime.getTime()));
+                LOGGER.log(Level.DEBUG, "Client receive TextMessage: [" + ((TextMessage) myResponseMsg).getText() + "] in " + myMilliSeconds + "ms from " + replyDestination.toString());
+            } catch (JMSException jMSException) {
+                LOGGER.log(Level.ERROR, jMSException);
+            }
+        }
+
+//            LOGGER.log(Level.DEBUG, "Client receive TextMessage in " + myMilliSeconds + "ms from " + aDestination.toString());
         return (TextMessage) myResponseMsg;
+    }
+
+    private Boolean AwaitingAck() {
+        long myMilliSeconds;
+        Date myStartTime = new Date();
+        TextMessage myResponseMsg;
+//        ReqReplyStatusCode myStatus;
+        long myReceiveTimeout;
+        ReqReplyReturnObject myReturnObj = new ReqReplyReturnObject();
+
+        myMilliSeconds = 0;
+        do {
+            try {
+                myReceiveTimeout = waitForAckMilliSec - myMilliSeconds;
+                if (myReceiveTimeout < 0) {
+                    myReceiveTimeout = 10;
+                }
+                LOGGER.log(Level.DEBUG, "Set ReceiveTimeout to " + myReceiveTimeout + " ms");
+
+                myResponseMsg = ReceiveTextMessage((int) myReceiveTimeout);
+
+                myReturnObj.setStatus(validate(myResponseMsg));
+
+                myMilliSeconds = (new Date().getTime() - myStartTime.getTime());
+            } catch (JMSException ex) {
+                LOGGER.log(Level.ERROR, ex);
+            }
+
+        } while (myMilliSeconds < waitForAckMilliSec && myReturnObj.getStatusError());
+
+        return myReturnObj.getStatusOK();
     }
 
     private ReqReplyStatusCode validate(TextMessage aMessage) throws JMSException {
@@ -203,6 +251,8 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
             return ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
         }
 
+//        String msgTypeReceived = aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE);
+//        String msgType = ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK;
         // More checks for MsgType: payload
         if (aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE).equals(ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD)) {
 
@@ -215,17 +265,12 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
                 LOGGER.log(Level.ERROR, "Property TOTAL_COUNT missing");
                 return ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR;
             }
-
+        } else if (!aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE).equals(ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK)) {
+            LOGGER.log(Level.ERROR, "PropertyName: MsgType not set properly");
+            return ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR;
         }
 
         return ReqReplyStatusCode.STATUS_OK;
-    }
-
-    private String createRandomString() {
-        Random random;
-        random = new Random(System.currentTimeMillis());
-        long randomLong = random.nextLong();
-        return Long.toHexString(randomLong);
     }
 
     public JmsTemplate getJmsTemplate() {
@@ -236,12 +281,20 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         this.jmsTemplate = jmsTemplate;
     }
 
-    public Destination getDestination() {
-        return destination;
+    public Destination getRequestDestination() {
+        return requestDestination;
     }
 
-    public void setDestination(Destination destination) {
-        this.destination = destination;
+    public void setRequestDestination(Destination requestDestination) {
+        this.requestDestination = requestDestination;
+    }
+
+    public Destination getReplyDestination() {
+        return replyDestination;
+    }
+
+    public void setReplyDestination(Destination replyDestination) {
+        this.replyDestination = replyDestination;
     }
 
     @Override

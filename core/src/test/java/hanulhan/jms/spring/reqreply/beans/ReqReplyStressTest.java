@@ -43,16 +43,16 @@ public class ReqReplyStressTest implements ApplicationContextAware {
     static SecureRandom rnd = new SecureRandom();
 
     // Test Setup
-    private static final int HOTEL_QUANTITY = 20;
+    private static final int HOTEL_QUANTITY = 1;
     static final long THREAD_MAX_SLEEP_TIME_MS = 500;
     static final long THREAD_MIN_SLEEP_TIME_MS = 50;
     static final long RESPNSE_MAX_STRING_LENGTH = 200;
     static final long TEST_RUN_TIME_SECONDS = 10;
+    static final long TEST_WAIT_TO_FINISH_SECONDS = 5;
 
     public class WebAction extends Thread {
 
         private final ReqReplyStressTestHotel hotel;
-        private long sleepTime;
         private int webCallQuantity;
         private int webCallErrorCount;
         private int webCallErrorTimeoutCount;
@@ -85,42 +85,40 @@ public class ReqReplyStressTest implements ApplicationContextAware {
         @Override
         @SuppressWarnings("SleepWhileInLoop")
         public void run() {
-            try {
-                while (this.run) {
-                    this.sleepTime = randomNumber(THREAD_MIN_SLEEP_TIME_MS, THREAD_MAX_SLEEP_TIME_MS);
-                    Thread.sleep(sleepTime);
-                    LOGGER.log(Level.INFO, "WebAction [" + this.hotel.getSystemIdent() + "] run");
+            Date myStartTime;
+            long sleepTime;
+            long myMilliSeconds;
+            while (this.run) {
+                sleepTime = randomNumber(THREAD_MIN_SLEEP_TIME_MS, THREAD_MAX_SLEEP_TIME_MS);
+                myStartTime = new Date();
+                do {
+                    myMilliSeconds = (int) ((new Date().getTime() - myStartTime.getTime()));
+                } while (myMilliSeconds < sleepTime);
 
-                    webCallQuantity++;
-                    ReqReplyPollingProducer myReqReply = (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 1000, 1000);
-                    ReqReplyReturnObject myResponse;
-                    try {
-                        myResponse = myReqReply.sendAndAwaitingResponse("REQUEST", "SYSTEM_IDENT", hotel.getSystemIdent());
+                LOGGER.log(Level.INFO, "WebAction [" + this.hotel.getSystemIdent() + "] run");
 
-                        if (!hotel.compareResponse(myResponse.getPayload())) {
-                            LOGGER.log(Level.ERROR, "NO RESPONSE MATCH");
-                            webCallErrorCount++;
-                            if (myResponse.getStatus() == ReqReplyStatusCode.STATUS_RESPONSE_TIMEOUT) {
-                                webCallErrorTimeoutCount++;
-                            } else if (myResponse.getStatus() == ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR) {
-                                webCallErrorHeaderCount++;
-                            }
+                webCallQuantity++;
+                ReqReplyPollingProducer myReqReply = (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 1000, 2000);
+                ReqReplyReturnObject myResponse;
+                try {
+                    myResponse = myReqReply.sendAndAwaitingResponse("REQUEST", "SYSTEM_IDENT", hotel.getSystemIdent());
+
+                    if (!hotel.compareResponse(myResponse.getPayload())) {
+                        LOGGER.log(Level.ERROR, "NO RESPONSE MATCH");
+                        webCallErrorCount++;
+                        if (myResponse.getStatus() == ReqReplyStatusCode.STATUS_RESPONSE_TIMEOUT) {
+                            webCallErrorTimeoutCount++;
+                        } else if (myResponse.getStatus() == ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR) {
+                            webCallErrorHeaderCount++;
                         }
-
-                    } catch (JMSException jMSException) {
-                        LOGGER.log(Level.ERROR, jMSException);
-                    }
-                    if (Thread.currentThread().isInterrupted()) {
-                        this.run = false;
                     }
 
+                } catch (JMSException jMSException) {
+                    LOGGER.log(Level.ERROR, jMSException);
                 }
 
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.TRACE, e);
-            } catch (BeansException e) {
-                LOGGER.log(Level.ERROR, e);
             }
+
         }
 
         public int getWebCallQuantity() {
@@ -193,17 +191,15 @@ public class ReqReplyStressTest implements ApplicationContextAware {
         // Stop Threads
         LOGGER.log(Level.INFO, "Stop Clients");
         for (WebAction temp : WebActionList) {
-            temp.cancel();
+            //temp.cancel();
+            temp.stopSending();
         }
 
-        try {
-            // Wait to make sure everything is finished
-            long waitTime = 10 * THREAD_MAX_SLEEP_TIME_MS;
-            LOGGER.log(Level.INFO, "Wait " + waitTime + "s to finish");
-            Thread.sleep(waitTime);
-        } catch (InterruptedException ex) {
-            LOGGER.log(Level.ERROR, ex);
-        }
+        LOGGER.log(Level.INFO, "Wait " + TEST_WAIT_TO_FINISH_SECONDS + "s to finish");
+        startTime = new Date();
+        do {
+            seconds = (int) ((new Date().getTime() - startTime.getTime()) / 1000);
+        } while (seconds < TEST_WAIT_TO_FINISH_SECONDS);
 
         for (WebAction temp : WebActionList) {
             LOGGER.log(Level.INFO, "Hotel {"

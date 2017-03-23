@@ -17,7 +17,7 @@
     </logger>    
 
     <logger name="hanulhan.jms.spring">
-        <level value="INFO" />
+        <level value="DEBUG" />
     </logger>    
 
     <logger name="org.springframework.jms">
@@ -25,7 +25,7 @@
     </logger>    
 
     <logger name="javax.jms">
-        <level value="INFO" />
+        <level value="DEBUG" />
     </logger>    
 
 

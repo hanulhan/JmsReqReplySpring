@@ -88,6 +88,7 @@ public class ReqReplyConsumer implements MessageListener {
     private void handleMessage(Message aMessage) {
 
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::handleMessage()");
+        String myResponseText;
         // Handle the Filter property
         try {
             if (aMessage.getJMSReplyTo() != null) {
@@ -100,29 +101,31 @@ public class ReqReplyConsumer implements MessageListener {
                 Destination myResponseDestination= aMessage.getJMSReplyTo();
 
                 // Send an ACK first
-                ReqReplyMessageCreator myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId, false);
+                ReqReplyMessageCreator myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId);
                 myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK);
                 myResponseCreator.setStringProperty(filterPropertyName, filterPropertyValue);
                 jmsTemplate.send(myResponseDestination, myResponseCreator);
 
-                String myResponse = filterPropertyInstance.getPropertyFilterResult(filterPropertyValue);
+                myResponseText = filterPropertyInstance.getPropertyFilterResult(filterPropertyValue);
 
                 int myMsgCount;
-                myMsgCount = (int) Math.ceil((double)myResponse.length() / maxMessageLength);
+                myMsgCount = (int) Math.ceil((double)myResponseText.length() / maxMessageLength);
 
                 LOGGER.log(Level.TRACE, "Split Response into " + myMsgCount + " pieces");
 
                 int myStartIndex;
                 int myEndIndex;
+                String myMessagePart;
+                
                 for (int i = 0; i < myMsgCount; i++) {
                     myStartIndex = i * maxMessageLength;
-                    myEndIndex   = ((i + 1) * maxMessageLength);
-                    if (myEndIndex > myResponse.length())   {
-                        myEndIndex = myResponse.length();
+                    myEndIndex   = ((i + 1) * maxMessageLength) - 1;
+                    if (myEndIndex >= myResponseText.length())   {
+                        myEndIndex = myResponseText.length()-1;
                     }
-                    String myMessagePart = myResponse.substring(myStartIndex, myEndIndex);
+                    myMessagePart = myResponseText.substring(myStartIndex, myEndIndex + 1);
                     
-                    myResponseCreator = new ReqReplyMessageCreator(myMessagePart, correlationId, false);
+                    myResponseCreator = new ReqReplyMessageCreator(myMessagePart, correlationId);
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT, myMsgCount);
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT, i + 1);
                     myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD);
@@ -136,6 +139,7 @@ public class ReqReplyConsumer implements MessageListener {
                             + myStartIndex 
                             + "-"
                             + myEndIndex
+                            + " [" + myMessagePart + "]"
                             + " to " + myResponseDestination.toString());
 
                     jmsTemplate.send(myResponseDestination, myResponseCreator);

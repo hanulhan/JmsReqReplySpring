@@ -24,25 +24,30 @@ import org.springframework.jms.core.MessageCreator;
  */
 public class ReqReplyMessageCreator implements MessageCreator {
 
-    private Destination tempDest;
+    private Destination replyDestination= null;
     private String messageId, correlationId;
     private TextMessage txtMessage;
     private Map<String, String> propertyStringMap;
     private Map<String, Integer> propertyIntMap;
     private final String messageText;
-    private final Boolean doReply;
     private static final Logger LOGGER = Logger.getLogger(ReqReplyMessageCreator.class);
 
-    public ReqReplyMessageCreator(String aMsg, String aCorrelationId, Boolean aDoReply) {
-        this.correlationId = aCorrelationId;
+
+    public ReqReplyMessageCreator(String aMsg, Destination aReplyDestination) {
         this.messageText = aMsg;
-        doReply = aDoReply;
+        this.replyDestination= aReplyDestination;
     }
 
-    public ReqReplyMessageCreator(String aMsg, Boolean aDoReply) {
+
+    public ReqReplyMessageCreator(String aMsg, String aCorrelationId) {
+        this.correlationId = aCorrelationId;
         this.messageText = aMsg;
-        doReply = aDoReply;
     }
+//
+//    public ReqReplyMessageCreator(String aMsg, Boolean aDoReply) {
+//        this.messageText = aMsg;
+//        doReply = aDoReply;
+//    }
 
     @Override
     public Message createMessage(Session aSession) throws JMSException {
@@ -54,9 +59,11 @@ public class ReqReplyMessageCreator implements MessageCreator {
 
         // Use MessageId-Pattern
         // The MessageId of the Req is set to the correlationId of the response
-        if (!doReply) {
+        if (replyDestination == null) {
             // This is a reply
             txtMessage.setJMSCorrelationID(correlationId);
+        } else {
+            txtMessage.setJMSReplyTo(replyDestination);
         }
 
         if (propertyStringMap != null && !propertyStringMap.isEmpty()) {
@@ -78,12 +85,6 @@ public class ReqReplyMessageCreator implements MessageCreator {
             }
         }
 
-        if (doReply) {
-            tempDest = aSession.createTemporaryQueue();
-            LOGGER.log(Level.DEBUG, "Creating tempQueue [" + tempDest.toString() + "]");
-            txtMessage.setJMSReplyTo(tempDest);
-        }
-
         return txtMessage;
     }
 
@@ -99,10 +100,6 @@ public class ReqReplyMessageCreator implements MessageCreator {
             propertyIntMap = new HashMap<>();
         }
         propertyIntMap.put(aPropertyKey, aPropertyValue);
-    }
-
-    public Destination getTempDest() {
-        return tempDest;
     }
 
     public String getMessageText() {

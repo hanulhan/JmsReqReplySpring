@@ -6,6 +6,7 @@
 package hanulhan.jms.spring.reqreply.util;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
+import static java.lang.Thread.sleep;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,11 +37,17 @@ public class ReqReplyTestFilterDelegator implements ReqReplyFilterInterface {
 
     @Override
     public String getPropertyFilterResult(String aPropertyFilterValue) {
-        String myMg= "0123456789";
+        String myMsg= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
         String retValue= new String();
-        for (int i=0; i< 10; i++)   {
-            retValue+= myMg;
+        for (int i=0; i< 2; i++)   {
+            retValue+= myMsg;
         }
+//        try {
+//            sleep(200);
+//        } catch (Exception e) {
+//            return myMsg;
+//        }
         return retValue;
     }
 

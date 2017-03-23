@@ -16,9 +16,10 @@ import org.springframework.util.ErrorHandler;
 public class JMSErrorHandler implements ErrorHandler    {
 
     private static final Logger LOGGER = Logger.getLogger(JMSErrorHandler.class);
+    
     @Override
     public void handleError(Throwable thrwbl) {
-        LOGGER.log(Level.ERROR, thrwbl);
+        LOGGER.log(Level.ERROR, "Error in EventListener\n" + thrwbl);
     }
     
 }

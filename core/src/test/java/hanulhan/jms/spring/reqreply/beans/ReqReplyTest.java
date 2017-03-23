@@ -5,15 +5,13 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
-import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
+import static hanulhan.jms.spring.reqreply.beans.ReqReplyStressTest.TEST_WAIT_TO_FINISH_SECONDS;
 import hanulhan.jms.spring.reqreply.util.ReqReplyReturnObject;
-import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 import javax.jms.JMSException;
-import org.apache.activemq.broker.BrokerService;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,16 +35,16 @@ public class ReqReplyTest implements ApplicationContextAware {
 
     public ReqReplyTest() {
 
-        LOGGER.log(Level.INFO, "StartBroker()");
-        try {
-            BrokerService broker = new BrokerService();
-            broker.setPersistent(false);
-            broker.setUseJmx(false);
-            broker.addConnector("tcp://localhost:61616");
-            broker.start();
-        } catch (Exception exception) {
-            LOGGER.log(Level.ERROR, exception);
-        }
+//        LOGGER.log(Level.INFO, "StartBroker()");
+//        try {
+//            BrokerService broker = new BrokerService();
+//            broker.setPersistent(false);
+//            broker.setUseJmx(false);
+//            broker.addConnector("tcp://localhost:61616");
+//            broker.start();
+//        } catch (Exception exception) {
+//            LOGGER.log(Level.ERROR, exception);
+//        }
     }
 
     /**
@@ -64,6 +62,12 @@ public class ReqReplyTest implements ApplicationContextAware {
             LOGGER.log(Level.ERROR, jMSException);
         }
 
+        LOGGER.log(Level.DEBUG, "Wait 15 seconds");
+        Date startTime = new Date();
+        long seconds;
+        do {
+            seconds = (int) ((new Date().getTime() - startTime.getTime()) / 1000);
+        } while (seconds < 15);
         
     }
 
