@@ -21,7 +21,7 @@
     </logger>    
 
     <logger name="org.springframework.jms">
-        <level value="INFO" />
+        <level value="INFOI" />
     </logger>    
 
     <logger name="javax.jms">
@@ -42,9 +42,9 @@
         <level value="DEBUG" />
     </logger>-->
 
-<!--    <logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
+    <logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
         <level value="DEBUG" />
-    </logger>-->
+    </logger>
     
 
     <root>

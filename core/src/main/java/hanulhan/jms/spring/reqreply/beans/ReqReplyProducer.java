@@ -6,28 +6,29 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
-import hanulhan.jms.spring.reqreply.util.ReqReplyReturnObject;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 
 /**
  *
  * @author uhansen
  */
-public class ReqReplyPollingProducer implements ApplicationContextAware {
+public class ReqReplyProducer implements MessageListener {
 
     // injected stuff
     private ApplicationContext applicationContext;
@@ -36,31 +37,35 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
     private Destination replyDestination;
 
     // internal
-    private final long waitForAckMilliSec;
+    private Map<String, String> activeRequestMap = new HashMap<>();
+    
     private final long waitForResponseMilliSec;
-    static final Logger LOGGER = Logger.getLogger(ReqReplyPollingProducer.class);
+    static final Logger LOGGER = Logger.getLogger(ReqReplyProducer.class);
     private String filterName;
     private String filterValue;
     private String messageId;
 
-    public ReqReplyPollingProducer() {
+    public ReqReplyProducer() {
         LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:ReqReplyPollingProducer()");
-        waitForAckMilliSec = 2000;
         waitForResponseMilliSec = 2000;
     }
 
-    public ReqReplyPollingProducer(int aWaitForAck, int aWaitForResponse) {
+    public ReqReplyProducer(int aWaitForResponse) {
         LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:ReqReplyPollingProducer()");
-        waitForAckMilliSec = aWaitForAck;
-        waitForResponseMilliSec = aWaitForResponse;
     }
 
-    public ReqReplyReturnObject sendAndAwaitingResponse(String aMessageText, String aFilterName, String aFilterValue) throws JMSException {
+    
+    public void sendRequest(String aMessageText, String aFilterName, String aFilterValue)    {
+        
+    }
+    
+    
+    public ReqReplyMessageObject sendAndAwaitingResponse(String aMessageText, String aFilterName, String aFilterValue) throws JMSException {
         TextMessage myResponseMsg;
 
         int myReceivedMsgCount, myTotalMsgCount;
         String[] myResponseArray = null;
-        ReqReplyReturnObject myReturnObj = new ReqReplyReturnObject();
+        ReqReplyMessageObject myReturnObj = new ReqReplyMessageObject();
         this.filterName = aFilterName;
         this.filterValue = aFilterValue;
 
@@ -95,7 +100,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         return myReturnObj;
     }
 
-    private ReqReplyReturnObject AwaitingResponse() {
+    private ReqReplyMessageObject AwaitingResponse() {
         long myReceiveTimeout;
         long myMilliSeconds = 0;
         Date myStartTime = new Date();
@@ -103,7 +108,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         int myReceivedMsgCount = 0, myTotalMsgCount = 0, myMsgCount;
 
         String[] myResponseArray = null;
-        ReqReplyReturnObject myReturnObj = new ReqReplyReturnObject();
+        ReqReplyMessageObject myReturnObj = new ReqReplyMessageObject();
 
         do {
             try {
@@ -195,7 +200,7 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         TextMessage myResponseMsg;
 //        ReqReplyStatusCode myStatus;
         long myReceiveTimeout;
-        ReqReplyReturnObject myReturnObj = new ReqReplyReturnObject();
+        ReqReplyMessageObject myReturnObj = new ReqReplyMessageObject();
 
         myMilliSeconds = 0;
         do {
@@ -224,25 +229,25 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
 
         if (aMessage == null) {
             LOGGER.log(Level.ERROR, "Timeout");
-            return ReqReplyStatusCode.STATUS_RESPONSE_TIMEOUT;
+            return ReqReplyStatusCode.STATUS_TIMEOUT;
         }
 
         // Check if Property: "MsgType"  exists
         if (!aMessage.propertyExists(ReqReplySettings.PROPERTY_NAME_MSG_TYPE)) {
             LOGGER.log(Level.ERROR, "PropertyName: MsgType missing in response");
-            return ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR;
+            return ReqReplyStatusCode.STATUS_HEADER_ERROR;
         }
 
         // Check if Property: <FilterName>  exists
         if (!aMessage.propertyExists(this.filterName)) {
             LOGGER.log(Level.ERROR, "FilterProperty: " + this.filterName + " missing in response");
-            return ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR;
+            return ReqReplyStatusCode.STATUS_HEADER_ERROR;
         }
 
         // Check if Filter-Property match
         if (!aMessage.getStringProperty(this.filterName).equals(this.filterValue)) {
             LOGGER.log(Level.ERROR, "FilterProperty mismatch in response");
-            return ReqReplyStatusCode.STATUS_RESPONSE_FILTER_MISMATCH;
+            return ReqReplyStatusCode.STATUS_FILTER_MISMATCH;
         }
 
         // Check for Correlation match
@@ -258,20 +263,21 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
 
             if (!aMessage.propertyExists(ReqReplySettings.PROPERTY_NAME_COUNT)) {
                 LOGGER.log(Level.ERROR, "Property COUNT missing");
-                return ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR;
+                return ReqReplyStatusCode.STATUS_HEADER_ERROR;
             }
 
             if (!aMessage.propertyExists(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT)) {
                 LOGGER.log(Level.ERROR, "Property TOTAL_COUNT missing");
-                return ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR;
+                return ReqReplyStatusCode.STATUS_HEADER_ERROR;
             }
         } else if (!aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE).equals(ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK)) {
             LOGGER.log(Level.ERROR, "PropertyName: MsgType not set properly");
-            return ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR;
+            return ReqReplyStatusCode.STATUS_HEADER_ERROR;
         }
 
         return ReqReplyStatusCode.STATUS_OK;
     }
+
 
     public JmsTemplate getJmsTemplate() {
         return jmsTemplate;
@@ -297,9 +303,13 @@ public class ReqReplyPollingProducer implements ApplicationContextAware {
         this.replyDestination = replyDestination;
     }
 
-    @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
         this.applicationContext = ac;
+    }
+
+    @Override
+    public void onMessage(Message message) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

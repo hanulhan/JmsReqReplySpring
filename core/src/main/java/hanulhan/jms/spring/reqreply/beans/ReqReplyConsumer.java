@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
-import hanulhan.jms.spring.reqreply.util.ReqReplyReturnObject;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import javax.annotation.PostConstruct;
 import javax.jms.MessageListener;
@@ -30,21 +30,22 @@ public class ReqReplyConsumer implements MessageListener {
 
     // injected stuff
     private JmsTemplate jmsTemplate;
-    private Destination destination;
+    private Destination reqDestination;
     private String filterPropertyName;
-    private ReqReplyFilterInterface filterPropertyInstance;
+    
+    private ReqReplyFilterInterface filterPropertyDelegator;
     private String serverId;
     private Integer maxMessageLength;
 
     // internal
     private static final Logger LOGGER = Logger.getLogger(ReqReplyConsumer.class);
     private String filterPropertyValue;
-    private ReqReplyReturnObject myResponse= new ReqReplyReturnObject();
+    private ReqReplyMessageObject myResponse= new ReqReplyMessageObject();
 
     @PostConstruct
     public void postConstruct() {
         LOGGER.log(Level.TRACE, "ReqReplyConsuer:postConstuct");
-        LOGGER.log(Level.TRACE, "destination: " + destination.toString());
+        LOGGER.log(Level.TRACE, "Req-Destination: " + reqDestination.toString());
         LOGGER.log(Level.TRACE, "jmsTemplate: " + jmsTemplate.toString());
         LOGGER.log(Level.TRACE, "filterPropertyName: " + filterPropertyName);
         LOGGER.log(Level.TRACE, "maxMessageLength: " + maxMessageLength);
@@ -66,7 +67,7 @@ public class ReqReplyConsumer implements MessageListener {
                         LOGGER.log(Level.TRACE, "Filter property in Message: " + aMessage.getStringProperty(filterPropertyName));
                         filterPropertyValue= aMessage.getStringProperty(filterPropertyName);
                         // Check if the filter-property should be handled
-                        if (filterPropertyInstance.getPropertyFilterActive(filterPropertyValue)) {
+                        if (filterPropertyDelegator.getPropertyFilterActive(filterPropertyValue)) {
                             handleMessage(aMessage);
                         } else {
                             LOGGER.log(Level.ERROR, "Message received, but fiter property does not fit");
@@ -106,7 +107,7 @@ public class ReqReplyConsumer implements MessageListener {
                 myResponseCreator.setStringProperty(filterPropertyName, filterPropertyValue);
                 jmsTemplate.send(myResponseDestination, myResponseCreator);
 
-                myResponseText = filterPropertyInstance.getPropertyFilterResult(filterPropertyValue);
+                myResponseText = filterPropertyDelegator.getPropertyFilterResult(filterPropertyValue);
 
                 int myMsgCount;
                 myMsgCount = (int) Math.ceil((double)myResponseText.length() / maxMessageLength);
@@ -150,13 +151,6 @@ public class ReqReplyConsumer implements MessageListener {
         }
     }
 
-    public Destination getDestination() {
-        return destination;
-    }
-
-    public void setDestination(Destination destination) {
-        this.destination = destination;
-    }
 
     public JmsTemplate getJmsTemplate() {
         return jmsTemplate;
@@ -174,13 +168,14 @@ public class ReqReplyConsumer implements MessageListener {
         this.filterPropertyName = filterPropertyName;
     }
 
-    public ReqReplyFilterInterface getFilterPropertyInstance() {
-        return filterPropertyInstance;
+    public ReqReplyFilterInterface getFilterPropertyDelegator() {
+        return filterPropertyDelegator;
     }
 
-    public void setFilterPropertyInstance(ReqReplyFilterInterface filterPropertyInstance) {
-        this.filterPropertyInstance = filterPropertyInstance;
+    public void setFilterPropertyDelegator(ReqReplyFilterInterface filterPropertyDelegator) {
+        this.filterPropertyDelegator = filterPropertyDelegator;
     }
+
 
     public String getServerId() {
         return serverId;
@@ -198,4 +193,13 @@ public class ReqReplyConsumer implements MessageListener {
         this.maxMessageLength = maxMessageLength;
     }
 
+    public Destination getReqDestination() {
+        return reqDestination;
+    }
+
+    public void setReqDestination(Destination reqDestination) {
+        this.reqDestination = reqDestination;
+    }
+
+    
 }

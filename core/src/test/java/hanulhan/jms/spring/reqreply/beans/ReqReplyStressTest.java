@@ -6,7 +6,7 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyStressTestHotel;
-import hanulhan.jms.spring.reqreply.util.ReqReplyReturnObject;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStressTestHotelList;
 import java.security.SecureRandom;
@@ -98,8 +98,8 @@ public class ReqReplyStressTest implements ApplicationContextAware {
                 LOGGER.log(Level.INFO, "WebAction [" + this.hotel.getSystemIdent() + "] run");
 
                 webCallQuantity++;
-                ReqReplyPollingProducer myReqReply = (ReqReplyPollingProducer) applicationContext.getBean("bean_vmReqReplyProducer", 1000, 2000);
-                ReqReplyReturnObject myResponse;
+                ReqReplyProducer myReqReply = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer", 1000, 2000);
+                ReqReplyMessageObject myResponse;
                 try {
                     myResponse = myReqReply.sendAndAwaitingResponse("REQUEST", "SYSTEM_IDENT", hotel.getSystemIdent());
 

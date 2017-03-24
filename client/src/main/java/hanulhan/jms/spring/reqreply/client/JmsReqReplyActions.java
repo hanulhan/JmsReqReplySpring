@@ -6,7 +6,7 @@
 package hanulhan.jms.spring.reqreply.client;
 
 import com.opensymphony.xwork2.ActionSupport;
-import hanulhan.jms.spring.reqreply.beans.ReqReplyPollingProducer;
+import hanulhan.jms.spring.reqreply.beans.ReqReplyProducer;
 import javax.jms.JMSException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -21,7 +21,7 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
 
     // Injected stuff
     private ApplicationContext applicationContext;
-    private ReqReplyPollingProducer reqReplyProducer;
+    private ReqReplyProducer reqReplyProducer;
     
     // Action input/output
     private int clientId;
@@ -81,11 +81,11 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         this.ident = ident;
     }
 
-    public ReqReplyPollingProducer getReqReplyProducer() {
+    public ReqReplyProducer getReqReplyProducer() {
         return reqReplyProducer;
     }
 
-    public void setReqReplyProducer(ReqReplyPollingProducer reqReplyProducer) {
+    public void setReqReplyProducer(ReqReplyProducer reqReplyProducer) {
         this.reqReplyProducer = reqReplyProducer;
     }
 
