@@ -40,7 +40,7 @@ public class ReqReplyConsumer implements MessageListener {
     // internal
     private static final Logger LOGGER = Logger.getLogger(ReqReplyConsumer.class);
     private String filterPropertyValue;
-    private ReqReplyMessageObject myResponse= new ReqReplyMessageObject();
+//    private ReqReplyMessageObject myResponse= new ReqReplyMessageObject();
 
     @PostConstruct
     public void postConstruct() {
