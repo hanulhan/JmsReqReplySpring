@@ -41,6 +41,7 @@ public class ReqReplyMessageObject {
         this.messageId = aMessageId;
         this.filterName = aFilterName;
         this.filterValue = aFilterValue;
+        this.msgBitMask= 0;
     }
 
     public ReqReplyStatusCode add(Message aMessage) throws JMSException {
@@ -53,8 +54,8 @@ public class ReqReplyMessageObject {
             if (this.msgTypeAck) {
                 this.ackReceived = true;
             } else {
-                lfdMsg = aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT);
-                msgBitMask |= 1 << (lfdMsg - 1);
+                lfdMsg = aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT) - 1;
+                msgBitMask |= 1 << lfdMsg;
                 myTotalCount = aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT);
 
                 // First Message?
@@ -62,6 +63,7 @@ public class ReqReplyMessageObject {
                     this.totalCount = myTotalCount;
                     this.msgCount = 1;
                     this.payload = new String[this.totalCount];
+                    LOGGER.log(Level.DEBUG, "ReqReplyMessageObj::add(), create new array with size " + this.totalCount);
                 } else {
                     this.msgCount++;
                 }
@@ -71,6 +73,7 @@ public class ReqReplyMessageObject {
                 }
 
                 this.payload[lfdMsg] = ((TextMessage) aMessage).getText();
+                LOGGER.log(Level.DEBUG, "ReqReplyMessageObj::add(), store payload to array[" + lfdMsg + "]");
             }
         }
 
@@ -84,7 +87,8 @@ public class ReqReplyMessageObject {
     public String getResponse() {
         String myResponse = null;
 
-        if (!isFinished()) {
+        if (isFinished()) {
+            myResponse= new String();
             for (String temp : payload) {
                 myResponse += temp;
             }

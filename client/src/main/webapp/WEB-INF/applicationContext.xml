@@ -49,7 +49,7 @@
         <constructor-arg value="vmReqTopic" />
     </bean>
 
-    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyPollingProducer" scope="prototype" >
+    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="prototype" >
         <description>
             Message Producer to send Requests to the VM-Req Topic
             and awaiting the Respnse

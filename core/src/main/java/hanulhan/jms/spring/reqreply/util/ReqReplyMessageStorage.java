@@ -34,17 +34,33 @@ public class ReqReplyMessageStorage {
     public ReqReplyStatusCode add(Message aMessage) throws JMSException {
         String myMessageId;
         ReqReplyStatusCode myStatus = ReqReplyStatusCode.STATUS_ERROR;
+        ReqReplyMessageObject myMsgObj;
         try {
             myMessageId = aMessage.getJMSCorrelationID();
             available.acquire();
 
             if (msgMap.containsKey(myMessageId)) {
-                myStatus = msgMap.get(myMessageId).add(aMessage);
-                String myBitMask= Integer.toHexString(msgMap.get(myMessageId).getMsgBitMask());
-                LOGGER.log(Level.DEBUG, "Add part to message [" + myMessageId + "], msgMask: " + myBitMask);
+                
+                // Get the MsgObj from the map
+                myMsgObj= msgMap.get(myMessageId);
+                
+                // Add the new Message to the MessageObject
+                myStatus= myMsgObj.add(aMessage);
+                
+                if (myStatus == ReqReplyStatusCode.STATUS_OK) {
+                    // put it back to the map
+                    msgMap.put(myMessageId, myMsgObj);
+
+                    String myBitMask= Integer.toHexString(msgMap.get(myMessageId).getMsgBitMask());
+                    int count= aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT);
+                    int totalCount= aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT);
+                    LOGGER.log(Level.DEBUG, "Add part " + count + "/" + totalCount + " to message [" + myMessageId + "], msgMask: " + myBitMask);
+                } else {
+                    LOGGER.log(Level.DEBUG, "ERROR adding Message to map");
+                }
             } else {
                 myStatus = ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
-                LOGGER.log(Level.ERROR, "Message [" + myMessageId + "] does not in storage");                
+                LOGGER.log(Level.ERROR, "Message [" + myMessageId + "] is not in storage");                
             }
         } catch (InterruptedException interruptedException) {
             LOGGER.log(Level.ERROR, interruptedException);
@@ -77,10 +93,12 @@ public class ReqReplyMessageStorage {
 
     public String getResponse(String myMessageId) {
         String myReturn = null;
+        ReqReplyMessageObject myMsgObj;
         try {
             available.acquire();
             if (msgMap.containsKey(myMessageId)) {
-                myReturn = "";
+                myReturn= msgMap.get(myMessageId).getResponse();
+                msgMap.remove(myMessageId);
             }
 
         } catch (InterruptedException interruptedException) {
@@ -96,7 +114,7 @@ public class ReqReplyMessageStorage {
         boolean myReturn = false;
         try {
             available.acquire();
-            myReturn = true;
+            myReturn = msgMap.get(myMessageId).isFinished();
 
         } catch (InterruptedException interruptedException) {
             LOGGER.log(Level.ERROR, interruptedException);
@@ -107,4 +125,7 @@ public class ReqReplyMessageStorage {
         return myReturn;
     }
 
+    public int size() {
+        return msgMap.size();
+    }
 }

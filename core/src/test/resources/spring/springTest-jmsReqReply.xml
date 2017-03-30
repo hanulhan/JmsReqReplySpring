@@ -98,15 +98,28 @@
         <constructor-arg value="vmReplyTopic" />
     </bean>
 
-    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyPollingProducer" scope="prototype" >
+    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="singleton" >
         <description>
             Message Producer to send Requests to the VM-Req Topic
             and awaiting the Respnse
         </description>
-        <property name="requestDestination" ref="bean_vmReqTopic"   />
-        <property name="replyDestination"   ref="bean_vmReplyTopic"   />
+        <property name="requestDestination" ref="bean_vmReqTopic" />
+        <property name="replyDestination"   ref="bean_vmReplyTopic" />
         <property name="jmsTemplate"        ref="bean_jmsTopicTemplate" />
+        <property name="filterName"         value="SYSTEM_IDENT" />
     </bean>
+
+
+    <bean id="bean_jmsReplyListenerContainer" 
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+          p:connectionFactory-ref="bean_DefaultConnectionFactory"
+          p:destinationName="vmReplyTopic"
+          p:messageListener-ref="bean_vmReqReplyProducer"
+          p:pubSubDomain="true"
+          p:subscriptionDurable="false"
+          p:durableSubscriptionName="REPLY-SUBSCRIBER"
+          p:errorHandler-ref="bean_jmsErrorHandler"
+          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
     <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.util.ReqReplyTestFilterDelegator">
         <property name="identList">

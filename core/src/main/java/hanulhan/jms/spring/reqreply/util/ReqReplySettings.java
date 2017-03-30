@@ -40,6 +40,30 @@ public class ReqReplySettings {
         this.reqDestination = reqDestination;
     }
 
+    public String getReqDestinationName() {
+        return reqDestinationName;
+    }
+
+    public void setReqDestinationName(String reqDestinationName) {
+        this.reqDestinationName = reqDestinationName;
+    }
+
+    public Destination getReplyDestination() {
+        return replyDestination;
+    }
+
+    public void setReplyDestination(Destination replyDestination) {
+        this.replyDestination = replyDestination;
+    }
+
+    public String getReplyDestinationName() {
+        return replyDestinationName;
+    }
+
+    public void setReplyDestinationName(String replyDestinationName) {
+        this.replyDestinationName = replyDestinationName;
+    }
+
     public int getMaxMessageLength() {
         return maxMessageLength;
     }
@@ -72,14 +96,6 @@ public class ReqReplySettings {
         this.filterPropertyName = filterPropertyName;
     }
 
-    public String getReqDestinationName() {
-        return reqDestinationName;
-    }
-
-    public void setReqDestinationName(String reqDestinationName) {
-        this.reqDestinationName = reqDestinationName;
-    }
-
     public String getReqSubscriberName() {
         return reqSubscriberName;
     }
@@ -96,21 +112,7 @@ public class ReqReplySettings {
         this.replySubscriberName = replySubscriberName;
     }
 
-    public Destination getReplyDestination() {
-        return replyDestination;
-    }
-
-    public void setReplyDestination(Destination replyDestination) {
-        this.replyDestination = replyDestination;
-    }
-
-    public String getReplyDestinationName() {
-        return replyDestinationName;
-    }
-
-    public void setReplyDestinationName(String replyDestinationName) {
-        this.replyDestinationName = replyDestinationName;
-    }
+    
     
     
 

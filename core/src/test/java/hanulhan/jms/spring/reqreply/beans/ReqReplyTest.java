@@ -7,6 +7,7 @@ package hanulhan.jms.spring.reqreply.beans;
 
 import static hanulhan.jms.spring.reqreply.beans.ReqReplyStressTest.TEST_WAIT_TO_FINISH_SECONDS;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
+import hanulhan.jms.spring.reqreply.util.ReqReplyTestFilterDelegator;
 import java.util.Date;
 import javax.jms.JMSException;
 import org.apache.log4j.Level;
@@ -52,25 +53,25 @@ public class ReqReplyTest implements ApplicationContextAware {
      */
     @Test
     public void testMe() {
-        ReqReplyProducer myReqReply= (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer", 5000, 5000);
-        ReqReplyMessageObject myResponse;
         try {
-            myResponse = myReqReply.sendAndAwaitingResponse("My Message", "SYSTEM_IDENT", "AAAA");
-            Assert.assertTrue(myResponse.getStatus().toString(), myResponse.getStatusOK() == true);
-        
-        } catch (JMSException jMSException) {
-            LOGGER.log(Level.ERROR, jMSException);
+            ReqReplyProducer myReqReply = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer");
+            ReqReplyTestFilterDelegator myFilterDelegator = new ReqReplyTestFilterDelegator();
+            String myResponse = null;
+            myResponse = myReqReply.getResponse("My Message", "AAAA", 2000);
+
+
+            LOGGER.log(Level.DEBUG, "Wait 2 seconds");
+            Date startTime = new Date();
+            long seconds;
+            do {
+                seconds = (int) ((new Date().getTime() - startTime.getTime()) / 1000);
+            } while (seconds < 2 );
+            Assert.assertTrue("NO response match", myResponse.equals(myFilterDelegator.getPropertyFilterResult("AAAA")));
+        } catch (InterruptedException ex) {
+            LOGGER.log(Level.ERROR, ex);
         }
 
-        LOGGER.log(Level.DEBUG, "Wait 15 seconds");
-        Date startTime = new Date();
-        long seconds;
-        do {
-            seconds = (int) ((new Date().getTime() - startTime.getTime()) / 1000);
-        } while (seconds < 15);
-        
     }
-
 
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
@@ -78,5 +79,3 @@ public class ReqReplyTest implements ApplicationContextAware {
     }
 
 }
-
-

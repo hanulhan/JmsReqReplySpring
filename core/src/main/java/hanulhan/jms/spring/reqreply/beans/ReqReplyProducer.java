@@ -6,10 +6,10 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageStorage;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
+import javax.annotation.PostConstruct;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -34,13 +34,19 @@ public class ReqReplyProducer implements MessageListener {
     private String filterName;
 
     // internal
-    private ReqReplyMessageStorage messageStorage = new ReqReplyMessageStorage(filterName);
+    private ReqReplyMessageStorage messageStorage;
     static final Logger LOGGER = Logger.getLogger(ReqReplyProducer.class);
 
     public ReqReplyProducer() {
-        LOGGER.log(Level.TRACE, "ReqReplyPollingProducer:ReqReplyPollingProducer()");
+        LOGGER.log(Level.TRACE, "ReqReplyProducer:ReqReplyProducer()");
     }
 
+    @PostConstruct
+    void InitMe()   {
+        messageStorage = new ReqReplyMessageStorage(filterName);
+    }
+    
+    
     public String getResponse(String aRequest, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
         Date startTime = new Date();
         int myMilliSeconds;
@@ -89,11 +95,56 @@ public class ReqReplyProducer implements MessageListener {
             if (myStatus.isError()) {
                 LOGGER.log(Level.ERROR, "Error adding message to storage");
             }
-                
         } catch (JMSException ex) {
             LOGGER.log(Level.ERROR, ex);
         }
 
     }
+    
+    public int getStorageSize() {
+        return messageStorage.size();
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    public JmsTemplate getJmsTemplate() {
+        return jmsTemplate;
+    }
+
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
+    public Destination getRequestDestination() {
+        return requestDestination;
+    }
+
+    public void setRequestDestination(Destination requestDestination) {
+        this.requestDestination = requestDestination;
+    }
+
+    public Destination getReplyDestination() {
+        return replyDestination;
+    }
+
+    public void setReplyDestination(Destination replyDestination) {
+        this.replyDestination = replyDestination;
+    }
+
+    public String getFilterName() {
+        return filterName;
+    }
+
+    public void setFilterName(String filterName) {
+        this.filterName = filterName;
+    }
+    
+    
 
 }

@@ -6,8 +6,6 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyStressTestHotel;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
-import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStressTestHotelList;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.jms.JMSException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -43,7 +40,7 @@ public class ReqReplyStressTest implements ApplicationContextAware {
     static SecureRandom rnd = new SecureRandom();
 
     // Test Setup
-    private static final int HOTEL_QUANTITY = 1;
+    private static final int HOTEL_QUANTITY = 2;
     static final long THREAD_MAX_SLEEP_TIME_MS = 500;
     static final long THREAD_MIN_SLEEP_TIME_MS = 50;
     static final long RESPNSE_MAX_STRING_LENGTH = 200;
@@ -98,23 +95,18 @@ public class ReqReplyStressTest implements ApplicationContextAware {
                 LOGGER.log(Level.INFO, "WebAction [" + this.hotel.getSystemIdent() + "] run");
 
                 webCallQuantity++;
-                ReqReplyProducer myReqReply = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer", 1000, 2000);
-                ReqReplyMessageObject myResponse;
+                ReqReplyProducer myReqReply = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer");
+                String myResponse = null;
+
                 try {
-                    myResponse = myReqReply.sendAndAwaitingResponse("REQUEST", "SYSTEM_IDENT", hotel.getSystemIdent());
+                    myResponse = myReqReply.getResponse("REQUEST", hotel.getSystemIdent(), 2000);
+                } catch (InterruptedException ex) {
+                    java.util.logging.Logger.getLogger(ReqReplyStressTest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                }
 
-                    if (!hotel.compareResponse(myResponse.getPayload())) {
-                        LOGGER.log(Level.ERROR, "NO RESPONSE MATCH");
-                        webCallErrorCount++;
-                        if (myResponse.getStatus() == ReqReplyStatusCode.STATUS_RESPONSE_TIMEOUT) {
-                            webCallErrorTimeoutCount++;
-                        } else if (myResponse.getStatus() == ReqReplyStatusCode.STATUS_RESPONSE_HEADER_ERROR) {
-                            webCallErrorHeaderCount++;
-                        }
-                    }
-
-                } catch (JMSException jMSException) {
-                    LOGGER.log(Level.ERROR, jMSException);
+                if (!hotel.compareResponse(myResponse)) {
+                    LOGGER.log(Level.ERROR, "NO RESPONSE MATCH");
+                    webCallErrorCount++;
                 }
 
             }
@@ -159,7 +151,6 @@ public class ReqReplyStressTest implements ApplicationContextAware {
         for (i = 0; i < HOTEL_QUANTITY; i++) {
 
             myHotel = new ReqReplyStressTestHotel(randomString(6), randomString(myResponseLength));
-//            myHotel = new ReqReplyStressTestHotel(randomString(6), "ABCDEFG");
             myHotelList.add(myHotel);
             WebActionList.add(new WebAction(myHotel));
         }
@@ -212,6 +203,10 @@ public class ReqReplyStressTest implements ApplicationContextAware {
             Assert.assertTrue("Req and response counts different", temp.getWebCallQuantity() == temp.getHotel().getResponseCount());
         }
 
+        
+        ReqReplyProducer myReqReply = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer");
+        Assert.assertTrue("Storage size should be 0", myReqReply.getStorageSize() == 0);
+        
     }
 
     private long randomNumber(long aMinValue, long aMaxValue) {
