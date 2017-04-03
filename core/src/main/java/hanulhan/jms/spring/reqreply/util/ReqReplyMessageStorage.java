@@ -31,7 +31,50 @@ public class ReqReplyMessageStorage {
         msgMap = Collections.synchronizedMap(new HashMap<String, ReqReplyMessageObject>());
     }
 
-    public ReqReplyStatusCode add(Message aMessage) throws JMSException {
+//    public synchronized ReqReplyStatusCode add(Message aMessage) throws JMSException {
+//        String myMessageId;
+//        ReqReplyStatusCode myStatus = ReqReplyStatusCode.STATUS_ERROR;
+//        ReqReplyMessageObject myMsgObj;
+//        try {
+//            myMessageId = aMessage.getJMSCorrelationID();
+//            available.acquire();
+//
+//            if (msgMap.containsKey(myMessageId)) {
+//
+//                // Get the MsgObj from the map
+//                myMsgObj = msgMap.get(myMessageId);
+//
+//                // Add the new Message to the MessageObject
+//                myStatus = myMsgObj.add(aMessage);
+//
+//                if (myStatus == ReqReplyStatusCode.STATUS_OK) {
+//                    // put it back to the map
+//                    msgMap.put(myMessageId, myMsgObj);
+//
+//                    String myFilterValue= myMsgObj.getFilterValue();
+//                    if (aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE).equals(ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD)) {
+//                        String myBitMask = Integer.toHexString(msgMap.get(myMessageId).getMsgBitMask());
+//                        int count = aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT);
+//                        int totalCount = aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT);
+//                        LOGGER.log(Level.DEBUG, "Add part " + count + "/" + totalCount + " to message [" + myMessageId + "], Filter: " + myFilterValue);
+//                    } else {
+//                        LOGGER.log(Level.DEBUG, "Add ACK to message [" + myMessageId + "] for Filter: " + myFilterValue);
+//                    }
+//                } else {
+//                    LOGGER.log(Level.DEBUG, "ERROR adding Message to map");
+//                }
+//            } else {
+//                myStatus = ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
+//                LOGGER.log(Level.ERROR, "Message [" + myMessageId + "] is not in storage");
+//            }
+//        } catch (InterruptedException interruptedException) {
+//            LOGGER.log(Level.ERROR, interruptedException);
+//        } finally {
+//            available.release();
+//        }
+//        return myStatus;
+//    }
+    public synchronized ReqReplyStatusCode add(Message aMessage) throws JMSException {
         String myMessageId;
         ReqReplyStatusCode myStatus = ReqReplyStatusCode.STATUS_ERROR;
         ReqReplyMessageObject myMsgObj;
@@ -40,28 +83,34 @@ public class ReqReplyMessageStorage {
             available.acquire();
 
             if (msgMap.containsKey(myMessageId)) {
+            // Get the MsgObj from the map
+                myMsgObj = msgMap.get(myMessageId);
                 
-                // Get the MsgObj from the map
-                myMsgObj= msgMap.get(myMessageId);
-                
-                // Add the new Message to the MessageObject
-                myStatus= myMsgObj.add(aMessage);
-                
-                if (myStatus == ReqReplyStatusCode.STATUS_OK) {
-                    // put it back to the map
-                    msgMap.put(myMessageId, myMsgObj);
+            } else {
+                myMsgObj= new ReqReplyMessageObject(aMessage.getJMSCorrelationID(), this.filterName, aMessage.getStringProperty(filterName));
+            }
+            
+            myStatus = myMsgObj.add(aMessage);
+            // Add the new Message to the MessageObject
 
-                    String myBitMask= Integer.toHexString(msgMap.get(myMessageId).getMsgBitMask());
-                    int count= aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT);
-                    int totalCount= aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT);
-                    LOGGER.log(Level.DEBUG, "Add part " + count + "/" + totalCount + " to message [" + myMessageId + "], msgMask: " + myBitMask);
+
+            if (myStatus == ReqReplyStatusCode.STATUS_OK) {
+                // put it back to the map
+                msgMap.put(myMessageId, myMsgObj);
+
+                String myFilterValue = myMsgObj.getFilterValue();
+                if (aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE).equals(ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD)) {
+                    String myBitMask = Integer.toHexString(msgMap.get(myMessageId).getMsgBitMask());
+                    int count = aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT);
+                    int totalCount = aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT);
+                    LOGGER.log(Level.DEBUG, "Add part " + count + "/" + totalCount + " to message [" + myMessageId + "], Filter: " + myFilterValue);
                 } else {
-                    LOGGER.log(Level.DEBUG, "ERROR adding Message to map");
+                    LOGGER.log(Level.DEBUG, "Add ACK to message [" + myMessageId + "] for Filter: " + myFilterValue);
                 }
             } else {
-                myStatus = ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
-                LOGGER.log(Level.ERROR, "Message [" + myMessageId + "] is not in storage");                
+                LOGGER.log(Level.DEBUG, "ERROR adding Message to map");
             }
+
         } catch (InterruptedException interruptedException) {
             LOGGER.log(Level.ERROR, interruptedException);
         } finally {
@@ -70,7 +119,7 @@ public class ReqReplyMessageStorage {
         return myStatus;
     }
 
-    public ReqReplyStatusCode add(String aMessageId, String aFilterValue) throws JMSException {
+    public synchronized ReqReplyStatusCode add(String aMessageId, String aFilterValue) throws JMSException {
         String myMessageId;
         ReqReplyStatusCode myStatus = ReqReplyStatusCode.STATUS_ERROR;
         try {
@@ -78,10 +127,10 @@ public class ReqReplyMessageStorage {
 
             if (msgMap.containsKey(aMessageId)) {
                 myStatus = ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
-                LOGGER.log(Level.DEBUG, "Add new message [" + aMessageId + "] should not exist in storage");
+                LOGGER.log(Level.TRACE, "Add new message [" + aMessageId + "] should not exist in storage");
             } else {
                 msgMap.put(aMessageId, new ReqReplyMessageObject(aMessageId, this.filterName, aFilterValue));
-                LOGGER.log(Level.DEBUG, "Add new message [" + aMessageId + "] to storage");
+                LOGGER.log(Level.TRACE, "Add new message [" + aMessageId + "] to storage");
             }
         } catch (InterruptedException interruptedException) {
             LOGGER.log(Level.ERROR, interruptedException);
@@ -91,13 +140,13 @@ public class ReqReplyMessageStorage {
         return myStatus;
     }
 
-    public String getResponse(String myMessageId) {
+    public synchronized String getResponse(String myMessageId) {
         String myReturn = null;
         ReqReplyMessageObject myMsgObj;
         try {
             available.acquire();
             if (msgMap.containsKey(myMessageId)) {
-                myReturn= msgMap.get(myMessageId).getResponse();
+                myReturn = msgMap.get(myMessageId).getResponse();
                 msgMap.remove(myMessageId);
             }
 
@@ -110,7 +159,21 @@ public class ReqReplyMessageStorage {
         return myReturn;
     }
 
-    public boolean isResponseReceived(String myMessageId) {
+    public synchronized ReqReplyMessageObject getMsgObj(String aMessageId) {
+        ReqReplyMessageObject myMsgObj = null;
+
+        try {
+            available.acquire();
+        } catch (InterruptedException ex) {
+            LOGGER.log(Level.ERROR, ex);
+        } finally {
+            available.release();
+        }
+
+        return myMsgObj;
+    }
+
+    public synchronized boolean isResponseReceived(String myMessageId) {
         boolean myReturn = false;
         try {
             available.acquire();
@@ -123,6 +186,10 @@ public class ReqReplyMessageStorage {
         }
 
         return myReturn;
+    }
+
+    public Map<String, ReqReplyMessageObject> getMsgMap() {
+        return msgMap;
     }
 
     public int size() {

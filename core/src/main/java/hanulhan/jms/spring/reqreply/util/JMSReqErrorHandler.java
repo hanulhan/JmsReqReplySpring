@@ -13,13 +13,13 @@ import org.springframework.util.ErrorHandler;
  *
  * @author uhansen
  */
-public class JMSErrorHandler implements ErrorHandler    {
+public class JMSReqErrorHandler implements ErrorHandler    {
 
-    private static final Logger LOGGER = Logger.getLogger(JMSErrorHandler.class);
+    private static final Logger LOGGER = Logger.getLogger(JMSReqErrorHandler.class);
     
     @Override
     public void handleError(Throwable thrwbl) {
-        LOGGER.log(Level.ERROR, "Error in EventListener\n" + thrwbl);
+        LOGGER.log(Level.ERROR, "Error in Req-EventListener\n" + thrwbl);
     }
     
 }

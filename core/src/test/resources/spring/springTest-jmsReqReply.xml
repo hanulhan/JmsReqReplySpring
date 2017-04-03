@@ -36,7 +36,7 @@
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <!--        <property name="brokerURL" value="tcp://localhost:61616" />-->
-<!--        <property name="brokerURL" value="vm://localhost?brokerConfig=xbean:activemq.xml" />-->
+        <!--        <property name="brokerURL" value="vm://localhost?brokerConfig=xbean:activemq.xml" />-->
         <property name="brokerURL" value="tcp://192.168.20.12:61616" />
         <property name="sendTimeout" value="0" />
     </bean>
@@ -118,7 +118,7 @@
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
           p:durableSubscriptionName="REPLY-SUBSCRIBER"
-          p:errorHandler-ref="bean_jmsErrorHandler"
+          p:errorHandler-ref="bean_jmsReplyErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
     <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.util.ReqReplyTestFilterDelegator">
@@ -132,7 +132,8 @@
         </property>
     </bean>
 
-    <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSErrorHandler" />
+    <bean id="bean_jmsReqErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReqErrorHandler" />
+    <bean id="bean_jmsReplyErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReplyErrorHandler" />
 
     
     

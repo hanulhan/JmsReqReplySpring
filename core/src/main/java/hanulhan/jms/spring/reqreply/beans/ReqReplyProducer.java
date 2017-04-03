@@ -6,6 +6,7 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageStorage;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
@@ -62,6 +63,10 @@ public class ReqReplyProducer implements MessageListener {
 
         if (messageStorage.isResponseReceived(myMessageId))  {
             return messageStorage.getResponse(myMessageId);
+        } else {
+            ReqReplyMessageObject myMsgObj= messageStorage.getMsgObj(myMessageId);
+            LOGGER.log(Level.ERROR, "################ RESPONSE is null #####################");
+            LOGGER.log(Level.ERROR, myMsgObj.toString());
         }
         return null;
     }
@@ -77,8 +82,10 @@ public class ReqReplyProducer implements MessageListener {
             myMessageId = myReqMessage.getMessageId();
             if (myMessageId != null) {
                 messageStorage.add(myMessageId, aFilterValue);
+            } else {
+                LOGGER.log(Level.ERROR, "messageId is null! ");
             }
-            LOGGER.log(Level.INFO, "Sending Message Id: " + myMessageId);
+            LOGGER.log(Level.DEBUG, "Sending Request [" + myMessageId + "] for Ident: " + aFilterValue);
 
         } catch (JmsException | JMSException jmsException) {
             LOGGER.log(Level.ERROR, "Error sending msg! " + jmsException);
@@ -143,6 +150,10 @@ public class ReqReplyProducer implements MessageListener {
 
     public void setFilterName(String filterName) {
         this.filterName = filterName;
+    }
+
+    public ReqReplyMessageStorage getMessageStorage() {
+        return messageStorage;
     }
     
     

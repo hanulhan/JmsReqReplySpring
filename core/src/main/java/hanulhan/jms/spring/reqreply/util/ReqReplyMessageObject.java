@@ -63,7 +63,7 @@ public class ReqReplyMessageObject {
                     this.totalCount = myTotalCount;
                     this.msgCount = 1;
                     this.payload = new String[this.totalCount];
-                    LOGGER.log(Level.DEBUG, "ReqReplyMessageObj::add(), create new array with size " + this.totalCount);
+//                    LOGGER.log(Level.DEBUG, "ReqReplyMessageObj::add(), create new array with size " + this.totalCount);
                 } else {
                     this.msgCount++;
                 }
@@ -73,14 +73,14 @@ public class ReqReplyMessageObject {
                 }
 
                 this.payload[lfdMsg] = ((TextMessage) aMessage).getText();
-                LOGGER.log(Level.DEBUG, "ReqReplyMessageObj::add(), store payload to array[" + lfdMsg + "]");
+//                LOGGER.log(Level.DEBUG, "ReqReplyMessageObj::add(), store payload to array[" + lfdMsg + "]");
             }
         }
 
         return this.statusCode;
     }
 
-    public boolean isFinished() {
+    public synchronized boolean isFinished() {
         return this.ackReceived && this.msgCount > 0 && this.msgCount == this.totalCount;
     }
 
@@ -174,4 +174,43 @@ public class ReqReplyMessageObject {
         return msgBitMask;
     }
 
+    public String getFilterValue() {
+        return filterValue;
+    }
+
+    public String getFilterName() {
+        return filterName;
+    }
+
+    public long getResponseTime() {
+        return responseTime;
+    }
+
+    public boolean isAckReceived() {
+        return ackReceived;
+    }
+
+    public int getMsgCount() {
+        return msgCount;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public ReqReplyStatusCode getStatusCode() {
+        return statusCode;
+    }
+
+    @Override
+    public String toString()    {
+        return  "MsgObj: {id: " + this.messageId
+                        + ", filter: " + this.filterValue
+                        + ", count: " + this.msgCount
+                        + ", totalCount: " + this.totalCount
+                        + ", bitMask: " + this.msgBitMask
+                        + ", ackReceived: " + this.ackReceived
+                        + ", status: " + this.statusCode;
+    }
+    
 }

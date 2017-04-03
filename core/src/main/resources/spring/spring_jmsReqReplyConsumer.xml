@@ -38,7 +38,7 @@
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
           p:durableSubscriptionName="REQ-SUBSCRIBER"
-          p:errorHandler-ref="bean_jmsErrorHandler"
+          p:errorHandler-ref="bean_jmsReqErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
     
 </beans>
