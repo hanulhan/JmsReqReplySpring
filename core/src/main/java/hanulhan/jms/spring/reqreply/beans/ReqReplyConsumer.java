@@ -6,7 +6,6 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import javax.jms.Destination;
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 import org.apache.log4j.Level;
@@ -15,13 +14,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import javax.annotation.PostConstruct;
+import javax.jms.JMSException;
 import javax.jms.MessageListener;
 
 /**
- *
+ * This class has a MessageListener to the jms REQUEST-Topic.
+ * 
+ * The request will be validated
+ * 
  * @author uhansen
  */
 public class ReqReplyConsumer implements MessageListener {
@@ -42,6 +44,9 @@ public class ReqReplyConsumer implements MessageListener {
     private String filterPropertyValue;
 //    private ReqReplyMessageObject myResponse= new ReqReplyMessageObject();
 
+    /**
+     *
+     */
     @PostConstruct
     public void postConstruct() {
         LOGGER.log(Level.TRACE, "ReqReplyConsuer:postConstuct");
@@ -51,10 +56,20 @@ public class ReqReplyConsumer implements MessageListener {
         LOGGER.log(Level.TRACE, "maxMessageLength: " + maxMessageLength);
     }
 
+    /**
+     *
+     */
     public ReqReplyConsumer() {
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::ReqReplyConsumer()");
     }
 
+    /**
+     * Spring default MessageHandler callback function
+     * Receive the Request from the client. Check the Header and the properties 
+     * of the message and handle the reply if the message is valid
+     * @param aMessage
+     * 
+     */
     @Override
     public void onMessage(Message aMessage) {
 
@@ -85,6 +100,13 @@ public class ReqReplyConsumer implements MessageListener {
         }
     }
 
+    
+    /**
+     * Message handler function
+     * ACK the message and redirect the request to the System (FilterPropertyDelegator)
+     * @param aMessage
+     * 
+     */
     private void handleMessage(Message aMessage) {
 
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::handleMessage()");
@@ -147,50 +169,98 @@ public class ReqReplyConsumer implements MessageListener {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public JmsTemplate getJmsTemplate() {
         return jmsTemplate;
     }
 
+    /**
+     *
+     * @param jmsTemplate
+     */
     public void setJmsTemplate(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFilterPropertyName() {
         return filterPropertyName;
     }
 
+    /**
+     *
+     * @param filterPropertyName
+     */
     public void setFilterPropertyName(String filterPropertyName) {
         this.filterPropertyName = filterPropertyName;
     }
 
+    /**
+     *
+     * @return
+     */
     public ReqReplyFilterInterface getFilterPropertyDelegator() {
         return filterPropertyDelegator;
     }
 
+    /**
+     *
+     * @param filterPropertyDelegator
+     */
     public void setFilterPropertyDelegator(ReqReplyFilterInterface filterPropertyDelegator) {
         this.filterPropertyDelegator = filterPropertyDelegator;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getServerId() {
         return serverId;
     }
 
+    /**
+     *
+     * @param serverId
+     */
     public void setServerId(String serverId) {
         this.serverId = serverId;
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getMaxMessageLength() {
         return maxMessageLength;
     }
 
+    /**
+     *
+     * @param maxMessageLength
+     */
     public void setMaxMessageLength(Integer maxMessageLength) {
         this.maxMessageLength = maxMessageLength;
     }
 
+    /**
+     *
+     * @return
+     */
     public Destination getReqDestination() {
         return reqDestination;
     }
 
+    /**
+     *
+     * @param reqDestination
+     */
     public void setReqDestination(Destination reqDestination) {
         this.reqDestination = reqDestination;
     }
