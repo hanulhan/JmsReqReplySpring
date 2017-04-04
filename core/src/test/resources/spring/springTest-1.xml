@@ -13,6 +13,8 @@
       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
       http://www.springframework.org/schema/context 
       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+      http://www.springframework.org/schema/tx 
+      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd      
       http://www.springframework.org/schema/jms
       http://www.springframework.org/schema/jms/spring-jms.xsd
       http://www.springframework.org/schema/task 
@@ -24,7 +26,9 @@
     <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
         <property name="reqDestination"        ref="bean_vmReqTopic" />
         <property name="reqDestinationName"    value="vmReqTopic" />
-        <property name="maxMessageLength"   value="50" />
+        <property name="replyDestination"      ref="bean_vmReplyTopic" />
+        <property name="replyDestinationName"  value="vmReplyTopic" />
+        <property name="maxMessageLength"   value="5" />
         <property name="serverId"           value="B2B-1" />
         <property name="filterPropertyName" value="SYSTEM_IDENT" />
     </bean>
@@ -32,8 +36,8 @@
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <!--        <property name="brokerURL" value="tcp://localhost:61616" />-->
-        <property name="brokerURL" value="tcp://192.168.20.12:61616" />
         <!--        <property name="brokerURL" value="vm://localhost?brokerConfig=xbean:activemq.xml" />-->
+        <property name="brokerURL" value="tcp://192.168.20.12:61616" />
         <property name="sendTimeout" value="0" />
     </bean>
 
@@ -71,8 +75,6 @@
             JmsTemplate calls that may span any number of transactions
         </description>
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
-        <property name="reconnectOnException" value="true" />
-        <property name="clientId" value="sampleSubscriber" />
     </bean>
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
@@ -90,7 +92,7 @@
         <description>The Topic to send requests to the systems</description>
         <constructor-arg value="vmReqTopic" />
     </bean>
-    
+
     <bean id="bean_vmReplyTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
         <description>The Topic to receive the response from the system</description>
         <constructor-arg value="vmReplyTopic" />
@@ -104,7 +106,7 @@
         <property name="requestDestination" ref="bean_vmReqTopic" />
         <property name="replyDestination"   ref="bean_vmReplyTopic" />
         <property name="jmsTemplate"        ref="bean_jmsTopicTemplate" />
-        <property name="filterName"         value="SYSTEM_IDENT" />        
+        <property name="filterName"         value="SYSTEM_IDENT" />
     </bean>
 
 
@@ -119,16 +121,19 @@
           p:errorHandler-ref="bean_jmsReplyErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
-    <bean id="bean_HotelList" class="hanulhan.jms.spring.reqreply.util.ReqReplyStressTestHotelList" scope="singleton" />
-
-    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.util.ReqReplyStressTestFilterDelegator" scope="singleton" />
+    <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.util.ReqReplyTest1_FilterDelegator">
+        <property name="identList">
+            <list>
+                <value>AAAA</value>
+                <value>CCCC</value>
+                <value>EEEE</value>
+                <value>GGGG</value>
+            </list>
+        </property>
+    </bean>
 
     <bean id="bean_jmsReqErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReqErrorHandler" />
     <bean id="bean_jmsReplyErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReplyErrorHandler" />
-
-
-
-
 
     
     

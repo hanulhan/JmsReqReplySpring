@@ -5,9 +5,8 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
-import hanulhan.jms.spring.reqreply.util.ReqReplyStressTestHotel;
-import hanulhan.jms.spring.reqreply.util.ReqReplyStressTestHotelList;
+import hanulhan.jms.spring.reqreply.util.ReqReplyTest2_Hotel;
+import hanulhan.jms.spring.reqreply.util.ReqReplyTest2_HotelList;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,11 +31,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author uhansen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/spring/springTest-jmsReqReplyStress.xml"})
-public class ReqReplyStressTest implements ApplicationContextAware {
+@ContextConfiguration(locations = {"/spring/springTest-2.xml"})
+public class ReqReplyTest2 implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
-    static final Logger LOGGER = Logger.getLogger(ReqReplyStressTest.class);
+    static final Logger LOGGER = Logger.getLogger(ReqReplyTest2.class);
     private List<WebAction> WebActionList = new ArrayList<>();
 
     static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -50,34 +49,50 @@ public class ReqReplyStressTest implements ApplicationContextAware {
     static final long TEST_RUN_TIME_SECONDS = 30;
     static final long TEST_WAIT_TO_FINISH_SECONDS = 5;
 
+    /**
+     * The WebAction class represents a web-session. A user requests
+     * data from a system. Multiple WebAction threads are uses in this test
+     */
     public class WebAction extends Thread {
 
-        private final ReqReplyStressTestHotel hotel;
+        private final ReqReplyTest2_Hotel hotel;
         private int webCallQuantity;
         private int webCallErrorCount;
         private int webCallErrorTimeoutCount;
-        private int webCallErrorHeaderCount;
         private Boolean run;
 
+        /**
+         *
+         */
         @PreDestroy
         public void destroyIt() {
             this.interrupt();
         }
 
-        public WebAction(ReqReplyStressTestHotel hotel) {
+        /**
+         *
+         * @param hotel
+         * In this test, the WebAction is linked to a hotel
+         */
+        public WebAction(ReqReplyTest2_Hotel hotel) {
             super();
             this.hotel = hotel;
             this.run = true;
             webCallQuantity = 0;
             webCallErrorCount = 0;
             webCallErrorTimeoutCount = 0;
-            webCallErrorHeaderCount = 0;
         }
 
+        /**
+         *
+         */
         public void stopSending() {
             this.run = false;
         }
 
+        /**
+         *
+         */
         public void cancel() {
             interrupt();
         }
@@ -94,8 +109,6 @@ public class ReqReplyStressTest implements ApplicationContextAware {
                 do {
                     myMilliSeconds = (int) ((new Date().getTime() - myStartTime.getTime()));
                 } while (myMilliSeconds < sleepTime);
-
-//                LOGGER.log(Level.INFO, "WebAction [" + this.hotel.getSystemIdent() + "] run");
 
                 webCallQuantity++;
                 ReqReplyProducer myReqReply = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer");
@@ -124,55 +137,82 @@ public class ReqReplyStressTest implements ApplicationContextAware {
 
         }
 
+        
+        /**
+         *
+         * @return
+         */
         public int getWebCallQuantity() {
             return webCallQuantity;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getWebCallErrorCount() {
             return webCallErrorCount;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getWebCallErrorTimeoutCount() {
             return webCallErrorTimeoutCount;
         }
 
-        public int getWebCallErrorHeaderCount() {
-            return webCallErrorHeaderCount;
-        }
-
-        public ReqReplyStressTestHotel getHotel() {
+        /**
+         *
+         * @return
+         */
+        public ReqReplyTest2_Hotel getHotel() {
             return hotel;
         }
 
     }
 
-    public ReqReplyStressTest() {
+    /**
+     * Constructor of the test-class
+     */
+    public ReqReplyTest2() {
 
     }
 
+    /**
+     *
+     */
     @PostConstruct
     public void InitTest() {
         int i;
 
         int myResponseLength = (int) randomNumber(20, RESPNSE_MAX_STRING_LENGTH);
-        ReqReplyStressTestHotelList myHotelList = (ReqReplyStressTestHotelList) applicationContext.getBean("bean_HotelList");
-        ReqReplyStressTestHotel myHotel;
+        ReqReplyTest2_HotelList myHotelList = (ReqReplyTest2_HotelList) applicationContext.getBean("bean_HotelList");
+        ReqReplyTest2_Hotel myHotel;
 
         // Initialize the Hotels and Threads
         for (i = 0; i < HOTEL_QUANTITY; i++) {
 
-            myHotel = new ReqReplyStressTestHotel(randomString(6), randomString(myResponseLength));
+            myHotel = new ReqReplyTest2_Hotel(randomString(6), randomString(myResponseLength));
             myHotelList.add(myHotel);
             WebActionList.add(new WebAction(myHotel));
         }
 
     }
 
+    /**
+     *
+     * @param ac
+     * @throws BeansException
+     */
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
         this.applicationContext = ac;
     }
 
+    /**
+     * the test itself
+     */
     @Test
     public void Test1() {
 
@@ -193,7 +233,6 @@ public class ReqReplyStressTest implements ApplicationContextAware {
         // Stop Threads
         LOGGER.log(Level.INFO, "Stop Clients");
         for (WebAction temp : WebActionList) {
-            //temp.cancel();
             temp.stopSending();
         }
 

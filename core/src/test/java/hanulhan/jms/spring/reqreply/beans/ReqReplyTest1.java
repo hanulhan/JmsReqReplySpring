@@ -5,9 +5,9 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
-import static hanulhan.jms.spring.reqreply.beans.ReqReplyStressTest.TEST_WAIT_TO_FINISH_SECONDS;
+import static hanulhan.jms.spring.reqreply.beans.ReqReplyTest2.TEST_WAIT_TO_FINISH_SECONDS;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
-import hanulhan.jms.spring.reqreply.util.ReqReplyTestFilterDelegator;
+import hanulhan.jms.spring.reqreply.util.ReqReplyTest1_FilterDelegator;
 import java.util.Date;
 import javax.jms.JMSException;
 import org.apache.log4j.Level;
@@ -27,14 +27,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author uhansen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/spring/springTest-jmsReqReply.xml"})
+@ContextConfiguration(locations = {"/spring/springTest-1.xml"})
 
-public class ReqReplyTest implements ApplicationContextAware {
+public class ReqReplyTest1 implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
-    private static final Logger LOGGER = Logger.getLogger(ReqReplyTest.class);
+    private static final Logger LOGGER = Logger.getLogger(ReqReplyTest1.class);
 
-    public ReqReplyTest() {
+    public ReqReplyTest1() {
 
 //        LOGGER.log(Level.INFO, "StartBroker()");
 //        try {
@@ -55,7 +55,7 @@ public class ReqReplyTest implements ApplicationContextAware {
     public void testMe() {
         try {
             ReqReplyProducer myReqReply = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer");
-            ReqReplyTestFilterDelegator myFilterDelegator = new ReqReplyTestFilterDelegator();
+            ReqReplyTest1_FilterDelegator myFilterDelegator = new ReqReplyTest1_FilterDelegator();
             String myResponse = null;
             myResponse = myReqReply.getResponse("My Message", "AAAA", 2000);
 

@@ -9,13 +9,13 @@ package hanulhan.jms.spring.reqreply.util;
  *
  * @author acentic
  */
-public class ReqReplyStressTestHotel {
+public class ReqReplyTest2_Hotel {
 
     private String systemIdent;
     private String response;
     private int responseCount;
 
-    public ReqReplyStressTestHotel(String systemIdent, String response) {
+    public ReqReplyTest2_Hotel(String systemIdent, String response) {
         this.systemIdent = systemIdent;
         this.response = response;
         responseCount = 0;

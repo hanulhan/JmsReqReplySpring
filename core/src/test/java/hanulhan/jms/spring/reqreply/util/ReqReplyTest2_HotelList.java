@@ -15,11 +15,11 @@ import org.springframework.context.ApplicationContext;
  *
  * @author uhansen
  */
-public class ReqReplyStressTestHotelList {
+public class ReqReplyTest2_HotelList {
 
-    private Map<String, ReqReplyStressTestHotel> hotelList = new HashMap<>();
+    private Map<String, ReqReplyTest2_Hotel> hotelList = new HashMap<>();
 
-    public ReqReplyStressTestHotelList() {
+    public ReqReplyTest2_HotelList() {
         super();
     }
 
@@ -35,7 +35,7 @@ public class ReqReplyStressTestHotelList {
         return hotelList.containsKey(aPropertyFilterName);
     }
 
-    public void add(ReqReplyStressTestHotel aHotel) {
+    public void add(ReqReplyTest2_Hotel aHotel) {
         hotelList.put(aHotel.getSystemIdent(), aHotel);
     }
 

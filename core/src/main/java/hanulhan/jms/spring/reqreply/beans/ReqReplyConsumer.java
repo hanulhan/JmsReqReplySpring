@@ -21,9 +21,9 @@ import javax.jms.MessageListener;
 
 /**
  * This class has a MessageListener to the jms REQUEST-Topic.
- * 
+ *
  * The request will be validated
- * 
+ *
  * @author uhansen
  */
 public class ReqReplyConsumer implements MessageListener {
@@ -64,48 +64,54 @@ public class ReqReplyConsumer implements MessageListener {
     }
 
     /**
-     * Spring default MessageHandler callback function
-     * Receive the Request from the client. Check the Header and the properties 
-     * of the message and handle the reply if the message is valid
+     * Spring default MessageHandler callback function Receive the Request from
+     * the client. Check the Header and the properties of the message and handle
+     * the reply if the message is valid
+     *
      * @param aMessage
-     * 
+     *
      */
     @Override
     public void onMessage(Message aMessage) {
 
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::onReceive()");
         try {
-            if (aMessage instanceof TextMessage) {
-                if (filterPropertyName != null && !filterPropertyName.trim().isEmpty()) {
-                    if (aMessage.propertyExists(filterPropertyName)) {
-                        LOGGER.log(Level.TRACE, "Filter property in Message: " + aMessage.getStringProperty(filterPropertyName));
-                        filterPropertyValue = aMessage.getStringProperty(filterPropertyName);
-                        // Check if the filter-property should be handled
-                        if (filterPropertyDelegator.getPropertyFilterActive(filterPropertyValue)) {
-                            handleMessage(aMessage);
-                        } else {
-                            LOGGER.log(Level.ERROR, "Message received, but fiter property does not fit");
-                        }
-                    } else {
-                        LOGGER.log(Level.ERROR, "Message received, but no filter property set");
-                    }
-                } else {
-                    LOGGER.log(Level.ERROR, "No Filter property set");
-                }
-            } else {
+            if (!(aMessage instanceof TextMessage)) {
                 LOGGER.log(Level.ERROR, "Message received, but not a TextMessage");
+                return;
             }
+
+            if (filterPropertyName == null || filterPropertyName.trim().isEmpty()) {
+                LOGGER.log(Level.ERROR, "No Filter property set");
+                return;
+            }
+            if (!aMessage.propertyExists(filterPropertyName)) {
+                LOGGER.log(Level.ERROR, "Message received, but no filter property set");
+                return;
+            }
+            
+            LOGGER.log(Level.TRACE, "Filter property in Message: " + aMessage.getStringProperty(filterPropertyName));
+            filterPropertyValue = aMessage.getStringProperty(filterPropertyName);
+            // Check if the filter-property should be handled
+            if (!filterPropertyDelegator.getPropertyFilterActive(filterPropertyValue)) {
+                LOGGER.log(Level.ERROR, "Message received, but fiter property does not fit");
+                return;
+            }
+
+            handleMessage(aMessage);
+
         } catch (JMSException jMSException) {
             LOGGER.log(Level.ERROR, jMSException);
         }
     }
 
-    
+
     /**
-     * Message handler function
-     * ACK the message and redirect the request to the System (FilterPropertyDelegator)
+     * Message handler function ACK the message and redirect the request to the
+     * System (FilterPropertyDelegator)
+     *
      * @param aMessage
-     * 
+     *
      */
     private void handleMessage(Message aMessage) {
 

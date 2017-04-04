@@ -14,11 +14,11 @@ import java.util.List;
  *
  * @author uhansen
  */
-public class ReqReplyTestFilterDelegator implements ReqReplyFilterInterface {
+public class ReqReplyTest1_FilterDelegator implements ReqReplyFilterInterface {
 
     private List<String> identList= new ArrayList<>();
 
-    public ReqReplyTestFilterDelegator() {
+    public ReqReplyTest1_FilterDelegator() {
         super();
     }
     

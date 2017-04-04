@@ -15,15 +15,15 @@ import org.springframework.context.ApplicationContext;
  *
  * @author uhansen
  */
-public class ReqReplyStressTestFilterDelegator implements ReqReplyFilterInterface {
+public class ReqReplyTest2_FilterDelegator implements ReqReplyFilterInterface {
 
-    private ReqReplyStressTestHotelList hotelList;
+    private ReqReplyTest2_HotelList hotelList;
 
     @Autowired
     ApplicationContext applicationContext;
     
     
-    public ReqReplyStressTestFilterDelegator() {
+    public ReqReplyTest2_FilterDelegator() {
         super();
     }
     
@@ -31,8 +31,7 @@ public class ReqReplyStressTestFilterDelegator implements ReqReplyFilterInterfac
     
     @Override
     public Boolean getPropertyFilterActive(String aPropertyFilterName) {
-//        return identList.contains(aPropertyFilterValue);
-        hotelList= (ReqReplyStressTestHotelList)applicationContext.getBean("bean_HotelList");
+        hotelList= (ReqReplyTest2_HotelList)applicationContext.getBean("bean_HotelList");
 
         if (hotelList.getFilterPropertyActive(aPropertyFilterName))    {
             return(true);
@@ -44,7 +43,7 @@ public class ReqReplyStressTestFilterDelegator implements ReqReplyFilterInterfac
     @Override
     public String getPropertyFilterResult(String aPropertyFilterName) {
 
-        hotelList= (ReqReplyStressTestHotelList)applicationContext.getBean("bean_HotelList");
+        hotelList= (ReqReplyTest2_HotelList)applicationContext.getBean("bean_HotelList");
         
         return hotelList.getFilterPropertyResult(aPropertyFilterName);
     }
