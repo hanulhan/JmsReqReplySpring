@@ -35,6 +35,11 @@ public class ReqReplyTest1_FilterDelegator implements ReqReplyFilterInterface {
         return false;
     }
 
+    
+    public void requestPropertyFilterResult(String afilterValue, String aMessageId) {
+        
+    }
+    
     @Override
     public String getPropertyFilterResult(String aPropertyFilterValue) {
         String myMsg= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
