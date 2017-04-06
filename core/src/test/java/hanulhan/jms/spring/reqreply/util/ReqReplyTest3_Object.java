@@ -9,38 +9,34 @@ package hanulhan.jms.spring.reqreply.util;
  *
  * @author uhansen
  */
-public class ReqReplyTest3_Object {
-    String messageId;
-    String ident;
-    String request;
+public class ReqReplyTest3_Object extends Object{
+    private String messageId;
+    private int consumerId;
+    private String ident;
+    private String request;
+    boolean inProgress= false;
 
     public ReqReplyTest3_Object(String ident) {
+        super();
         this.ident = ident;
+                
     }
 
-    public String getMessageId() {
-        return messageId;
+    public boolean isInProgress() {
+        return inProgress;
     }
 
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
+    
 
-    public String getIdent() {
-        return ident;
-    }
-
-    public void setIdent(String ident) {
-        this.ident = ident;
-    }
-
-    public String getRequest() {
-        return request;
-    }
-
-    public void setRequest(String request) {
-        this.request = request;
+    public void setNewRequest(String aRequest, String aMessageId, int aConsumerId)  {
+        this.inProgress= true;
+        this.request= aRequest;
+        this.messageId= aMessageId;
+        this.consumerId= aConsumerId;
     }
     
-    
+    @Override
+    public String toString()  {
+        return "Object [ident:" + ident + ", consumer: " + consumerId + ", request: " + request + ", msgId: " + messageId;
+    }
 }
