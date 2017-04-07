@@ -7,21 +7,12 @@ package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyTest3_IdentMap;
 import hanulhan.jms.spring.reqreply.util.ReqReplyTest3_Object;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.PreDestroy;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
@@ -34,11 +25,15 @@ public class ReqReplyTest3 {
 
 //    ApplicationContext applicationContext;
     static final Logger LOGGER = Logger.getLogger(ReqReplyTest3.class);
-    
+
     private final long WAIT_SECONDS = 50;
     private final String SYSTEM_IDENT = "ABCDE";
     private final int REQUEST_QUANTITY = 20;
-    
+    private final int CLIENT_QUANTITY = 2;
+    private final long MAX_CONSUMER_SLEEP_TIME = 500;
+    private final long MIN_CONSUMER_SLEEP_TIME = 50;
+    private final long SYSTEM_RECONNECT_TIME = 200;
+
     ReqReplyTest3_IdentMap identMap = new ReqReplyTest3_IdentMap();
 
 //    @Override
@@ -47,64 +42,137 @@ public class ReqReplyTest3 {
 //    }
     @Test
     public void MyTest() {
-        
-        Consumer myConsumer1 = new Consumer(SYSTEM_IDENT, 1, REQUEST_QUANTITY, identMap);
-        Consumer myConsumer2 = new Consumer(SYSTEM_IDENT, 2, REQUEST_QUANTITY, identMap);
+        Consumer[] myConsumer = new Consumer[CLIENT_QUANTITY];
+        int i;
+        long maxRequestSendTime = 0;
+        long minRequestSendTime = Long.MAX_VALUE;
+        long avgRequestSendTime = 0;
+        long maxSystemHoldTime = 0;
+        long minSystemHoldTime = Long.MAX_VALUE;
+        long avgSystemHoldTime = 0;
+
+        for (i = 0; i < CLIENT_QUANTITY; i++) {
+            myConsumer[i] = new Consumer(SYSTEM_IDENT, (i + 1), REQUEST_QUANTITY, identMap);
+        }
         System mySystem = new System(SYSTEM_IDENT, identMap);
         Date startTime;
         long mySeconds;
-        
+
         mySystem.start();
-        myConsumer1.start();
-        myConsumer2.start();
+        for (i = 0; i < CLIENT_QUANTITY; i++) {
+            myConsumer[i].start();
+        }
 //        LOGGER.log(Level.DEBUG, "Test running for " + WAIT_SECONDS + " s");
 //        startTime = new Date();
 //        do {
 //            mySeconds = (int) ((new Date().getTime() - startTime.getTime()) / 1000);
 //        } while (mySeconds < WAIT_SECONDS);
 
-        while (myConsumer1.isAlive() && myConsumer2.isAlive()) {}
+        boolean isAlive;
+        do {
+            isAlive = false;
+            for (i = 0; i < CLIENT_QUANTITY; i++) {
+                if (myConsumer[i].isActive()) {
+                    isAlive = true;
+                }
+            }
+        } while (isAlive);
+        mySystem.stopMe();
+
         LOGGER.log(Level.DEBUG, "Wait additinal 5 s");
         startTime = new Date();
         do {
             mySeconds = (int) ((new Date().getTime() - startTime.getTime()) / 1000);
-        } while (mySeconds < 5);        
-        mySystem.cancel();
-        Assert.assertTrue("Some Requests not processed, system received: " + mySystem.getRequestReceiveCount(), mySystem.getRequestReceiveCount() == 2 * REQUEST_QUANTITY);
-    }
-    
-    public class System extends Thread {
+        } while (mySeconds < 5);
+
+        Assert.assertTrue("Some Requests not processed, system received: " + mySystem.getRequestReceiveCount(), mySystem.getRequestReceiveCount() == CLIENT_QUANTITY * REQUEST_QUANTITY);
+        Assert.assertTrue("No System should be connected", identMap.size() == 0);
+
+        for (i = 0; i < CLIENT_QUANTITY; i++) {
+            LOGGER.log(Level.DEBUG, "Consumer " + i + " Timeouts: " + myConsumer[i].getRequestTimeoutQuantity());
+        }
+        long l;
+        long [] x= mySystem.getRequestSendTimeStat();
+        for (i=0; i < REQUEST_QUANTITY; i++) {
+            l= x[i];
+            avgRequestSendTime += l;
+            if (minRequestSendTime > l) {
+                minRequestSendTime = l;
+            }
+            if (maxRequestSendTime < l) {
+                maxRequestSendTime = l;
+            }
+        }
+        avgRequestSendTime = avgRequestSendTime / (long)(REQUEST_QUANTITY * CLIENT_QUANTITY);
+
+        x= mySystem.getSystemHoldTimeStat();
+        for (i=0; i < REQUEST_QUANTITY; i++) {
+            l= x[i];
+            if (minSystemHoldTime > l) {
+                minSystemHoldTime = l;
+            }
+            if (maxSystemHoldTime < l) {
+                maxSystemHoldTime = l;
+            }
+        }
+        avgSystemHoldTime = avgSystemHoldTime / (long)mySystem.getSystemConnectCounter();
+
+        LOGGER.log(Level.DEBUG, "###### REQUEST SEND TIME STATISTIC #######");
+        LOGGER.log(Level.DEBUG, "avg: " + avgRequestSendTime + " ms");
+        LOGGER.log(Level.DEBUG, "max: " + maxRequestSendTime + " ms");
+        LOGGER.log(Level.DEBUG, "min: " + minRequestSendTime + " ms");
         
+        LOGGER.log(Level.DEBUG, "###### SYSTEM HOLD TIME STATISTIC #######");
+        LOGGER.log(Level.DEBUG, "avg: " + avgSystemHoldTime + " ms");
+        LOGGER.log(Level.DEBUG, "max: " + maxSystemHoldTime + " ms");
+        LOGGER.log(Level.DEBUG, "min: " + minSystemHoldTime + " ms");
+        
+    }
+
+    
+
+    public class System extends Thread {
+
         private final String ident;
         private boolean active = true;
         ReqReplyTest3_IdentMap identMap;
         private int requestReceiveCount = 0;
-        
+        private int systemConnectCounter= 0;
+        private final long[] requestSendTimeStat;
+        private final long[] systemHoldTimeStat;
+
         @PreDestroy
         public void destroyIt() {
             this.interrupt();
         }
-        
+
         public System(String ident, ReqReplyTest3_IdentMap aIdentMap) {
             this.ident = ident;
             this.identMap = aIdentMap;
+            requestSendTimeStat = new long[CLIENT_QUANTITY * REQUEST_QUANTITY];
+            systemHoldTimeStat = new long[2 * CLIENT_QUANTITY * REQUEST_QUANTITY];
         }
-        
+
         private synchronized void stopMe() {
             this.active = false;
         }
-        
+
         public void cancel() {
             interrupt();
         }
-        
+
         @Override
         @SuppressWarnings("SleepWhileInLoop")
         public void run() {
-            while (!Thread.currentThread().isInterrupted()) {
-//            while (this.active) {
+            Date startTime;
+            long myMilliSeconds;
+            long now;
+
+            while (active) {
                 LOGGER.log(Level.DEBUG, "System [" + ident + "] connected");
-                
+                systemConnectCounter++;
+                startTime = new Date();
+
                 if (identMap.IsIdentInMap(ident)) {
                     LOGGER.log(Level.ERROR, "ERROR: Ident already in map");
                 } else {
@@ -112,78 +180,106 @@ public class ReqReplyTest3 {
                         ReqReplyTest3_Object myObj = new ReqReplyTest3_Object(ident);
                         synchronized (myObj) {
                             LOGGER.log(Level.TRACE, "System enter synchronized block");
-                            
+
                             identMap.put(ident, myObj);
                             LOGGER.log(Level.TRACE, "System waits for notify");
                             myObj.wait(2000);
-                            
+                            systemHoldTimeStat[systemConnectCounter-1] = (new Date().getTime() - startTime.getTime());
                             if (myObj.isInProgress()) {
+                                now= new Date().getTime();
+                                long z= myObj.getStartTime().getTime();
+                                myMilliSeconds= now - z;
+                                requestSendTimeStat[requestReceiveCount] = myMilliSeconds;
                                 requestReceiveCount++;
+
                                 LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect with Response: " + myObj.toString());
                             } else {
-                                LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect");
+                                LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect ");
                             }
                             if (identMap.IsIdentInMap(ident)) {
                                 identMap.remove(ident);
                             }
                         }
-                        Thread.sleep(200);
+                        Thread.sleep(SYSTEM_RECONNECT_TIME);
                     } catch (InterruptedException ex) {
                         LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect");
                     }
                 }
             }
         }
-        
+
         public int getRequestReceiveCount() {
             return requestReceiveCount;
         }
+
+        public long[] getRequestSendTimeStat() {
+            return requestSendTimeStat;
+        }
+
+        public long[] getSystemHoldTimeStat() {
+            return systemHoldTimeStat;
+        }
+
+        public int getSystemConnectCounter() {
+            return systemConnectCounter;
+        }
         
+        
+
     }
-    
+
     public class Consumer extends Thread {
-        
+
         private final String ident;
         private boolean active;
         private final int consumerId;
-        private int requestQuantity;
-        
+        private final int requestSendQuantity;
+        private int requestTimeoutQuantity = 0;
+
         ReqReplyTest3_IdentMap identMap;
-        
+
         public Consumer(String ident, int aId, int aReqQuantity, ReqReplyTest3_IdentMap aIdentMap) {
             this.active = true;
             this.ident = ident;
             this.consumerId = aId;
-            this.requestQuantity = aReqQuantity;
+            this.requestSendQuantity = aReqQuantity;
             this.identMap = aIdentMap;
         }
-        
+
         private synchronized void stopMe() {
             this.active = false;
         }
-        
+
+        public int getRequestTimeoutQuantity() {
+            return requestTimeoutQuantity;
+        }
+
         @Override
         @SuppressWarnings("SleepWhileInLoop")
         public void run() {
             int i = 0;
-            while (i < requestQuantity) {
+            while (i < requestSendQuantity) {
                 try {
-                    //while (!identMap.ready(ident)) {}
-//                LOGGER.log(Level.TRACE, "Consumer: " + consumerId +" try to add Request to map");
-                    if (identMap.addRequest(ident, consumerId, "HALLO", "MESSAGE-" + (i + 1), 1000))  {
+                    if (identMap.addRequest(ident, consumerId, "HALLO", "MESSAGE-" + (i + 1), 2000)) {
                         i++;
+                    } else {
+                        requestTimeoutQuantity++;
                     }
-                    Thread.sleep(200);
+                    Thread.sleep(randomNumber(MIN_CONSUMER_SLEEP_TIME, MAX_CONSUMER_SLEEP_TIME));
                 } catch (InterruptedException ex) {
                     LOGGER.log(Level.ERROR, ex);
                 }
             }
             this.active = false;
         }
-        
+
         public boolean isActive() {
             return active;
         }
-        
+
+    }
+
+    private long randomNumber(long aMinValue, long aMaxValue) {
+        return aMinValue + (long) (Math.random() * (aMaxValue - aMinValue));
     }
 }

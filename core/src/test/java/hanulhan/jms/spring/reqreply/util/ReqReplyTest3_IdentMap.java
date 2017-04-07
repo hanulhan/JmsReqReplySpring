@@ -6,6 +6,7 @@
 package hanulhan.jms.spring.reqreply.util;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -57,46 +58,53 @@ public class ReqReplyTest3_IdentMap {
         return this.identMap.containsKey(aIdent);
     }
 
-    public synchronized boolean ready(String aIdent) {
-        boolean retValue = false;
-        try {
-            available.acquire();
-            retValue = identMap.containsKey(aIdent) && !identMap.get(aIdent).isInProgress();
-        } catch (InterruptedException ex) {
-            LOGGER.log(Level.ERROR, ex);
-        } finally {
-            available.release();
-        }
-        return retValue;
-    }
+//    public synchronized boolean ready(String aIdent) {
+//        boolean retValue = false;
+//        try {
+//            available.acquire();
+//            retValue = identMap.containsKey(aIdent) && !identMap.get(aIdent).isInProgress();
+//        } catch (InterruptedException ex) {
+//            LOGGER.log(Level.ERROR, ex);
+//        } finally {
+//            available.release();
+//        }
+//        return retValue;
+//    }
 
+    
     public boolean addRequest(String aIdent, int aConsumerId, String aRequest, String aMessageId, long aTimeout) {
 
         boolean retValue = false;
+        Date startTime= new Date();
         try {
-            if (available.tryAcquire(aTimeout, TimeUnit.MILLISECONDS)) {
-                LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " AQUIRE map");
+//            if (available.tryAcquire(aTimeout, TimeUnit.MILLISECONDS)) {
+                available.acquire();
+                LOGGER.log(Level.DEBUG, "Consumer: " + aConsumerId + " AQUIRE map in " + (new Date().getTime() - startTime.getTime()) + "ms");
                 if (identMap.containsKey(aIdent) && !identMap.get(aIdent).isInProgress()) {
 //                if (identMap.containsKey(aIdent)) {
                     ReqReplyTest3_Object myObj = identMap.get(aIdent);
                     synchronized (myObj) {
-                        myObj.setNewRequest(aRequest, aMessageId, aConsumerId);
+                        myObj.setNewRequest(aRequest, aMessageId, aConsumerId, startTime);
                         LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " NOTIFY Object");
                         myObj.notify();
                         retValue = true;
-                        //identMap.remove(aIdent);
+                        identMap.remove(aIdent);
                     }
                 } else {
-                    LOGGER.log(Level.TRACE, "ident not in map or busy");
+                    LOGGER.log(Level.ERROR, "ident not in map or busy");
                 }
-            } else {
-                LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + "could not aquire map");
-            }
+//            } else {
+//                LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + "could not aquire map");
+//            }
         } catch (InterruptedException interruptedException) {
             LOGGER.log(Level.ERROR, interruptedException);
         } finally {
             available.release();
         }
         return retValue;
+    }
+    
+    public int size()  {
+        return identMap.size();
     }
 }

@@ -5,6 +5,8 @@
  */
 package hanulhan.jms.spring.reqreply.util;
 
+import java.util.Date;
+
 /**
  *
  * @author uhansen
@@ -14,6 +16,7 @@ public class ReqReplyTest3_Object extends Object{
     private int consumerId;
     private String ident;
     private String request;
+    private Date startTime;
     boolean inProgress= false;
 
     public ReqReplyTest3_Object(String ident) {
@@ -34,6 +37,23 @@ public class ReqReplyTest3_Object extends Object{
         this.messageId= aMessageId;
         this.consumerId= aConsumerId;
     }
+
+    public void setNewRequest(String aRequest, String aMessageId, int aConsumerId, Date aStartTime)  {
+        this.inProgress= true;
+        this.request= aRequest;
+        this.messageId= aMessageId;
+        this.consumerId= aConsumerId;
+        this.startTime= aStartTime;
+    }
+    
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+    
     
     @Override
     public String toString()  {
