@@ -28,11 +28,11 @@ public class ReqReplyTest3 {
 
     private final long WAIT_SECONDS = 50;
     private final String SYSTEM_IDENT = "ABCDE";
-    private final int REQUEST_QUANTITY = 20;
-    private final int CLIENT_QUANTITY = 2;
+    private final int REQUEST_QUANTITY = 2;
+    private final int CLIENT_QUANTITY = 10;
     private final long MAX_CONSUMER_SLEEP_TIME = 500;
-    private final long MIN_CONSUMER_SLEEP_TIME = 50;
-    private final long SYSTEM_RECONNECT_TIME = 200;
+    private final long MIN_CONSUMER_SLEEP_TIME = 100;
+    private final long SYSTEM_RECONNECT_TIME = 100;
 
     ReqReplyTest3_IdentMap identMap = new ReqReplyTest3_IdentMap();
 
@@ -85,9 +85,6 @@ public class ReqReplyTest3 {
             mySeconds = (int) ((new Date().getTime() - startTime.getTime()) / 1000);
         } while (mySeconds < 5);
 
-        Assert.assertTrue("Some Requests not processed, system received: " + mySystem.getRequestReceiveCount(), mySystem.getRequestReceiveCount() == CLIENT_QUANTITY * REQUEST_QUANTITY);
-        Assert.assertTrue("No System should be connected", identMap.size() == 0);
-
         for (i = 0; i < CLIENT_QUANTITY; i++) {
             LOGGER.log(Level.DEBUG, "Consumer " + i + " Timeouts: " + myConsumer[i].getRequestTimeoutQuantity());
         }
@@ -108,6 +105,7 @@ public class ReqReplyTest3 {
         x= mySystem.getSystemHoldTimeStat();
         for (i=0; i < REQUEST_QUANTITY; i++) {
             l= x[i];
+            avgSystemHoldTime += l;
             if (minSystemHoldTime > l) {
                 minSystemHoldTime = l;
             }
@@ -126,7 +124,9 @@ public class ReqReplyTest3 {
         LOGGER.log(Level.DEBUG, "avg: " + avgSystemHoldTime + " ms");
         LOGGER.log(Level.DEBUG, "max: " + maxSystemHoldTime + " ms");
         LOGGER.log(Level.DEBUG, "min: " + minSystemHoldTime + " ms");
-        
+
+        Assert.assertTrue("Some Requests not processed, system received: " + mySystem.getRequestReceiveCount(), mySystem.getRequestReceiveCount() == CLIENT_QUANTITY * REQUEST_QUANTITY);
+        Assert.assertTrue("No System should be connected", identMap.size() == 0);        
     }
 
     
@@ -197,7 +197,7 @@ public class ReqReplyTest3 {
                                 LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect ");
                             }
                             if (identMap.IsIdentInMap(ident)) {
-                                identMap.remove(ident);
+                                identMap.delete(ident);
                             }
                         }
                         Thread.sleep(SYSTEM_RECONNECT_TIME);

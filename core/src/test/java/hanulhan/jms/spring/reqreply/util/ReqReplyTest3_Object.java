@@ -5,7 +5,9 @@
  */
 package hanulhan.jms.spring.reqreply.util;
 
+import static hanulhan.jms.spring.reqreply.util.ReqReplyTest3_IdentMap.LOGGER;
 import java.util.Date;
+import org.apache.log4j.Level;
 
 /**
  *
@@ -44,6 +46,7 @@ public class ReqReplyTest3_Object extends Object{
         this.messageId= aMessageId;
         this.consumerId= aConsumerId;
         this.startTime= aStartTime;
+        LOGGER.log(Level.DEBUG, "setNewRequest [consumer:" + aConsumerId + ", messageId: " + aMessageId);
     }
     
     public Date getStartTime() {
