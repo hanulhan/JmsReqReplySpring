@@ -21,18 +21,30 @@ public class ReqReplyTest3_Object extends Object{
     private Date startTime;
     boolean inProgress= false;
 
+    /**
+     *
+     * @param ident
+     */
     public ReqReplyTest3_Object(String ident) {
         super();
         this.ident = ident;
                 
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isInProgress() {
         return inProgress;
     }
 
-    
-
+    /**
+     *
+     * @param aRequest
+     * @param aMessageId
+     * @param aConsumerId
+     */
     public void setNewRequest(String aRequest, String aMessageId, int aConsumerId)  {
         this.inProgress= true;
         this.request= aRequest;
@@ -40,6 +52,13 @@ public class ReqReplyTest3_Object extends Object{
         this.consumerId= aConsumerId;
     }
 
+    /**
+     *
+     * @param aRequest
+     * @param aMessageId
+     * @param aConsumerId
+     * @param aStartTime
+     */
     public void setNewRequest(String aRequest, String aMessageId, int aConsumerId, Date aStartTime)  {
         this.inProgress= true;
         this.request= aRequest;
@@ -49,10 +68,18 @@ public class ReqReplyTest3_Object extends Object{
         LOGGER.log(Level.DEBUG, "setNewRequest [consumer:" + aConsumerId + ", messageId: " + aMessageId);
     }
     
+    /**
+     *
+     * @return
+     */
     public Date getStartTime() {
         return startTime;
     }
 
+    /**
+     *
+     * @param startTime
+     */
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }

@@ -22,7 +22,7 @@ public class ReqReplyMessageObject {
     private String messageId = null;
     private String filterValue = null;
     private String filterName = null;
-    private Date startTime = new Date();
+    private final Date startTime = new Date();
     private long responseTime = 0;
 
     // vars modified by a new message
@@ -36,6 +36,12 @@ public class ReqReplyMessageObject {
     private ReqReplyStatusCode statusCode = ReqReplyStatusCode.STATUS_ERROR;
     static final Logger LOGGER = Logger.getLogger(ReqReplyMessageObject.class);
 
+    /**
+     *
+     * @param aMessageId
+     * @param aFilterName
+     * @param aFilterValue
+     */
     public ReqReplyMessageObject(String aMessageId, String aFilterName, String aFilterValue) {
         super();
         this.messageId = aMessageId;
@@ -44,6 +50,12 @@ public class ReqReplyMessageObject {
         this.msgBitMask= 0;
     }
 
+    /**
+     *
+     * @param aMessage
+     * @return
+     * @throws JMSException
+     */
     public ReqReplyStatusCode add(Message aMessage) throws JMSException {
 
         int lfdMsg;
@@ -80,10 +92,18 @@ public class ReqReplyMessageObject {
         return this.statusCode;
     }
 
+    /**
+     *
+     * @return
+     */
     public synchronized boolean isFinished() {
         return this.ackReceived && this.msgCount > 0 && this.msgCount == this.totalCount;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getResponse() {
         String myResponse = null;
 
@@ -162,42 +182,82 @@ public class ReqReplyMessageObject {
         return ReqReplyStatusCode.STATUS_OK;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getStatusOk() {
         return statusCode == ReqReplyStatusCode.STATUS_OK;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getMessageId() {
         return messageId;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMsgBitMask() {
         return msgBitMask;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFilterValue() {
         return filterValue;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFilterName() {
         return filterName;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getResponseTime() {
         return responseTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isAckReceived() {
         return ackReceived;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMsgCount() {
         return msgCount;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTotalCount() {
         return totalCount;
     }
 
+    /**
+     *
+     * @return
+     */
     public ReqReplyStatusCode getStatusCode() {
         return statusCode;
     }

@@ -17,6 +17,10 @@ public class JMSReqErrorHandler implements ErrorHandler    {
 
     private static final Logger LOGGER = Logger.getLogger(JMSReqErrorHandler.class);
     
+    /**
+     *
+     * @param thrwbl
+     */
     @Override
     public void handleError(Throwable thrwbl) {
         LOGGER.log(Level.ERROR, "Error in Req-EventListener\n" + thrwbl);

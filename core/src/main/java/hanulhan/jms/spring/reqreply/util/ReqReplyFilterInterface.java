@@ -10,6 +10,18 @@ package hanulhan.jms.spring.reqreply.util;
  * @author uhansen
  */
 public interface ReqReplyFilterInterface {
+
+    /**
+     *
+     * @param aPropertyFilterName
+     * @return
+     */
     public Boolean getPropertyFilterActive(String aPropertyFilterName);
+
+    /**
+     *
+     * @param aPropertyFilterName
+     * @return
+     */
     public String  getPropertyFilterResult(String aPropertyFilterName);
 }

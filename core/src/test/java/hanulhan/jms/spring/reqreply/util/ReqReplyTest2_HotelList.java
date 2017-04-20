@@ -19,6 +19,9 @@ public class ReqReplyTest2_HotelList {
 
     private Map<String, ReqReplyTest2_Hotel> hotelList = new HashMap<>();
 
+    /**
+     *
+     */
     public ReqReplyTest2_HotelList() {
         super();
     }
@@ -35,6 +38,10 @@ public class ReqReplyTest2_HotelList {
         return hotelList.containsKey(aPropertyFilterName);
     }
 
+    /**
+     *
+     * @param aHotel
+     */
     public void add(ReqReplyTest2_Hotel aHotel) {
         hotelList.put(aHotel.getSystemIdent(), aHotel);
     }

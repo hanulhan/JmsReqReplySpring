@@ -13,6 +13,10 @@ import org.springframework.context.ApplicationEvent;
  */
 public class ReqReplyTest_Event extends ApplicationEvent {
     
+    /**
+     *
+     * @param source
+     */
     public ReqReplyTest_Event(Object source) {
         super(source);
     }

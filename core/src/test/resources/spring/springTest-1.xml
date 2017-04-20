@@ -118,7 +118,7 @@
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
           p:durableSubscriptionName="REPLY-SUBSCRIBER"
-          p:errorHandler-ref="bean_jmsReplyErrorHandler"
+          p:errorHandler-ref="bean_jmsErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
     <bean id="bean_FilterPropertyDelegator" class="hanulhan.jms.spring.reqreply.util.ReqReplyTest1_FilterDelegator">
@@ -132,8 +132,7 @@
         </property>
     </bean>
 
-    <bean id="bean_jmsReqErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReqErrorHandler" />
-    <bean id="bean_jmsReplyErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReplyErrorHandler" />
+    <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSErrorHandler" />
 
     
     

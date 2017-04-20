@@ -24,10 +24,18 @@ public class ReqReplyTest3_IdentMap {
     private final Semaphore available = new Semaphore(1, true);
     static final Logger LOGGER = Logger.getLogger(ReqReplyTest3_IdentMap.class);
 
+    /**
+     *
+     */
     public ReqReplyTest3_IdentMap() {
         identMap = Collections.synchronizedMap(new HashMap<String, ReqReplyTest3_Object>());
     }
 
+    /**
+     *
+     * @param aIdent
+     * @param aObj
+     */
     public synchronized void put(String aIdent, ReqReplyTest3_Object aObj) {
         try {
             available.acquire();
@@ -40,6 +48,10 @@ public class ReqReplyTest3_IdentMap {
         }
     }
 
+    /**
+     *
+     * @param aIdent
+     */
     public synchronized void delete(String aIdent) {
         try {
             available.acquire();
@@ -52,44 +64,60 @@ public class ReqReplyTest3_IdentMap {
         }
     }
 
+    /**
+     *
+     * @param aIdent
+     * @return
+     */
     public synchronized boolean IsIdentInMap(String aIdent) {
         return this.identMap.containsKey(aIdent);
     }
 
+    /**
+     *
+     * @param aIdent
+     * @param aConsumerId
+     * @param aRequest
+     * @param aMessageId
+     * @param aTimeout
+     * @return
+     */
     @SuppressWarnings("SleepWhileInLoop")
     public boolean addRequest(String aIdent, int aConsumerId, String aRequest, String aMessageId, long aTimeout) {
 
         boolean retValue = false;
         Date startTime = new Date();
         long myMilliSeconds;
+        long myAquireTimeMs= aTimeout / 10;
         do {
             try {
-                if (available.tryAcquire(250, TimeUnit.MILLISECONDS)) {
+                if (available.tryAcquire(myAquireTimeMs, TimeUnit.MILLISECONDS)) {
+//                    LOGGER.log(Level.DEBUG, "Consumer: " + aConsumerId + " aquire identMap");
                     if (identMap.containsKey(aIdent) && !identMap.get(aIdent).isInProgress()) {
                         ReqReplyTest3_Object myObj = identMap.get(aIdent);
                         
                         synchronized (myObj) {
                             myObj.setNewRequest(aRequest, aMessageId, aConsumerId, startTime);
-                            LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " NOTIFY Object");
+//                            LOGGER.log(Level.DEBUG, "Consumer: " + aConsumerId + " NOTIFY Object");
                             retValue = true;
                             identMap.remove(aIdent);
                             myObj.notify();
                         }
-                    } else {
-                        Thread.sleep(100);
-//                        LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " AQUIRE map in " + (new Date().getTime() - startTime.getTime()) + "ms, but ident not in map");
                     }
+                } else {
+                    Thread.sleep(myAquireTimeMs);
                 }
             } catch (InterruptedException ex) {
                 LOGGER.log(Level.ERROR, ex);
             } finally {
                 available.release();
+//                LOGGER.log(Level.DEBUG, "Consumer: " + aConsumerId + " release identMap");
             }
             myMilliSeconds = (new Date().getTime() - startTime.getTime());
         } while (retValue == false && myMilliSeconds < aTimeout);
 
         if (myMilliSeconds >= aTimeout)    {
-            LOGGER.log(Level.ERROR, "TIMEOUT");
+            LOGGER.log(Level.ERROR, "TIMEOUT (" + myMilliSeconds + ") Consumer: " + aConsumerId + " adding Request ");
         }
         return retValue;
     }
@@ -132,6 +160,11 @@ public class ReqReplyTest3_IdentMap {
 //        }
 //        return retValue;
 //    }
+
+    /**
+     *
+     * @return
+     */
     public int size() {
         return identMap.size();
     }

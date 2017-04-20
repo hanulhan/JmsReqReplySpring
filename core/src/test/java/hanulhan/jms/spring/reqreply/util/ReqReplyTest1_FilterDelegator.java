@@ -5,8 +5,6 @@
  */
 package hanulhan.jms.spring.reqreply.util;
 
-import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
-import static java.lang.Thread.sleep;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +16,9 @@ public class ReqReplyTest1_FilterDelegator implements ReqReplyFilterInterface {
 
     private List<String> identList= new ArrayList<>();
 
+    /**
+     *
+     */
     public ReqReplyTest1_FilterDelegator() {
         super();
     }
@@ -35,7 +36,11 @@ public class ReqReplyTest1_FilterDelegator implements ReqReplyFilterInterface {
         return false;
     }
 
-    
+    /**
+     *
+     * @param afilterValue
+     * @param aMessageId
+     */
     public void requestPropertyFilterResult(String afilterValue, String aMessageId) {
         
     }
@@ -56,6 +61,10 @@ public class ReqReplyTest1_FilterDelegator implements ReqReplyFilterInterface {
         return retValue;
     }
 
+    /**
+     *
+     * @param identList
+     */
     public void setIdentList(List<String> identList) {
         this.identList = identList;
     }

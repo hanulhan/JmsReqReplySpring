@@ -25,6 +25,10 @@ public class ReqReplyMessageStorage {
     static final Logger LOGGER = Logger.getLogger(ReqReplyMessageStorage.class);
     private String filterName;
 
+    /**
+     *
+     * @param aFilterName
+     */
     public ReqReplyMessageStorage(String aFilterName) {
         super();
         this.filterName = aFilterName;
@@ -74,6 +78,13 @@ public class ReqReplyMessageStorage {
 //        }
 //        return myStatus;
 //    }
+
+    /**
+     *
+     * @param aMessage
+     * @return
+     * @throws JMSException
+     */
     public synchronized ReqReplyStatusCode add(Message aMessage) throws JMSException {
         String myMessageId;
         ReqReplyStatusCode myStatus = ReqReplyStatusCode.STATUS_ERROR;
@@ -119,6 +130,13 @@ public class ReqReplyMessageStorage {
         return myStatus;
     }
 
+    /**
+     *
+     * @param aMessageId
+     * @param aFilterValue
+     * @return
+     * @throws JMSException
+     */
     public synchronized ReqReplyStatusCode add(String aMessageId, String aFilterValue) throws JMSException {
         String myMessageId;
         ReqReplyStatusCode myStatus = ReqReplyStatusCode.STATUS_ERROR;
@@ -140,6 +158,11 @@ public class ReqReplyMessageStorage {
         return myStatus;
     }
 
+    /**
+     *
+     * @param myMessageId
+     * @return
+     */
     public synchronized String getResponse(String myMessageId) {
         String myReturn = null;
         ReqReplyMessageObject myMsgObj;
@@ -159,6 +182,11 @@ public class ReqReplyMessageStorage {
         return myReturn;
     }
 
+    /**
+     *
+     * @param aMessageId
+     * @return
+     */
     public synchronized ReqReplyMessageObject getMsgObj(String aMessageId) {
         ReqReplyMessageObject myMsgObj = null;
 
@@ -173,6 +201,11 @@ public class ReqReplyMessageStorage {
         return myMsgObj;
     }
 
+    /**
+     *
+     * @param myMessageId
+     * @return
+     */
     public synchronized boolean isResponseReceived(String myMessageId) {
         boolean myReturn = false;
         try {
@@ -188,10 +221,18 @@ public class ReqReplyMessageStorage {
         return myReturn;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<String, ReqReplyMessageObject> getMsgMap() {
         return msgMap;
     }
 
+    /**
+     *
+     * @return
+     */
     public int size() {
         return msgMap.size();
     }

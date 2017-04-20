@@ -16,12 +16,18 @@ public class ReqReplyTest1_Hotel implements ApplicationEventPublisherAware {
 
     private ApplicationEventPublisher publisher;
     
-    
+    /**
+     *
+     * @param aep
+     */
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher aep) {
         this.publisher= aep;
     }
 
+    /**
+     *
+     */
     public void publish() {
         ReqReplyTest_Event myEvent= new ReqReplyTest_Event(this);
         publisher.publishEvent(myEvent);

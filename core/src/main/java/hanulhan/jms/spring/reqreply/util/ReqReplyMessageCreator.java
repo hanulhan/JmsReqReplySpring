@@ -32,13 +32,21 @@ public class ReqReplyMessageCreator implements MessageCreator {
     private final String messageText;
     private static final Logger LOGGER = Logger.getLogger(ReqReplyMessageCreator.class);
 
-
+    /**
+     *
+     * @param aMsg
+     * @param aReplyDestination
+     */
     public ReqReplyMessageCreator(String aMsg, Destination aReplyDestination) {
         this.messageText = aMsg;
         this.replyDestination= aReplyDestination;
     }
 
-
+    /**
+     *
+     * @param aMsg
+     * @param aCorrelationId
+     */
     public ReqReplyMessageCreator(String aMsg, String aCorrelationId) {
         this.correlationId = aCorrelationId;
         this.messageText = aMsg;
@@ -88,6 +96,11 @@ public class ReqReplyMessageCreator implements MessageCreator {
         return txtMessage;
     }
 
+    /**
+     *
+     * @param aPropertyKey
+     * @param aPropertyValue
+     */
     public void setStringProperty(String aPropertyKey, String aPropertyValue) {
         if (propertyStringMap == null) {
             propertyStringMap = new HashMap<>();
@@ -95,6 +108,11 @@ public class ReqReplyMessageCreator implements MessageCreator {
         propertyStringMap.put(aPropertyKey, aPropertyValue);
     }
 
+    /**
+     *
+     * @param aPropertyKey
+     * @param aPropertyValue
+     */
     public void setIntProperty(String aPropertyKey, Integer aPropertyValue) {
         if (propertyIntMap == null) {
             propertyIntMap = new HashMap<>();
@@ -102,10 +120,19 @@ public class ReqReplyMessageCreator implements MessageCreator {
         propertyIntMap.put(aPropertyKey, aPropertyValue);
     }
 
+    /**
+     *
+     * @return
+     */
     public String getMessageText() {
         return messageText;
     }
 
+    /**
+     *
+     * @return
+     * @throws JMSException
+     */
     public String getMessageId() throws JMSException {
         return txtMessage.getJMSMessageID();
     }

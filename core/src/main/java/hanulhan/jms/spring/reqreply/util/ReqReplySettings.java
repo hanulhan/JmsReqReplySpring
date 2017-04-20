@@ -12,10 +12,30 @@ import javax.jms.Destination;
  * @author uhansen
  */
 public class ReqReplySettings {
+
+    /**
+     *
+     */
     public static final String PROPERTY_NAME_COUNT = "MSG_COUNT";
+
+    /**
+     *
+     */
     public static final String PROPERTY_NAME_TOTAL_COUNT = "TOTAL_COUNT";
+
+    /**
+     *
+     */
     public static final String PROPERTY_NAME_MSG_TYPE = "MSG_TYPE";
+
+    /**
+     *
+     */
     public static final String PROPERTY_VALUE_MSG_TYPE_ACK = "ACK";
+
+    /**
+     *
+     */
     public static final String PROPERTY_VALUE_MSG_TYPE_PAYLOAD = "PAYLOAD";
     
     private Destination reqDestination;
@@ -32,82 +52,162 @@ public class ReqReplySettings {
     private String      reqSubscriberName;
     private String      replySubscriberName;
 
+    /**
+     *
+     * @return
+     */
     public Destination getReqDestination() {
         return reqDestination;
     }
 
+    /**
+     *
+     * @param reqDestination
+     */
     public void setReqDestination(Destination reqDestination) {
         this.reqDestination = reqDestination;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getReqDestinationName() {
         return reqDestinationName;
     }
 
+    /**
+     *
+     * @param reqDestinationName
+     */
     public void setReqDestinationName(String reqDestinationName) {
         this.reqDestinationName = reqDestinationName;
     }
 
+    /**
+     *
+     * @return
+     */
     public Destination getReplyDestination() {
         return replyDestination;
     }
 
+    /**
+     *
+     * @param replyDestination
+     */
     public void setReplyDestination(Destination replyDestination) {
         this.replyDestination = replyDestination;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getReplyDestinationName() {
         return replyDestinationName;
     }
 
+    /**
+     *
+     * @param replyDestinationName
+     */
     public void setReplyDestinationName(String replyDestinationName) {
         this.replyDestinationName = replyDestinationName;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMaxMessageLength() {
         return maxMessageLength;
     }
 
+    /**
+     *
+     * @param maxMessageLength
+     */
     public void setMaxMessageLength(int maxMessageLength) {
         this.maxMessageLength = maxMessageLength;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getServerId() {
         return serverId;
     }
 
+    /**
+     *
+     * @param serverId
+     */
     public void setServerId(String serverId) {
         this.serverId = serverId;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getClientId() {
         return clientId;
     }
 
+    /**
+     *
+     * @param clientId
+     */
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFilterPropertyName() {
         return filterPropertyName;
     }
 
+    /**
+     *
+     * @param filterPropertyName
+     */
     public void setFilterPropertyName(String filterPropertyName) {
         this.filterPropertyName = filterPropertyName;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getReqSubscriberName() {
         return reqSubscriberName;
     }
 
+    /**
+     *
+     * @param reqSubscriberName
+     */
     public void setReqSubscriberName(String reqSubscriberName) {
         this.reqSubscriberName = reqSubscriberName;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getReplySubscriberName() {
         return replySubscriberName;
     }
 
+    /**
+     *
+     * @param replySubscriberName
+     */
     public void setReplySubscriberName(String replySubscriberName) {
         this.replySubscriberName = replySubscriberName;
     }

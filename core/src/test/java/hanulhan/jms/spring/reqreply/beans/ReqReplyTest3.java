@@ -28,11 +28,13 @@ public class ReqReplyTest3 {
 
     private final long WAIT_SECONDS = 50;
     private final String SYSTEM_IDENT = "ABCDE";
-    private final int REQUEST_QUANTITY = 2;
-    private final int CLIENT_QUANTITY = 10;
+    private final int REQUEST_QUANTITY = 20;
+    private final int CLIENT_QUANTITY = 20;
     private final long MAX_CONSUMER_SLEEP_TIME = 500;
     private final long MIN_CONSUMER_SLEEP_TIME = 100;
     private final long SYSTEM_RECONNECT_TIME = 100;
+    private final long REQUEST_TIMEOUT_MS = 2500;
+    private final long AQUIRE_TIME_MS = 250;
 
     ReqReplyTest3_IdentMap identMap = new ReqReplyTest3_IdentMap();
 
@@ -260,9 +262,10 @@ public class ReqReplyTest3 {
             int i = 0;
             while (i < requestSendQuantity) {
                 try {
-                    if (identMap.addRequest(ident, consumerId, "HALLO", "MESSAGE-" + (i + 1), 2000)) {
+                    if (identMap.addRequest(ident, consumerId, "HALLO", "MESSAGE-" + (i + 1), REQUEST_TIMEOUT_MS)) {
                         i++;
                     } else {
+                        LOGGER.log(Level.DEBUG, "TIMEOUT addRequest");
                         requestTimeoutQuantity++;
                     }
                     Thread.sleep(randomNumber(MIN_CONSUMER_SLEEP_TIME, MAX_CONSUMER_SLEEP_TIME));

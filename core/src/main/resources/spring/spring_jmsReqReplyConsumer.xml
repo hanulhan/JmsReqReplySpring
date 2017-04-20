@@ -19,7 +19,7 @@
         http://www.springframework.org/schema/task/spring-task-3.0.xsd
     ">
     
-    <!-- spring_jmsReqReplyProducer.xml -->
+    <!-- spring_jmsReqReplyConsumer.xml -->
     
     <bean   id="bean_jmsReqReplyConsumer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer" scope="singleton" >
         <property name="jmsTemplate"            ref="bean_jmsTopicTemplate" />
@@ -38,7 +38,7 @@
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
           p:durableSubscriptionName="REQ-SUBSCRIBER"
-          p:errorHandler-ref="bean_jmsReqErrorHandler"
+          p:errorHandler-ref="bean_jmsErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
     
 </beans>
