@@ -178,7 +178,7 @@ public class ReqReplyTest4 {
 
             while (active) {
                 LOGGER.log(Level.DEBUG, "System [" + ident + "] connected");
-                systemConnectCounter++;
+
                 startTime = new Date();
 
                 if (identMap.IsIdentInMap(ident)) {
