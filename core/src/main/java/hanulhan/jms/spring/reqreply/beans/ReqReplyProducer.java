@@ -6,7 +6,6 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageStorage;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
@@ -58,6 +57,7 @@ public class ReqReplyProducer implements MessageListener {
      * @return the JMS-messageId or null
      * @throws InterruptedException 
      */
+    @SuppressWarnings("SleepWhileInLoop")
     public String getResponse(String aRequest, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
         Date startTime = new Date();
         int myMilliSeconds;
@@ -74,9 +74,9 @@ public class ReqReplyProducer implements MessageListener {
         if (messageStorage.isResponseReceived(myMessageId))  {
             return messageStorage.getResponse(myMessageId);
         } else {
-            ReqReplyMessageObject myMsgObj= messageStorage.getMsgObj(myMessageId);
+            //ReqReplyMessageObject myMsgObj= messageStorage.getMsgObj(myMessageId);
             LOGGER.log(Level.ERROR, "################ RESPONSE is null #####################");
-            LOGGER.log(Level.ERROR, myMsgObj.toString());
+            //LOGGER.log(Level.ERROR, myMsgObj.toString());
         }
         return null;
     }
@@ -118,7 +118,8 @@ public class ReqReplyProducer implements MessageListener {
      */
     @Override
     public void onMessage(Message aMessage) {
-        ReqReplyStatusCode myStatus= ReqReplyStatusCode.STATUS_ERROR;
+        ReqReplyStatusCode myStatus;
+        LOGGER.log(Level.DEBUG, "onMessage()");
         try {
             myStatus= messageStorage.add(aMessage);
             if (myStatus.isError()) {

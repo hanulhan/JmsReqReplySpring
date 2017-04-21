@@ -35,8 +35,8 @@
 
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <!--        <property name="brokerURL" value="tcp://localhost:61616" />-->
-        <!--        <property name="brokerURL" value="vm://localhost?brokerConfig=xbean:activemq.xml" />-->
+<!--                <property name="brokerURL" value="tcp://localhost:61616" />-->
+<!--                <property name="brokerURL" value="vm://localhost?brokerConfig=xbean:activemq.xml" />-->
         <property name="brokerURL" value="tcp://192.168.20.12:61616" />
         <property name="sendTimeout" value="0" />
     </bean>

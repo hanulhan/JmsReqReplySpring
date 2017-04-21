@@ -21,11 +21,11 @@
     </logger>    
 
     <logger name="org.springframework.jms">
-        <level value="INFO" />
+        <level value="DEBUG" />
     </logger>    
 
     <logger name="javax.jms">
-        <level value="INFO" />
+        <level value="DEBUG" />
     </logger>    
 
 

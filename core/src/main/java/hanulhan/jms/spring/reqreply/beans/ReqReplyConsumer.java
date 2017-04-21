@@ -13,8 +13,10 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
+import hanulhan.jms.spring.reqreply.util.ReqReplyFilterMap;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
+import hanulhan.jms.spring.reqreply.util.RequestObject;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
@@ -36,13 +38,12 @@ public class ReqReplyConsumer implements MessageListener {
     private String filterPropertyName;
 
     private ReqReplyFilterInterface filterPropertyDelegator;
-    private String serverId;
+    private String consumerId;
     private Integer maxMessageLength;
 
     // internal
     private static final Logger LOGGER = Logger.getLogger(ReqReplyConsumer.class);
-    private String filterPropertyValue;
-//    private ReqReplyMessageObject myResponse= new ReqReplyMessageObject();
+    private ReqReplyFilterMap filterMap = new ReqReplyFilterMap();
 
     /**
      *
@@ -64,6 +65,32 @@ public class ReqReplyConsumer implements MessageListener {
     }
 
     /**
+     *
+     * @param aReqObj
+     * @return
+     */
+    public boolean ConnectSystem(RequestObject aReqObj) {
+        String myFilterValue = aReqObj.getFilterValue();
+
+        if (filterMap.IsFilterInMap(myFilterValue)) {
+            return false;
+        }
+
+        filterMap.put(myFilterValue, aReqObj);
+        return true;
+    }
+
+    private boolean IsSystemConnected(String aFilterValue) {
+        return filterMap.IsFilterInMap(aFilterValue);
+    }
+
+    public void DisconnectSystem(String aFilterValue) {
+        if (filterMap.IsFilterInMap(aFilterValue)) {
+            filterMap.delete(aFilterValue);
+        }
+    }
+
+    /**
      * Spring default MessageHandler callback function Receive the Request from
      * the client. Check the Header and the properties of the message and handle
      * the reply if the message is valid
@@ -74,6 +101,11 @@ public class ReqReplyConsumer implements MessageListener {
     @Override
     public void onMessage(Message aMessage) {
 
+        String myIdent;
+        String myRequest;
+        String correlationId;
+        Destination myResponseDestination;
+        ReqReplyMessageCreator myResponseCreator;
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::onReceive()");
         try {
             if (!(aMessage instanceof TextMessage)) {
@@ -89,22 +121,41 @@ public class ReqReplyConsumer implements MessageListener {
                 LOGGER.log(Level.ERROR, "Message received, but no filter property set");
                 return;
             }
-            
-            LOGGER.log(Level.TRACE, "Filter property in Message: " + aMessage.getStringProperty(filterPropertyName));
-            filterPropertyValue = aMessage.getStringProperty(filterPropertyName);
-            // Check if the filter-property should be handled
-            if (!filterPropertyDelegator.getPropertyFilterActive(filterPropertyValue)) {
-                LOGGER.log(Level.ERROR, "Message received, but fiter property does not fit");
-                return;
-            }
 
-            handleMessage(aMessage);
+            LOGGER.log(Level.TRACE, "Filter property in Message: " + aMessage.getStringProperty(filterPropertyName));
+            myIdent = aMessage.getStringProperty(filterPropertyName);
+
+//            if (!filterPropertyDelegator.getPropertyFilterActive(filterPropertyValue)) {
+//                LOGGER.log(Level.ERROR, "Message received, but fiter property does not fit");
+//                return;
+//            }
+//
+//            handleMessage(aMessage);
+            if (IsSystemConnected(myIdent)) {
+
+                // Block the system and send ACK
+                myRequest = ((TextMessage) aMessage).getText();
+                correlationId = aMessage.getJMSMessageID();
+
+                if (filterMap.addRequest(myIdent, consumerId, myRequest, correlationId, 2000)) {
+
+                    // Send an ACK
+                    myResponseDestination = aMessage.getJMSReplyTo();
+
+                    myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId);
+                    myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK);
+                    myResponseCreator.setStringProperty(filterPropertyName, myIdent);
+                    jmsTemplate.send(myResponseDestination, myResponseCreator);
+                    LOGGER.log(Level.DEBUG, "Consumer send ACK"
+                            + ", Ident: " + myIdent
+                            + ", msgId: " + correlationId);
+                }
+            }
 
         } catch (JMSException jMSException) {
             LOGGER.log(Level.ERROR, jMSException);
         }
     }
-
 
     /**
      * Message handler function ACK the message and redirect the request to the
@@ -117,6 +168,7 @@ public class ReqReplyConsumer implements MessageListener {
 
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::handleMessage()");
         String myResponseText;
+        String myIdent = null;
         // Handle the Filter property
         try {
             if (aMessage.getJMSReplyTo() != null) {
@@ -131,13 +183,13 @@ public class ReqReplyConsumer implements MessageListener {
                 // Send an ACK first
                 ReqReplyMessageCreator myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId);
                 myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK);
-                myResponseCreator.setStringProperty(filterPropertyName, filterPropertyValue);
+                myResponseCreator.setStringProperty(filterPropertyName, myIdent);
                 jmsTemplate.send(myResponseDestination, myResponseCreator);
                 LOGGER.log(Level.DEBUG, "Server send ACK"
-                        + ", Ident: " + filterPropertyValue
+                        + ", Ident: " + myIdent
                         + ", msgId: " + correlationId);
 
-                myResponseText = filterPropertyDelegator.getPropertyFilterResult(filterPropertyValue);
+                myResponseText = filterPropertyDelegator.getPropertyFilterResult(myIdent);
 
                 int myMsgCount;
                 myMsgCount = (int) Math.ceil((double) myResponseText.length() / maxMessageLength);
@@ -160,11 +212,11 @@ public class ReqReplyConsumer implements MessageListener {
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT, myMsgCount);
                     myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT, i + 1);
                     myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD);
-                    myResponseCreator.setStringProperty(filterPropertyName, filterPropertyValue);
+                    myResponseCreator.setStringProperty(filterPropertyName, myIdent);
 
                     LOGGER.log(Level.DEBUG, "Server send response "
                             + (i + 1) + "/" + myMsgCount
-                            + ", Ident: " + filterPropertyValue
+                            + ", Ident: " + myIdent
                             + ", msgId: " + correlationId);
 
                     jmsTemplate.send(myResponseDestination, myResponseCreator);
@@ -228,7 +280,7 @@ public class ReqReplyConsumer implements MessageListener {
      * @return
      */
     public String getServerId() {
-        return serverId;
+        return consumerId;
     }
 
     /**
@@ -236,7 +288,7 @@ public class ReqReplyConsumer implements MessageListener {
      * @param serverId
      */
     public void setServerId(String serverId) {
-        this.serverId = serverId;
+        this.consumerId = serverId;
     }
 
     /**

@@ -92,13 +92,13 @@ public class ReqReplyTest3_IdentMap {
         do {
             try {
                 if (available.tryAcquire(myAquireTimeMs, TimeUnit.MILLISECONDS)) {
-//                    LOGGER.log(Level.DEBUG, "Consumer: " + aConsumerId + " aquire identMap");
+                    LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " aquire identMap");
                     if (identMap.containsKey(aIdent) && !identMap.get(aIdent).isInProgress()) {
                         ReqReplyTest3_Object myObj = identMap.get(aIdent);
                         
                         synchronized (myObj) {
                             myObj.setNewRequest(aRequest, aMessageId, aConsumerId, startTime);
-//                            LOGGER.log(Level.DEBUG, "Consumer: " + aConsumerId + " NOTIFY Object");
+                            LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " NOTIFY Object");
                             retValue = true;
                             identMap.remove(aIdent);
                             myObj.notify();
@@ -111,7 +111,7 @@ public class ReqReplyTest3_IdentMap {
                 LOGGER.log(Level.ERROR, ex);
             } finally {
                 available.release();
-//                LOGGER.log(Level.DEBUG, "Consumer: " + aConsumerId + " release identMap");
+                LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " release identMap");
             }
             myMilliSeconds = (new Date().getTime() - startTime.getTime());
         } while (retValue == false && myMilliSeconds < aTimeout);

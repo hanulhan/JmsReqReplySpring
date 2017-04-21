@@ -27,10 +27,10 @@ import org.junit.Test;
  * @author uhansen
  */
 
-public class ReqReplyTest3 {
+public class ReqReplyTest4 {
 
 //    ApplicationContext applicationContext;
-    static final Logger LOGGER = Logger.getLogger(ReqReplyTest3.class);
+    static final Logger LOGGER = Logger.getLogger(ReqReplyTest4.class);
 
     private final long WAIT_SECONDS = 50;
     private final String SYSTEM_IDENT = "ABCDE";
@@ -236,55 +236,14 @@ public class ReqReplyTest3 {
 
     }
 
-    public class Consumer extends Thread {
+    public class WebSession extends Thread {
 
-        private final String ident;
-        private boolean active;
-        private final int consumerId;
-        private final int requestSendQuantity;
-        private int requestTimeoutQuantity = 0;
-
-        ReqReplyTest3_IdentMap identMap;
-
-        public Consumer(String ident, int aId, int aReqQuantity, ReqReplyTest3_IdentMap aIdentMap) {
-            this.active = true;
-            this.ident = ident;
-            this.consumerId = aId;
-            this.requestSendQuantity = aReqQuantity;
-            this.identMap = aIdentMap;
-        }
-
-        private synchronized void stopMe() {
-            this.active = false;
-        }
-
-        public int getRequestTimeoutQuantity() {
-            return requestTimeoutQuantity;
-        }
 
         @Override
         @SuppressWarnings("SleepWhileInLoop")
         public void run() {
-            int i = 0;
-            while (i < requestSendQuantity) {
-                try {
-                    if (identMap.addRequest(ident, consumerId, "HALLO", "MESSAGE-" + (i + 1), REQUEST_TIMEOUT_MS)) {
-                        i++;
-                    } else {
-                        LOGGER.log(Level.DEBUG, "TIMEOUT addRequest");
-                        requestTimeoutQuantity++;
-                    }
-                    Thread.sleep(randomNumber(MIN_CONSUMER_SLEEP_TIME, MAX_CONSUMER_SLEEP_TIME));
-                } catch (InterruptedException ex) {
-                    LOGGER.log(Level.ERROR, ex);
-                }
-            }
-            this.active = false;
         }
 
-        public boolean isActive() {
-            return active;
-        }
 
     }
 

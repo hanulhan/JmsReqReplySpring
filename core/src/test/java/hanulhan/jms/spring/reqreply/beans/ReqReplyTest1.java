@@ -36,16 +36,6 @@ public class ReqReplyTest1 implements ApplicationContextAware {
 
     public ReqReplyTest1() {
 
-//        LOGGER.log(Level.INFO, "StartBroker()");
-//        try {
-//            BrokerService broker = new BrokerService();
-//            broker.setPersistent(false);
-//            broker.setUseJmx(false);
-//            broker.addConnector("tcp://localhost:61616");
-//            broker.start();
-//        } catch (Exception exception) {
-//            LOGGER.log(Level.ERROR, exception);
-//        }
     }
 
     /**
@@ -66,6 +56,7 @@ public class ReqReplyTest1 implements ApplicationContextAware {
             do {
                 seconds = (int) ((new Date().getTime() - startTime.getTime()) / 1000);
             } while (seconds < 2 );
+            Assert.assertTrue("Response TIMEOUT", myResponse != null);
             Assert.assertTrue("NO response match", myResponse.equals(myFilterDelegator.getPropertyFilterResult("AAAA")));
         } catch (InterruptedException ex) {
             LOGGER.log(Level.ERROR, ex);
