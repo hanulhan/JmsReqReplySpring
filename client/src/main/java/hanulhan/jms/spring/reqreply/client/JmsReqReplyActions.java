@@ -13,16 +13,17 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
 /**
  *
  * @author uhansen
  */
-public class JmsReqReplyActions extends ActionSupport implements ApplicationContextAware    {
+public class JmsReqReplyActions extends ActionSupport implements ApplicationContextAware {
 
     // Injected stuff
     private ApplicationContext applicationContext;
     private ReqReplyProducer reqReplyProducer;
-    
+
     // Action input/output
     private int clientId;
     private String ident;
@@ -30,37 +31,33 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
     String msgResponse;
     private String jsonStatus;
 
-    
     // Internal
     private static final Logger LOGGER = Logger.getLogger(JmsReqReplyActions.class);
     private static final String JSON_OK = "OK";
     private static final String JSON_ERROR = "ERR";
-    private static final String JSON_ERROR_CONFIG = "ERR_CONFIG";    
+    private static final String JSON_ERROR_CONFIG = "ERR_CONFIG";
 
     static int msgCount = 0;
-    
 
     public JmsReqReplyActions() {
         super();
         msgCount++;
     }
-    
-    public String doSetClientId()   {
+
+    public String doSetClientId() {
         LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSetClientId()");
-        
+
         return SUCCESS;
     }
-    
-    public String doSendMessage()   {
-        jsonStatus= JSON_OK;
+
+    public String doSendMessage() throws InterruptedException {
+        jsonStatus = JSON_OK;
         LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSendMessage()");
 
-        msgText= "Message " + msgCount + " from Client " + clientId;
-        try {
-            msgResponse = reqReplyProducer.sendAndAwaitingResponse(msgText, ident);
-        } catch (JMSException jMSException) {
-            LOGGER.log(Level.ERROR, jMSException);
-        }
+        msgText = "Message " + msgCount + " from Client " + clientId;
+        String myMessageId = reqReplyProducer.sendRequest(msgText, "AAA");
+
+        msgResponse = reqReplyProducer.getResponse("Hallo", "AAA", 2000);
 
         return SUCCESS;
     }
@@ -104,14 +101,11 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
     public void setMsgResponse(String msgResponse) {
         this.msgResponse = msgResponse;
     }
-    
-    
-    
+
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
-        this.applicationContext= ac;
+        this.applicationContext = ac;
 
-        
     }
-    
+
 }
