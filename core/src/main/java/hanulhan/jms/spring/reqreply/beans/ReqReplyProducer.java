@@ -22,8 +22,10 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 
 /**
- *
- * @author uhansen
+ *  Provides functions to write a Request to a Queue/Topic and receive the response
+ *  to the request.<p>
+ *  A Message Listener writes received responses to a "messageStorage". 
+ *  The receive function check the message storage wether the response is received.
  */
 public class ReqReplyProducer implements MessageListener {
 
@@ -47,7 +49,15 @@ public class ReqReplyProducer implements MessageListener {
         messageStorage = new ReqReplyMessageStorage(filterName);
     }
     
-    
+    /**
+     * Check the "messageStorage wether a response is received within "aTimeoutMilliSec" 
+     * for the given Filter (aFilterValue)
+     * @param aRequest
+     * @param aFilterValue
+     * @param aTimeoutMilliSec
+     * @return the JMS-messageId or null
+     * @throws InterruptedException 
+     */
     public String getResponse(String aRequest, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
         Date startTime = new Date();
         int myMilliSeconds;
@@ -71,7 +81,13 @@ public class ReqReplyProducer implements MessageListener {
         return null;
     }
     
-    
+    /**
+     * Send the Request to a Queue/Topic, add Property information for FilterValue
+     * and return the JMS-messageId
+     * @param aMessageText
+     * @param aFilterValue
+     * @return the JMS-MessageId or null
+     */
     public String sendRequest(String aMessageText, String aFilterValue) {
         String myMessageId= null;
         ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessageText, replyDestination);
@@ -94,6 +110,12 @@ public class ReqReplyProducer implements MessageListener {
         return myMessageId;
     }
 
+
+    /**
+     * Spring/JMS Default Message Listener Container.
+     * Receive the response from the Reply TOPIC and put it to the "messageStorage"
+     * @param aMessage 
+     */
     @Override
     public void onMessage(Message aMessage) {
         ReqReplyStatusCode myStatus= ReqReplyStatusCode.STATUS_ERROR;
@@ -155,7 +177,4 @@ public class ReqReplyProducer implements MessageListener {
     public ReqReplyMessageStorage getMessageStorage() {
         return messageStorage;
     }
-    
-    
-
 }
