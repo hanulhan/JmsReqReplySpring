@@ -7,6 +7,7 @@ package hanulhan.jms.spring.reqreply.util;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -87,18 +88,20 @@ public class ReqReplyFilterMap {
     public boolean addRequest(String aIdent, String aConsumerId, String aRequest, String aMessageId, long aTimeout) {
 
         boolean retValue = false;
-        Date startTime = new Date();
+        GregorianCalendar startDateTime = new GregorianCalendar();
+        GregorianCalendar gregory = new GregorianCalendar();
         long myMilliSeconds;
         long myAquireTimeMs = aTimeout / 10;
         do {
             try {
+                startDateTime.setTime(new Date());
                 if (available.tryAcquire(myAquireTimeMs, TimeUnit.MILLISECONDS)) {
                     LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " aquire identMap");
                     if (filterMap.containsKey(aIdent) && !filterMap.get(aIdent).isBusy()) {
                         RequestObject myObj = filterMap.get(aIdent);
 
                         synchronized (myObj) {
-                            myObj.setNewRequest(aRequest, aMessageId, aConsumerId, startTime);
+                            myObj.setNewRequest(aRequest, aMessageId, aConsumerId, DateConverter.createXmlGregorianCalendar(startDateTime));
                             LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " NOTIFY Object");
                             retValue = true;
                             filterMap.remove(aIdent);
@@ -113,8 +116,9 @@ public class ReqReplyFilterMap {
             } finally {
                 available.release();
                 LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " release identMap");
+                myMilliSeconds= DateConverter.elapsedMilliSeconds(startDateTime);
             }
-            myMilliSeconds = (new Date().getTime() - startTime.getTime());
+           
         } while (retValue == false && myMilliSeconds < aTimeout);
 
         if (myMilliSeconds >= aTimeout) {

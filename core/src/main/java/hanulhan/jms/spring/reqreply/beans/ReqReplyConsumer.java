@@ -35,9 +35,9 @@ public class ReqReplyConsumer implements MessageListener {
     // injected stuff
     private JmsTemplate jmsTemplate;
     private Destination reqDestination;
+    private Destination replyDestination;
     private String filterPropertyName;
 
-    private ReqReplyFilterInterface filterPropertyDelegator;
     private String consumerId;
     private Integer maxMessageLength;
 
@@ -70,12 +70,12 @@ public class ReqReplyConsumer implements MessageListener {
      * @return
      */
     public boolean ConnectSystem(RequestObject aReqObj) {
-        String myFilterValue = aReqObj.getFilterValue();
+        String myFilterValue = aReqObj.getIdent();
 
         if (filterMap.IsFilterInMap(myFilterValue)) {
             return false;
         }
-
+        LOGGER.log(Level.DEBUG, "ReqReplyConsumer::ConnectSystem()");
         filterMap.put(myFilterValue, aReqObj);
         return true;
     }
@@ -86,7 +86,45 @@ public class ReqReplyConsumer implements MessageListener {
 
     public void DisconnectSystem(String aFilterValue) {
         if (filterMap.IsFilterInMap(aFilterValue)) {
+            LOGGER.log(Level.DEBUG, "ReqReplyConsumer::DisconnectSystem()");
             filterMap.delete(aFilterValue);
+            
+        }
+    }
+
+    public void sendResponse(String aIdent, String aResponse, String aMessageId) {
+        int myMsgCount;
+        ReqReplyMessageCreator myResponseCreator;
+
+        LOGGER.log(Level.TRACE, "SendResponse()");
+        myMsgCount = (int) Math.ceil((double) aResponse.length() / maxMessageLength);
+
+        LOGGER.log(Level.TRACE, "Split Response into " + myMsgCount + " pieces");
+
+        int myStartIndex;
+        int myEndIndex;
+        String myMessagePart;
+
+        for (int i = 0; i < myMsgCount; i++) {
+            myStartIndex = i * maxMessageLength;
+            myEndIndex = ((i + 1) * maxMessageLength) - 1;
+            if (myEndIndex >= aResponse.length()) {
+                myEndIndex = aResponse.length() - 1;
+            }
+            myMessagePart = aResponse.substring(myStartIndex, myEndIndex + 1);
+
+            myResponseCreator = new ReqReplyMessageCreator(myMessagePart, aMessageId);
+            myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT, myMsgCount);
+            myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT, i + 1);
+            myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD);
+            myResponseCreator.setStringProperty(filterPropertyName, aIdent);
+
+            LOGGER.log(Level.DEBUG, "Server send response "
+                    + (i + 1) + "/" + myMsgCount
+                    + ", Ident: " + aResponse
+                    + ", msgId: " + aMessageId);
+
+            jmsTemplate.send(replyDestination, myResponseCreator);
         }
     }
 
@@ -125,12 +163,7 @@ public class ReqReplyConsumer implements MessageListener {
             LOGGER.log(Level.TRACE, "Filter property in Message: " + aMessage.getStringProperty(filterPropertyName));
             myIdent = aMessage.getStringProperty(filterPropertyName);
 
-//            if (!filterPropertyDelegator.getPropertyFilterActive(filterPropertyValue)) {
-//                LOGGER.log(Level.ERROR, "Message received, but fiter property does not fit");
-//                return;
-//            }
-//
-//            handleMessage(aMessage);
+
             if (IsSystemConnected(myIdent)) {
 
                 // Block the system and send ACK
@@ -157,30 +190,18 @@ public class ReqReplyConsumer implements MessageListener {
         }
     }
 
-    /**
-     * Message handler function ACK the message and redirect the request to the
-     * System (FilterPropertyDelegator)
-     *
-     * @param aMessage
-     *
-     */
+    /*
     private void handleMessage(Message aMessage) {
 
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::handleMessage()");
         String myResponseText;
         String myIdent = null;
-        // Handle the Filter property
         try {
             if (aMessage.getJMSReplyTo() != null) {
-//                LOGGER.log(Level.INFO, "Server(" + serverId + ") send response for filter " + this.filterPropertyValue);
-//                LOGGER.log(Level.DEBUG, "Server(" + serverId + ") take the msg and send ACK to " + aMessage.getJMSReplyTo().toString());
 
-                // Use MessageId-Pattern
-                // The MessageId of the Req is set to the correlationId of the response
                 String correlationId = aMessage.getJMSMessageID();
                 Destination myResponseDestination = aMessage.getJMSReplyTo();
 
-                // Send an ACK first
                 ReqReplyMessageCreator myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId);
                 myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK);
                 myResponseCreator.setStringProperty(filterPropertyName, myIdent);
@@ -190,7 +211,6 @@ public class ReqReplyConsumer implements MessageListener {
                         + ", msgId: " + correlationId);
 
                 myResponseText = filterPropertyDelegator.getPropertyFilterResult(myIdent);
-
                 int myMsgCount;
                 myMsgCount = (int) Math.ceil((double) myResponseText.length() / maxMessageLength);
 
@@ -226,6 +246,7 @@ public class ReqReplyConsumer implements MessageListener {
             LOGGER.log(Level.ERROR, jMSException);
         }
     }
+    */
 
     /**
      *
@@ -257,22 +278,6 @@ public class ReqReplyConsumer implements MessageListener {
      */
     public void setFilterPropertyName(String filterPropertyName) {
         this.filterPropertyName = filterPropertyName;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public ReqReplyFilterInterface getFilterPropertyDelegator() {
-        return filterPropertyDelegator;
-    }
-
-    /**
-     *
-     * @param filterPropertyDelegator
-     */
-    public void setFilterPropertyDelegator(ReqReplyFilterInterface filterPropertyDelegator) {
-        this.filterPropertyDelegator = filterPropertyDelegator;
     }
 
     /**
@@ -323,4 +328,13 @@ public class ReqReplyConsumer implements MessageListener {
         this.reqDestination = reqDestination;
     }
 
+    public Destination getReplyDestination() {
+        return replyDestination;
+    }
+
+    public void setReplyDestination(Destination replyDestination) {
+        this.replyDestination = replyDestination;
+    }
+
+    
 }

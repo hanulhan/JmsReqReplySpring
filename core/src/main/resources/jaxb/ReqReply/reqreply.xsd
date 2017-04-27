@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+    <xs:element  name="ReqReply">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:restriction base="xs:anyType">
+                    <xs:sequence>
+                        <xs:element name="request" type="xs:string" />
+                        <xs:element name="response" type="xs:string" minOccurs="0" />
+                    </xs:sequence>                    
+                    <xs:attribute name="ident"     use="required" >
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string" />
+                        </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="messageid" type="xs:string" use="required" />
+                    <xs:attribute name="consumderid"  type="xs:string" />
+                    <xs:attribute name="created"   type="xs:dateTime" />
+                </xs:restriction>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

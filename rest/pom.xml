@@ -26,6 +26,21 @@
 
         <dependency>
             <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+        </dependency>                                                
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
 
@@ -144,6 +159,17 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>com.acentic.cloudservices</groupId>
+            <artifactId>webutil</artifactId>
+            <type>war</type>
+        </dependency>
+
+        <!-- internal -->
+        <dependency>
+            <groupId>hanulhan.jms.spring.reqreply</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
 
         <!-- =================================== -->
         <!--         TEST Dependencies           -->
@@ -163,7 +189,7 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
+        <finalName>ReqReply</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

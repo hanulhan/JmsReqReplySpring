@@ -4,7 +4,7 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
             xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
-    <display-name>Jms Web-Client</display-name>
+    <display-name>JmsReqReply</display-name>
     
     <context-param>
         <param-name>contextConfigLocation</param-name>
@@ -25,61 +25,42 @@
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
+
     <filter>
-        <filter-name>struts2</filter-name>
-        <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+        <filter-name>jersey</filter-name>
+        <filter-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</filter-class>
         <init-param>
-            <param-name>config</param-name>
-            <param-value>struts-default.xml,struts-plugin.xml,struts/struts.xml</param-value>
+            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>
+                hanulhan.jms.reqreply.rest
+            </param-value>
         </init-param>
     </filter>
-    
-    <!--
-    <filter>
-        <filter-name>oemInViewFilterCore</filter-name>
-        <filter-class>org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class>
+    <filter-mapping>
+        <filter-name>jersey</filter-name>
+        <url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
+    <servlet>
+        <servlet-name>ServletAdaptor</servlet-name>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
         <init-param>
-            <param-name>entityManagerFactoryBeanName</param-name>
-            <param-value>entityManagerFactoryCore</param-value>
+            <description>Multiple packages, separated by semicolon(;), can be specified in param-value</description>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>hanulhan.jms.reqreply.rest</param-value>
         </init-param>
-    </filter>
-    -->
-
-    <filter>
-        <filter-name>requestContextFilter</filter-name>
-        <filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
-    </filter>
-
-<!--    <filter>
-        <filter-name>sitemesh</filter-name>
-        <filter-class>com.opensymphony.sitemesh.webapp.SiteMeshFilter</filter-class>
-    </filter>-->
-
-    <filter-mapping>
-        <filter-name>requestContextFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
-    <!--
-    <filter-mapping>
-        <filter-name>oemInViewFilterCore</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    -->
-
-    <filter-mapping>
-        <filter-name>struts2</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    
-    <!--
-    <filter-mapping>
-        <filter-name>sitemesh</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>REQUEST</dispatcher>
-    </filter-mapping>
-    -->
-    
+        <init-param>
+            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServletAdaptor</servlet-name>
+        <url-pattern>/webresources/*</url-pattern>
+    </servlet-mapping>    
 
 </web-app>

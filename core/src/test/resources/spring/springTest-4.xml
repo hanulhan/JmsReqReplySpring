@@ -1,40 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:amq="http://activemq.apache.org/schema/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"   
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jee="http://www.springframework.org/schema/jee"  
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:task="http://www.springframework.org/schema/task"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="
       http://www.springframework.org/schema/beans 
       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-      http://www.springframework.org/schema/jms
-      http://www.springframework.org/schema/jms/spring-jms.xsd
       http://www.springframework.org/schema/context 
       http://www.springframework.org/schema/context/spring-context-3.0.xsd
-      http://www.springframework.org/schema/util 
-      http://www.springframework.org/schema/util/spring-util.xsd      
+      http://www.springframework.org/schema/jms
+      http://www.springframework.org/schema/jms/spring-jms.xsd
       http://www.springframework.org/schema/task 
-      http://www.springframework.org/schema/task/spring-task-3.0.xsd      
-      http://www.springframework.org/schema/jee  
-      http://www.springframework.org/schema/jee/spring-jee-3.0.xsd      
-      http://www.springframework.org/schema/tx 
-      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
->
+      http://www.springframework.org/schema/task/spring-task-3.0.xsd
+">
 
-    <import resource="classpath:/spring/spring_ReqReply_rest.xml" />      
+    <!--    sprintTest-4.xml    -->
     
     <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
         <property name="reqDestination"        ref="bean_vmReqTopic" />
-        <property name="reqDestinationName"    value="${topic.name.request}" />
+        <property name="reqDestinationName"    value="vmReqTopic" />
         <property name="replyDestination"      ref="bean_vmReplyTopic" />
-        <property name="maxMessageLength"   value="${message.length}" />
-        <property name="serverId"           value="${server.id}" />
+        <property name="maxMessageLength"   value="50" />
+        <property name="serverId"           value="B2B-1" />
         <property name="filterPropertyName" value="SYSTEM_IDENT" />
     </bean>
     
@@ -49,7 +41,7 @@
     </bean>
     
 
-<!--    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="singleton" >
+        <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="singleton" >
         <description>
             Message Producer to send Requests to the VM-Req Topic
             and awaiting the Respnse
@@ -58,11 +50,13 @@
         <property name="replyDestination"   ref="bean_vmReplyTopic" />
         <property name="jmsTemplate"        ref="bean_jmsTopicTemplate" />
         <property name="filterName"         value="SYSTEM_IDENT" />        
-    </bean>-->
+    </bean>
 
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${broker.url}" />
+        <!--        <property name="brokerURL" value="tcp://localhost:61616" />-->
+        <property name="brokerURL" value="tcp://192.168.20.12:61616" />
+        <!--        <property name="brokerURL" value="vm://localhost?brokerConfig=xbean:activemq.xml" />-->
         <property name="sendTimeout" value="0" />
     </bean>
 
@@ -89,7 +83,7 @@
 
         <constructor-arg ref="bean_amqConnectionFactory" />
         <property name="reconnectOnException" value="true" />
-<!--        <property name="exceptionListener" ref="bean_brokerExceptionListenerBean" /> -->
+        <property name="exceptionListener" ref="bean_brokerExceptionListenerBean" /> 
         <property name="sessionCacheSize" value="10" />
     </bean>
 
@@ -101,7 +95,7 @@
         </description>
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
         <property name="reconnectOnException" value="true" />
-        <property name="clientId" value="${client.id}" />
+        <property name="clientId" value="sampleSubscriber" />
     </bean>
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
@@ -117,12 +111,12 @@
 
     <bean id="bean_vmReqTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
         <description>The Topic to send requests to the systems</description>
-        <constructor-arg value="${topic.name.request}" />
+        <constructor-arg value="vmReqTopic" />
     </bean>
     
     <bean id="bean_vmReplyTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
         <description>The Topic to receive the response from the system</description>
-        <constructor-arg value="${topic.name.response}" />
+        <constructor-arg value="vmReplyTopic" />
     </bean>
 
 
@@ -131,27 +125,27 @@
     
     <bean id="bean_jmsReqListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-          p:connectionFactory-ref="bean_SingleConnectionFactory"
+          p:connectionFactory-ref="bean_DefaultConnectionFactory"
           p:destinationName="#{bean_ReqReplySettings.getReqDestinationName()}"
           p:messageListener-ref="bean_jmsReqReplyConsumer1"
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
-          p:durableSubscriptionName="${request.durable.subscriber.name}"
+          p:durableSubscriptionName="REQ-SUBSCRIBER"
           p:errorHandler-ref="bean_jmsErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
 
 
-<!--        <bean id="bean_jmsReplyListenerContainer" 
+        <bean id="bean_jmsReplyListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-          p:connectionFactory-ref="bean_SingleConnectionFactory"
+          p:connectionFactory-ref="bean_DefaultConnectionFactory"
           p:destinationName="vmReplyTopic"
           p:messageListener-ref="bean_vmReqReplyProducer"
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
           p:durableSubscriptionName="REPLY-SUBSCRIBER"
           p:errorHandler-ref="bean_jmsErrorHandler"
-          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>-->
+          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
     
-
+    
 </beans>
