@@ -127,7 +127,7 @@
 
 
 
-    <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSErrorHandler" />
+    <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReqErrorHandler" />
     
     <bean id="bean_jmsReqListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
