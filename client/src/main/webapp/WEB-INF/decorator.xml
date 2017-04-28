@@ -1,0 +1,15 @@
+<!-- decorator.xml from project shop-web  -->
+
+<!DOCTYPE project>
+<decorators defaultdir="/WEB-INF"> 
+    <excludes> 
+        <pattern>/js/*</pattern> 
+        <pattern>/css/*</pattern> 
+    </excludes> 
+
+    <decorator name="layout-reqreply" page="/layout-reqreply.jsp"> 
+        <pattern>/reqreply/*</pattern>
+    </decorator> 
+    
+    
+</decorators> 

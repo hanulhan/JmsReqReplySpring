@@ -16,7 +16,10 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 
@@ -29,6 +32,7 @@ import org.springframework.jms.core.JmsTemplate;
 public class ReqReplyProducer implements MessageListener {
 
     // injected stuff
+    @Autowired
     private ApplicationContext applicationContext;
     private JmsTemplate jmsTemplate;
     private Destination requestDestination;
@@ -43,10 +47,6 @@ public class ReqReplyProducer implements MessageListener {
         LOGGER.log(Level.TRACE, "ReqReplyProducer:ReqReplyProducer()");
     }
 
-    @PostConstruct
-    void InitMe()   {
-        messageStorage = new ReqReplyMessageStorage(filterName);
-    }
     
     /**
      * Check the "messageStorage wether a response is received within "aTimeoutMilliSec" 
@@ -173,6 +173,7 @@ public class ReqReplyProducer implements MessageListener {
 
     public void setFilterName(String filterName) {
         this.filterName = filterName;
+        messageStorage = new ReqReplyMessageStorage(filterName);
     }
 
     public ReqReplyMessageStorage getMessageStorage() {

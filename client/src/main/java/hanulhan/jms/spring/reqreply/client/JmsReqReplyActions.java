@@ -53,9 +53,9 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
     public String doSendMessage() throws InterruptedException {
         jsonStatus = JSON_OK;
         LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSendMessage()");
-
+        reqReplyProducer= (ReqReplyProducer)applicationContext.getBean("bean_vmReqReplyProducer");
+        
         msgText = "Message " + msgCount + " from Client " + clientId;
-        String myMessageId = reqReplyProducer.sendRequest(msgText, "AAA");
 
         msgResponse = reqReplyProducer.getResponse("Hallo", "AAA", 2000);
 

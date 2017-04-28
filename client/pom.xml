@@ -44,6 +44,11 @@
             <artifactId>struts2-json-plugin</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>opensymphony</groupId>
+            <artifactId>sitemesh</artifactId>
+        </dependency>            
+
         <!-- Internal   -->
         <dependency>
             <groupId>hanulhan.jms.spring.reqreply</groupId>

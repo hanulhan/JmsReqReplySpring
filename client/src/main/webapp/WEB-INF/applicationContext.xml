@@ -9,6 +9,7 @@
        xmlns:task="http://www.springframework.org/schema/task"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="
       http://www.springframework.org/schema/beans 
       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -30,36 +31,107 @@
     #                   applicationContext of JMS-WebClient
     #########################################################################-->
 
-    <import resource="classpath*:/spring/spring_amq_message_broker.xml" />
-
-    <bean id="brokerSettingsBean" class="com.acentic.cloudservices.messagebroker.BrokerSettings" >
-        <property name="jmxServiceURL"   value="${jms.broker.service.url}" />
-<!--        <property name="mBeanObjectName" value="${jms.broker.mbean.objectName}" />-->
-        <property name="brokerURL"       value="${jms.broker.url}" />
-<!--        <property name="sendTimeout"     value="${jms.broker.send.timeout}" />-->
-        <property name="queueNameList">
-            <list>
-                <value>vmReqTopic</value>
-            </list>
-        </property>
+    <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
+        <property name="reqDestination"        ref="bean_vmReqTopic" />
+        <property name="reqDestinationName"    value="${topic.name.request}" />
+        <property name="replyDestination"      ref="bean_vmReplyTopic" />
+        <property name="maxMessageLength"   value="${message.length}" />
+        <property name="serverId"           value="${server.id}" />
+        <property name="filterPropertyName" value="SYSTEM_IDENT" />
     </bean>
 
-    <bean id="bean_vmReqTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
-        <description>The Topic to send requests to the systems</description>
-        <constructor-arg value="vmReqTopic" />
-    </bean>
-
-    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="prototype" >
+    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="singleton" >
         <description>
             Message Producer to send Requests to the VM-Req Topic
             and awaiting the Respnse
         </description>
-        <property name="destination" ref="bean_vmReqTopic"   />
-        <property name="jmsTemplate" ref="bean_jmsTemplate" />
+        <property name="requestDestination" ref="bean_vmReqTopic" />
+        <property name="replyDestination"   ref="bean_vmReplyTopic" />
+        <property name="jmsTemplate"        ref="bean_jmsTopicTemplate" />
+        <property name="filterName"         value="SYSTEM_IDENT" />        
     </bean>
+
+    <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${broker.url}" />
+        <property name="sendTimeout" value="0" />
+    </bean>
+
+    <bean id="bean_CachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <description> 
+            The CachingConnectionFactory extends the functionality of SingleConnectionFactory 
+            and adds the caching of Sessions, MessageProducers, and MessageConsumers. 
+            The initial cache size is set to 1, use the property sessionCacheSize 
+            to increase the number of cached sessions. Note that the number of actual 
+            cached sessions will be more than that number as sessions are cached based 
+            on their acknowledgment mode, so there can be up to 4 cached session instances 
+            when sessionCacheSize is set to one, one for each acknowledgment mode. 
+            MessageProducers and MessageConsumers are cached within their owning session 
+            and also take into account the unique properties of the producers 
+            and consumers when caching. MessageProducers are cached based on their 
+            destination. MessageConsumers are cached based on a key composed of the 
+            destination, selector, noLocal delivery flag, and the durable subscription 
+            name (if creating durable consumers).
+            
+            Note that the number of actual cached sessions will be more than that number as sessions 
+            are cached based on their acknowledgment mode, so there can be up to 4 cached session instances 
+            when sessionCacheSize is set to one.
+        </description>
+
+        <constructor-arg ref="bean_amqConnectionFactory" />
+        <property name="reconnectOnException" value="true" />
+<!--        <property name="exceptionListener" ref="bean_brokerExceptionListenerBean" /> -->
+        <property name="sessionCacheSize" value="10" />
+    </bean>
+
+    <bean id="bean_SingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+        <description>
+            This SingleConnectionFactory is useful for testing and standalone 
+            environments so that the same connection can be used for multiple 
+            JmsTemplate calls that may span any number of transactions
+        </description>
+        <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
+        <property name="reconnectOnException" value="true" />
+        <property name="clientId" value="${client.id}" />
+    </bean>
+    
+    <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
+    
+    <!-- Which connectionFactory should be used -->
+    <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
+       
+    <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="pubSubDomain" value="true" />
+        <property name="connectionFactory" ref="bean_DefaultConnectionFactory" />
+    </bean>
+    
+
+    <bean id="bean_vmReqTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
+        <description>The Topic to send requests to the systems</description>
+        <constructor-arg value="${topic.name.request}" />
+    </bean>
+    
+    <bean id="bean_vmReplyTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
+        <description>The Topic to receive the response from the system</description>
+        <constructor-arg value="${topic.name.response}" />
+    </bean>
+
+
+
+    <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReqErrorHandler" />
 
 
     <bean id="bean_ReqReplyActions" class="hanulhan.jms.spring.reqreply.client.JmsReqReplyActions" scope="prototype"    >
-        <property name="reqReplyProducer" ref="bean_vmReqReplyProducer" />
+<!--        <property name="reqReplyProducer" ref="bean_vmReqReplyProducer" />-->
     </bean>
+    
+    <bean id="bean_jmsReplyListenerContainer" 
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+          p:connectionFactory-ref="bean_SingleConnectionFactory"
+          p:destinationName="vmReplyTopic"
+          p:messageListener-ref="bean_vmReqReplyProducer"
+          p:pubSubDomain="true"
+          p:subscriptionDurable="false"
+          p:durableSubscriptionName="${reply.durable.subscriber.name}"
+          p:errorHandler-ref="bean_jmsErrorHandler"
+          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 </beans>
