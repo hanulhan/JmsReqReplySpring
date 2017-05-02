@@ -73,10 +73,10 @@ public class SystemAliveRest implements ApplicationContextAware {
                     if (myRequestObj.isBusy()) {
                         LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
                     } else {
-                        myRequestObj.setMessageId("MESSAGE-ID-1");
-                        myRequestObj.setNewRequest("REQUEST-1", "MESSAGE-ID-1", "B2B-1");
-                        myRequestObj.setConsumerId("B2B-1");
-                        myRequestObj.setStartDateTime(DateConverter.createXmlGregorianCalendar(gregory));
+//                        myRequestObj.setMessageId("MESSAGE-ID-1");
+//                        myRequestObj.setNewRequest("REQUEST-1", "MESSAGE-ID-1", "B2B-1");
+//                        myRequestObj.setConsumerId("B2B-1");
+//                        myRequestObj.setStartDateTime(DateConverter.createXmlGregorianCalendar(gregory));
                         LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect ");
                     }
                 } catch (InterruptedException ex) {

@@ -92,7 +92,7 @@
         </description>
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
         <property name="reconnectOnException" value="true" />
-        <property name="clientId" value="${client.id}" />
+        <property name="clientId" value="B2B-1" />
     </bean>
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
