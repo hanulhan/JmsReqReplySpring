@@ -57,33 +57,6 @@
                         <!-- sidebar menu -->
                         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                             <div id="menu" class="menu_section">
-<!--                                <ul class="nav side-menu">
-                                    <li>
-                                        <a>
-                                            <i class="fa fa-minus-circle"></i>
-                                            Benutzerverwaltung
-                                            <span class="fa fa-chevron-down"></span>
-                                        </a>
-                                        <ul class="nav child_menu">
-                                            <li>
-                                                <a href="https://localhost:18443/ACS/security/doAccessSystemUsers">Benutzer</a>
-                                            </li>
-                                            <li>
-                                                <a href="https://localhost:18443/ACS/security/doAccessSystemUserGroups">Benutzergruppen</a>
-                                            </li
-                                            ><li>
-                                                <a href="https://localhost:18443/ACS/security/doAccessSystemRoles">Sicherheitsrollen</a>
-                                            </li>
-                                            <li>
-                                                <a href="https://localhost:18443/ACS/security/doAccessSystemRoleAppGroups">Anwendungsgruppen</a>
-                                            </li>
-                                            <li>
-                                                <a href="https://localhost:18443/ACS/apiusers/doApiUserNew">API Benutzer</a>
-                                            </li>
-                                        </ul>
-
-                                    </li>
-                                </ul>-->
                             </div>
                         </div>
                         <!-- /sidebar menu -->
@@ -96,11 +69,6 @@
                             <a id="fullscreen" data-toggle="tooltip" data-placement="top" title="FullScreen">
                                 <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
                             </a>
-                            <!--
-                                          <a data-toggle="tooltip" data-placement="top" title="Lock">
-                                            <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-                                          </a>
-                            -->
                             <a id="logout" href="<s:url value='/session/'/>doLogout.action" data-toggle="tooltip" data-placement="top" title="Logout">
                                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
                             </a>
@@ -119,88 +87,14 @@
 
                             <ul class="nav navbar-nav navbar-right">
                                 <li class="">
-                                    <!--                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                                        <img src="<s:url value='/images/user/user.png'/>" alt="">John Doe
-                                                        <span class=" fa fa-angle-down"></span>
-                                                      </a>-->
                                     <ul class="dropdown-menu dropdown-usermenu pull-right">
                                         <li><a href="javascript:;"> Profile</a></li>
-                                        <!--
-                                                            <li>
-                                                              <a href="javascript:;">
-                                                                <span class="badge bg-red pull-right">50%</span>
-                                                                <span>Settings</span>
-                                                              </a>
-                                                            </li>
-                                        -->
                                         <li><a href="javascript:;">Help</a></li>
                                         <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                                     </ul>
                                 </li>
 
                                 <li role="presentation" class="dropdown">
-                                    <!--                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                                                        <i class="fa fa-envelope-o"></i>
-                                                        <span class="badge bg-primary">6</span>
-                                                      </a>-->
-                                    <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                                        <li>
-                                            <a>
-                                                <span class="image"><img src="<s:url value='/images/user/user.png'/>" alt="Profile Image" /></span>
-                                                <span>
-                                                    <span>John Smith</span>
-                                                    <span class="time">3 mins ago</span>
-                                                </span>
-                                                <span class="message">
-                                                    Film festivals used to be do-or-die moments for movie makers. They were where...
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a>
-                                                <span class="image"><img src="<s:url value='/images/user/user.png'/>" alt="Profile Image" /></span>
-                                                <span>
-                                                    <span>John Smith</span>
-                                                    <span class="time">3 mins ago</span>
-                                                </span>
-                                                <span class="message">
-                                                    Film festivals used to be do-or-die moments for movie makers. They were where...
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a>
-                                                <span class="image"><img src="<s:url value='/images/user/user.png'/>" alt="Profile Image" /></span>
-                                                <span>
-                                                    <span>John Smith</span>
-                                                    <span class="time">3 mins ago</span>
-                                                </span>
-                                                <span class="message">
-                                                    Film festivals used to be do-or-die moments for movie makers. They were where...
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a>
-                                                <span class="image"><img src="<s:url value='/images/user/user.png'/>" alt="Profile Image" /></span>
-                                                <span>
-                                                    <span>John Smith</span>
-                                                    <span class="time">3 mins ago</span>
-                                                </span>
-                                                <span class="message">
-                                                    Film festivals used to be do-or-die moments for movie makers. They were where...
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="text-center">
-                                                <a>
-                                                    <strong>See All Alerts</strong>
-                                                    <i class="fa fa-angle-right"></i>
-                                                </a>
-                                            </div>
-                                        </li>
-                                    </ul>
                                 </li>
                             </ul>
                         </nav>

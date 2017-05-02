@@ -34,17 +34,6 @@
         </init-param>
     </filter>
     
-    <!--
-    <filter>
-        <filter-name>oemInViewFilterCore</filter-name>
-        <filter-class>org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class>
-        <init-param>
-            <param-name>entityManagerFactoryBeanName</param-name>
-            <param-value>entityManagerFactoryCore</param-value>
-        </init-param>
-    </filter>
-    -->
-
     <filter>
         <filter-name>requestContextFilter</filter-name>
         <filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
@@ -61,12 +50,6 @@
     </filter-mapping>
 
     
-    <!--    <filter-mapping>
-        <filter-name>oemInViewFilterCore</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>-->
-    
-
     <filter-mapping>
         <filter-name>struts2</filter-name>
         <url-pattern>/*</url-pattern>
@@ -81,7 +64,7 @@
     </filter-mapping>
     
 
-    <servlet>
+<!--    <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
         <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
         <init-param>
@@ -98,6 +81,6 @@
     <servlet-mapping>
         <servlet-name>ServletAdaptor</servlet-name>
         <url-pattern>/webresources/*</url-pattern>
-    </servlet-mapping>    
+    </servlet-mapping>    -->
 
 </web-app>

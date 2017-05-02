@@ -17,7 +17,7 @@
         <action name="doSendMessage" class="bean_ReqReplyActions"  method="doSendMessage">
             <result name="success" type="json">
                 <param name="ignoreHierarchy">false</param>
-                <param name="includeProperties">msgText, msgResponse</param>
+                <param name="includeProperties">ident.*, request.*, jsonStatus.*, response.*</param>
             </result>
         </action>
     

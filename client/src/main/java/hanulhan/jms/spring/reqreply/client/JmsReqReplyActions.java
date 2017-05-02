@@ -7,6 +7,7 @@ package hanulhan.jms.spring.reqreply.client;
 
 import com.opensymphony.xwork2.ActionSupport;
 import hanulhan.jms.spring.reqreply.beans.ReqReplyProducer;
+import hanulhan.jms.spring.reqreply.util.ReqReply;
 import javax.jms.JMSException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -26,10 +27,8 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
 
     // Action input/output
     private int clientId;
-    private String ident;
-    String msgText;
-    String msgResponse;
-    private String jsonStatus;
+    private JsonStatus jsonStatus;
+    private String ident, request, response;
 
     // Internal
     private static final Logger LOGGER = Logger.getLogger(JmsReqReplyActions.class);
@@ -51,14 +50,13 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
     }
 
     public String doSendMessage() throws InterruptedException {
-        jsonStatus = JSON_OK;
+        jsonStatus = new JsonStatus();
         LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSendMessage()");
         reqReplyProducer= (ReqReplyProducer)applicationContext.getBean("bean_vmReqReplyProducer");
         
-        msgText = "Message " + msgCount + " from Client " + clientId;
-
-        msgResponse = reqReplyProducer.getResponse("Hallo", "AAA", 2000);
-
+        LOGGER.log(Level.DEBUG, "Request: " + request + ", Ident: " + ident);
+        
+        response= reqReplyProducer.getResponse(request, ident, 2000);
         return SUCCESS;
     }
 
@@ -70,14 +68,6 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         this.clientId = clientId;
     }
 
-    public String getIdent() {
-        return ident;
-    }
-
-    public void setIdent(String ident) {
-        this.ident = ident;
-    }
-
     public ReqReplyProducer getReqReplyProducer() {
         return reqReplyProducer;
     }
@@ -86,21 +76,40 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         this.reqReplyProducer = reqReplyProducer;
     }
 
-    public String getMsgText() {
-        return msgText;
+    public JsonStatus getJsonStatus() {
+        return jsonStatus;
     }
 
-    public void setMsgText(String msgText) {
-        this.msgText = msgText;
+    public void setJsonStatus(JsonStatus jsonStatus) {
+        this.jsonStatus = jsonStatus;
     }
 
-    public String getMsgResponse() {
-        return msgResponse;
+    public String getIdent() {
+        return ident;
     }
 
-    public void setMsgResponse(String msgResponse) {
-        this.msgResponse = msgResponse;
+    public void setIdent(String ident) {
+        this.ident = ident;
     }
+
+    public String getRequest() {
+        return request;
+    }
+
+    public void setRequest(String request) {
+        this.request = request;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+
+
 
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
