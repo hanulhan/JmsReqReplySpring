@@ -121,8 +121,7 @@
     <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReqErrorHandler" />
 
 
-    <bean id="bean_ReqReplyActions" class="hanulhan.jms.spring.reqreply.client.JmsReqReplyActions" scope="prototype"    >
-<!--        <property name="reqReplyProducer" ref="bean_vmReqReplyProducer" />-->
+    <bean id="bean_ReqReplyActions" class="hanulhan.jms.spring.reqreply.websession.JmsReqReplyActions" scope="prototype"    >
     </bean>
     
     <bean id="bean_jmsReplyListenerContainer" 

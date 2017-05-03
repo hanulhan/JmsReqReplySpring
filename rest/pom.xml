@@ -189,7 +189,7 @@
     </dependencies>
 
     <build>
-        <finalName>ReqReply</finalName>
+        <finalName>reqreply-rest</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

@@ -22,7 +22,7 @@
     </listener>
 
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>reqreply/index-reqreply-rest.jsp</welcome-file>
     </welcome-file-list>
 
 
@@ -36,7 +36,7 @@
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
             <param-value>
-                hanulhan.jms.reqreply.rest
+                hanulhan.jms.spring.reqreply.rest
             </param-value>
         </init-param>
     </filter>
@@ -50,7 +50,7 @@
         <init-param>
             <description>Multiple packages, separated by semicolon(;), can be specified in param-value</description>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>hanulhan.jms.reqreply.rest</param-value>
+            <param-value>hanulhan.jms.spring.reqreply.rest</param-value>
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>

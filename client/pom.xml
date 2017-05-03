@@ -8,7 +8,7 @@
     </parent>
 	
     <artifactId>web-client</artifactId>
-    <name>JmsReqReply :: Spring :: WebClient</name>
+    <name>JmsReqReply :: Spring :: WebSession</name>
     <packaging>war</packaging>
     <properties>
     </properties>
@@ -64,7 +64,8 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
+<!--        <finalName>${project.artifactId}</finalName>-->
+        <finalName>reqreply-web</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package hanulhan.jms.spring.reqreply.client;
+package hanulhan.jms.spring.reqreply.websession;
 
 import com.opensymphony.xwork2.ActionSupport;
 import hanulhan.jms.spring.reqreply.beans.ReqReplyProducer;
@@ -56,7 +56,7 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         
         LOGGER.log(Level.DEBUG, "Request: " + request + ", Ident: " + ident);
         
-        response= reqReplyProducer.getResponse(request, ident, 2000);
+        response= reqReplyProducer.getResponse(request, ident, 30000);
         return SUCCESS;
     }
 

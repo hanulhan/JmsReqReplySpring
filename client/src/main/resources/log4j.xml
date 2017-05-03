@@ -17,7 +17,7 @@
         <level value="INFO" />
     </logger>    
 
-    <logger name="hanulhan.jms.spring">
+    <logger name="hanulhan.jms.spring.reqreply">
         <level value="TRACE" />
     </logger>    
 

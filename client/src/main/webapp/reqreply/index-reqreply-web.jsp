@@ -4,7 +4,6 @@
 <%@ taglib uri="/struts-tags" prefix="s"%>
 <html>
     <head>
-
     </head>
     <body>
         <div class="x_panel">
@@ -28,7 +27,6 @@
                                     <input class="form-control" id="idRequest" name="idRequest" value="Request-1" autocomplete="off" type="text">
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ident">
                                     Ident: 
@@ -41,8 +39,6 @@
                                     </select>
                                 </div>
                             </div>
-                            <a></a>
-
                             <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="response">
                                     Response                                   
@@ -67,6 +63,10 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="col-xs-2">    
+                            <div class="loader" id="idLoader"></div>
+                        </div>
+
                     </div>
                 </form>
                 <content tag="footlines">
@@ -83,6 +83,9 @@
                         var removeLink = "<a href='javascript:void(0);' onclick='removeLocation(\"#id#\");'><i class=\"fa fa-trash-o\" /></a>";
                         $(document).ready(function () {
                             $("#btn_submit").bind("click", function (event, data) {
+                                $("#btn_submit").prop('disabled', true).delay(500);
+                                $("#btn_submit").attr('class', 'btn btn-default').delay(500);
+                                $("#idLoader").show().delay(500);
                                 doSubmit();
                             });
 
@@ -93,9 +96,11 @@
 
                             $("#btn_submit").prop('disabled', false);
                             $("#btn_submit").attr('class', 'btn btn-success');
-                            
+
                             $("#btn_clear").prop('disabled', true);
                             $("#btn_clear").attr('class', 'btn btn-default');
+                            
+                            $("#idLoader").hide();
                         });
 
                     </script>
@@ -104,6 +109,7 @@
 
                         function doClear() {
                             $("#idResponse").text("");
+                            
                             $("#btn_submit").prop('disabled', false);
                             $("#btn_submit").attr('class', 'btn btn-success');
                             $("#btn_clear").prop('disabled', true);
@@ -127,11 +133,11 @@
                                 url: surl,
                                 type: "GET",
                                 cache: false,
-                                async: false,
+                                async: true,
                                 success: function (html) {
                                     if (html == null || html.jsonStatus == null || html.jsonStatus.status != "OK") {
-                                        console.log("unable to send request" + textStatus);
-
+                                        console.log("unable to send request");
+                                        $("#idLoader").hide();
                                         ret = false;
                                     } else {
                                         //                        if ($("#locationId").prop("readonly") == true) {
@@ -151,9 +157,11 @@
                                         //                        }
                                         //doResetDisplay();
                                         // close modal popup
+                                        
+                                        $("#idLoader").hide();
                                         $("#btn_submit").prop('disabled', true);
                                         $("#btn_submit").attr('class', 'btn btn-default');
-                                        
+
                                         $("#btn_clear").prop('disabled', false);
                                         $("#btn_clear").attr('class', 'btn btn-success');
 
@@ -166,8 +174,10 @@
                                     }
                                 },
                                 error: function (jqXHR, textStatus, errorThrown) {
+                                    
                                     alert("unable to send request");
                                     console.log("unable to send request" + textStatus);
+                                    $("#idLoader").hide();
                                     return;
                                 }
                             });

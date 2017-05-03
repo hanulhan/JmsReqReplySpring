@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package hanulhan.jms.reqreply.rest;
+package hanulhan.jms.spring.reqreply.rest;
 
 import hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer;
 import hanulhan.jms.spring.reqreply.util.*;
@@ -55,7 +55,7 @@ public class SystemAliveRest implements ApplicationContextAware {
 
     /**
      * Retrieves representation of an instance of
-     * hanulhan.jms.reqreply.topic.SystemAlive
+     * hanulhan.jms.spring.reqreply.topic.SystemAlive
      *
      * @return an instance of java.lang.String
      */

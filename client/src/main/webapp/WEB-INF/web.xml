@@ -22,7 +22,7 @@
     </listener>
 
     <welcome-file-list>
-        <welcome-file>reqreply/index-reqreply.jsp</welcome-file>
+        <welcome-file>reqreply/index-reqreply-web.jsp</welcome-file>
     </welcome-file-list>
 
     <filter>
