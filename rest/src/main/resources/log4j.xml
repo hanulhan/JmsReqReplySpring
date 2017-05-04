@@ -10,6 +10,14 @@
         </layout>
     </appender>
 
+    <appender name="reqreply" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="${log4j.logpath}/reqreply-rest.log"/>
+        <param name="MaxFileSize" value="10MB"/>
+        <param name="MaxBackupIndex" value="5"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+        </layout>
+    </appender>
     
     
     
@@ -19,6 +27,7 @@
 
     <logger name="hanulhan.jms.spring.reqreply">
         <level value="TRACE" />
+        <appender-ref ref="reqreply" />
     </logger>    
 
     <logger name="org.springframework.jms">
