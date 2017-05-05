@@ -36,6 +36,7 @@
         <property name="maxMessageLength"   value="${message.length}" />
         <property name="serverId"           value="${server.id}" />
         <property name="filterPropertyName" value="SYSTEM_IDENT" />
+        <property name="holdTimeSec"        value="${hold.time.systemAlive}" />
     </bean>
     
     

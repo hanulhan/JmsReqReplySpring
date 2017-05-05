@@ -28,8 +28,7 @@
 
     <bean id="bean_SysemAliveRest" class="hanulhan.jms.spring.reqreply.rest.SystemAliveRest" scope="prototype">
         <property name="reqReplyConsumer" ref="bean_jmsReqReplyConsumer1" />
-        <property name="ident" value="VIDEOSYS" />
-        <property name="holdTime" value="${hold.time.systemAlive}" />
+        <property name="holdTimeSec" value="#{bean_ReqReplySettings.getHoldTimeSec()}" />
     </bean>
 
     <bean id="bean_SysemDataRest" class="hanulhan.jms.spring.reqreply.rest.SystemDataRest" scope="prototype">

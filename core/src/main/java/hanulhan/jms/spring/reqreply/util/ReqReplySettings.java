@@ -51,6 +51,8 @@ public class ReqReplySettings {
     
     private String      reqSubscriberName;
     private String      replySubscriberName;
+    
+    private long        holdTimeSec;
 
     /**
      *
@@ -211,6 +213,15 @@ public class ReqReplySettings {
     public void setReplySubscriberName(String replySubscriberName) {
         this.replySubscriberName = replySubscriberName;
     }
+
+    public long getHoldTimeSec() {
+        return holdTimeSec;
+    }
+
+    public void setHoldTimeSec(long holdTimeSec) {
+        this.holdTimeSec = holdTimeSec;
+    }
+
 
     
     

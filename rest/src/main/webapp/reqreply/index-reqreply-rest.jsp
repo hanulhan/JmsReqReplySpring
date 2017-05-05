@@ -16,7 +16,7 @@
         function NavigateSystemAliveRestCall() {
 
             var ctx = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
-            var s = window.location.origin + ctx + "/rest/systemalive";
+            var s = window.location.origin + ctx + "/rest/systemalive" + "?ident=VIDEOSYS";
             window.open(s);
         }
 
@@ -41,7 +41,6 @@
             xmlhttp.open("POST", s, true);
             xmlhttp.setRequestHeader("Content-Type", "application/xml; charset=utf-8");
             xmlhttp.setRequestHeader("Accept", "text/html");
-            var encXml= encodeURI(xml);
             xmlhttp.send(xml);
             
 

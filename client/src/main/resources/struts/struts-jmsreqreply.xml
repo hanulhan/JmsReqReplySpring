@@ -4,11 +4,11 @@
 
 <!-- Author: uhansen -->
 <struts>
-<!--    <constant  name="struts.custom.i18n.resources" value="i18n/statistics" />-->
+    <!--    <constant  name="struts.custom.i18n.resources" value="i18n/statistics" />-->
 
     <package name="jmsReqReply" namespace="/jmsReqReply" extends="default">
 
-<!--        <action name="doAccessRestStatistics" class="bean_StatisticsActionsClass" method="doAccessRestStatistics">
+        <!--        <action name="doAccessRestStatistics" class="bean_StatisticsActionsClass" method="doAccessRestStatistics">
             <param name="roles">ROLE_SYSTEM_SUPER_ADMIN</param>
             <result name="success">/statistics/statistics-rest.jsp</result>
         </action>-->
@@ -17,11 +17,16 @@
         <action name="doSendMessage" class="bean_ReqReplyActions"  method="doSendMessage">
             <result name="success" type="json">
                 <param name="ignoreHierarchy">false</param>
-                <param name="includeProperties">ident.*, request.*, jsonStatus.*, response.*</param>
+                <param name="includeProperties">ident.*, request.*, jsonStatus.*, response.*, timeout.*</param>
             </result>
         </action>
     
-
+        <action name="doGetTimeout"  class="bean_ReqReplyActions"  method="doGetTimeout">
+            <result name="success" type="json">
+                <param name="ignoreHierarchy">false</param>
+                <param name="includeProperties">jsonStatus.*, timeout.*</param>
+            </result>
+        </action>
     </package>	
 </struts>
 

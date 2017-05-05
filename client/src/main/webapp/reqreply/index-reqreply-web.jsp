@@ -18,20 +18,20 @@
                       class="form-horizontal form-label-left" data-parsley-validate>
 
                     <div class="row">
-                        <div class="col-xs-6">
+                        <div class="col-md-9">
                             <div class="form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="idRequest">
+                                <label class="control-label col-md-2" for="idRequest">
                                     Request:
                                 </label>
-                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                <div class="col-md-3">
                                     <input class="form-control" id="idRequest" name="idRequest" value="Request-1" autocomplete="off" type="text">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ident">
+                                <label class="control-label col-md-2" for="ident">
                                     Ident: 
                                 </label>
-                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                <div class="col-md-3">
                                     <select id="idIdent" name="ident" class="input-sm" data-style="btn-primary" required="" >
                                         <option selected >VIDEOSYS</option>
                                         <option >ACSIP</option>
@@ -40,35 +40,55 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="response">
-                                    Response                                   
+                                <label class="control-label col-md-2" for="idTimeout">
+                                    Timeout [s]:
                                 </label>
-                                <div class="col-md-9 col-sm-9 col-xs-12">
-                                    <div class="form-control" id="idResponse" name="response"></div>
+                                <div class="col-md-1">
+                                    <input class="form-control" id="idTimeout" name="idTimeout" value="" autocomplete="off" type="text">
                                 </div>
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <div class="col-md-9 col-md-offset-3">
+                                    <button id="btn_submit" type="button" class="btn btn-success">
+                                        Send
+                                    </button>
+                                    <button id="btn_clear" type="button" class="btn btn-default">
+                                        Clear
+                                    </button>
 
-                        <div class="col-xs-2">    
-                            <div class="modal-footer">
-                                <button id="btn_submit" type="button" class="btn btn-success">
-                                    Send
-                                </button>
+                                </div>                                    
                             </div>
                         </div>
-                        <div class="col-xs-2">    
-                            <div class="modal-footer">
-                                <button id="btn_clear" type="button" class="btn btn-default">
-                                    Clear
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-xs-2">    
+                        <div class="col-md-3">
                             <div class="loader" id="idLoader"></div>
                         </div>
-
                     </div>
+                    <div >
+                        <br>
+                    </div>
+
                 </form>
+                <div class="row">
+                    <div class="col-md-9">
+                        <label class="control-label col-md-2" for="idResponseLength">
+                            ResponseLength:
+                        </label>
+                        <div class="col-md-1">
+                            <div class="form-control" id="idResponseLength" name="responseLength" value="" autocomplete="off" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            <label class="control-label" for="idResponse">
+                                Response                                   
+                            </label>
+                            <textarea id="idResponse" readonly="readonly" required="required" class="form-control" name="response" data-parsley-trigger="keyup" data-parsley-minlength="20" data-parsley-maxlength="500" data-parsley-minlength-message="Come on! You need to enter at least a 20 caracters long comment.." data-parsley-validation-threshold="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <content tag="footlines">
                     <!-- // yatdcf - yet another tabledata column filter // -->
                     <script src="<s:url value='/js/'/>yadcf/jquery.dataTables.yadcf.js"></script>
@@ -99,8 +119,33 @@
 
                             $("#btn_clear").prop('disabled', true);
                             $("#btn_clear").attr('class', 'btn btn-default');
-                            
+
                             $("#idLoader").hide();
+                            
+                            var surl = "<s:url action='doGetTimeout.action' namespace='/jmsReqReply'/>";
+
+                            var ret = null;
+
+                            $.ajax({
+                                url: surl,
+                                type: "GET",
+                                cache: false,
+                                async: true,
+                                success: function (html) {
+                                    if (html == null || html.jsonStatus == null || html.jsonStatus.status != "OK") {
+                                        console.log("unable to get timeout");
+                                        ret = false;
+                                    } else {
+                                        $("#idTimeout").val(html.timeout);
+                                    }
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+
+                                    alert("unable to get timeout");
+                                    console.log("unable to get timeout" + textStatus);
+                                    return;
+                                }
+                            });
                         });
 
                     </script>
@@ -109,7 +154,8 @@
 
                         function doClear() {
                             $("#idResponse").text("");
-                            
+                            $("#idResponseLength").text("");
+
                             $("#btn_submit").prop('disabled', false);
                             $("#btn_submit").attr('class', 'btn btn-success');
                             $("#btn_clear").prop('disabled', true);
@@ -125,7 +171,8 @@
 
                             var request = $("#idRequest").val();
                             var ident = $("#idIdent").val();
-                            var surl = "<s:url action='doSendMessage.action' namespace='/jmsReqReply'/>?ident=" + ident + "&request=" + request;
+                            var timeout = $("#idTimeout").val();
+                            var surl = "<s:url action='doSendMessage.action' namespace='/jmsReqReply'/>?ident=" + ident + "&request=" + request + "&timeout=" + timeout;
 
                             var ret = null;
 
@@ -140,24 +187,8 @@
                                         $("#idLoader").hide();
                                         ret = false;
                                     } else {
-                                        //                        if ($("#locationId").prop("readonly") == true) {
-                                        //                            var lastupdate = $('#table_weatherlist').find('tr#' + currObj.id).find('td:eq(3)').html();
-                                        //                            $('#table_weatherlist').dataTable().fnUpdate(
-                                        //                                    [currObj.id, currObj.ident, currObj.name, lastupdate, "", "", ""],
-                                        //                                    $('#table_weatherlist tr[id=' + currObj.id + ']')[0]
-                                        //                                    );
-                                        //                        } else {
-                                        //                            var oTable = $('#table_weatherlist').dataTable();
-                                        //                            var addId = oTable.fnAddData(
-                                        //                                    [currObj.id, currObj.ident, currObj.name, "", "", "", ""],
-                                        //                                    false
-                                        //                                    );
-                                        //                            var theNode = $('#table_weatherlist').dataTable().fnSettings().aoData[addId[0]].nTr;
-                                        //                            theNode.setAttribute('id', currObj.id);
-                                        //                        }
-                                        //doResetDisplay();
-                                        // close modal popup
-                                        
+
+
                                         $("#idLoader").hide();
                                         $("#btn_submit").prop('disabled', true);
                                         $("#btn_submit").attr('class', 'btn btn-default');
@@ -166,15 +197,20 @@
                                         $("#btn_clear").attr('class', 'btn btn-success');
 
                                         if (html.response != null) {
-                                            $("#idResponse").text(html.response);
+                                            
+                                            var array= html.response.split(",");
+                                            $("#idResponseLength").text(array[0]);
+                                            $("#idResponse").text(array[1]);
+
                                         } else {
                                             $("#idResponse").text("TIMEOUT");
+                                            $("#idResponseLength").text("0");
                                         }
                                         ret = true;
                                     }
                                 },
                                 error: function (jqXHR, textStatus, errorThrown) {
-                                    
+
                                     alert("unable to send request");
                                     console.log("unable to send request" + textStatus);
                                     $("#idLoader").hide();

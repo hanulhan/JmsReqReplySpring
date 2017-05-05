@@ -28,6 +28,7 @@
         <jms.broker.data.directory>${project.build.directory}/ActiveMQ-Data</jms.broker.data.directory>        
         <jms.broker.send.timeout></jms.broker.send.timeout>
 
+        <hold.time.systemAlive>30</hold.time.systemAlive>
         <log4j.logpath>/var/log/tomcat7</log4j.logpath>
 
         <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -381,7 +382,7 @@
                 <message.length>50</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER</reply.durable.subscriber.name>
-                <hold.time.systemAlive>25</hold.time.systemAlive>
+
                 <broker.url>tcp://192.168.20.12:61616</broker.url>
                 <!--                <broker.url>tcp://localhost:61616</broker.url>-->
                 <!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
