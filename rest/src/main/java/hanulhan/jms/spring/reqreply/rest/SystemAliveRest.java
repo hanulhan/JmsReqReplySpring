@@ -5,6 +5,7 @@
  */
 package hanulhan.jms.spring.reqreply.rest;
 
+import com.sun.jersey.api.client.ClientResponse;
 import hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer;
 import hanulhan.jms.spring.reqreply.util.*;
 import java.util.Date;
@@ -19,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -65,14 +67,15 @@ public class SystemAliveRest implements ApplicationContextAware {
      */
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public ReqReply SystemAlive(@QueryParam("ident") String ident) {
+    public Response SystemAlive(@QueryParam("ident") String ident) {
         RequestObject myRequestObj;
-        ReqReply retObj = null;
         GregorianCalendar gregory = new GregorianCalendar();
+        Response myResponse = Response.status(Status.BAD_REQUEST).build();
         gregory.setTime(new Date());
         myRequestObj= new RequestObject(ident);
         if (ident == null)  {
-            throw new WebApplicationException(Response.Status.FORBIDDEN);
+            return Response.status(Status.BAD_REQUEST).build();
+//            throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
         
         if (reqReplyConsumer.ConnectSystem(myRequestObj)) {
@@ -82,21 +85,20 @@ public class SystemAliveRest implements ApplicationContextAware {
                     myRequestObj.wait(holdTimeSec * 1000);
                     if (myRequestObj.isBusy()) {
                         LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
-                        retObj= myRequestObj.getReqReply();
+                        myResponse= Response.ok(myRequestObj.getReqReply()).build();
                     } else {
-                        LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect and returns: " + Response.Status.NO_CONTENT);
-                        throw new WebApplicationException(Response.Status.NO_CONTENT);
+                        LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect and returns: " + Status.NO_CONTENT);
+                        myResponse= Response.status(Status.NO_CONTENT).build();
                     }
                 } catch (InterruptedException ex) {
                     LOGGER.log(Level.ERROR, ex);
-                    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-                    
+                    myResponse= Response.status(Status.INTERNAL_SERVER_ERROR).build();
                 }
             }
 
             reqReplyConsumer.DisconnectSystem(ident);
         }
-        return retObj;
+        return myResponse;
     }
 
     public void setReqReplyConsumer(ReqReplyConsumer reqReplyConsumer) {

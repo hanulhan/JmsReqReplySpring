@@ -122,7 +122,7 @@
 
 
     <bean id="bean_ReqReplyActions" class="hanulhan.jms.spring.reqreply.websession.JmsReqReplyActions" scope="prototype"    >
-        <property name="initialTimeout" value="30" />
+        <property name="initialTimeoutSec" value="30" />
     </bean>
     
     <bean id="bean_jmsReplyListenerContainer" 

@@ -24,7 +24,7 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
     // Injected stuff
     private ApplicationContext applicationContext;
     private ReqReplyProducer reqReplyProducer;
-    private int initialTimeout;
+    private int initialTimeoutSec;
 
     // Action input/output
     private int clientId;
@@ -55,15 +55,15 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSendMessage()");
         reqReplyProducer= (ReqReplyProducer)applicationContext.getBean("bean_vmReqReplyProducer");
         
-        LOGGER.log(Level.DEBUG, "Request: " + request + ", Ident: " + ident + ", Timeout: " + timeout);
+        LOGGER.log(Level.DEBUG, "Request: " + request + ", Ident: " + ident + ", Timeout: " + timeout + "s");
         
-        response= reqReplyProducer.getResponse(request, ident, Integer.parseInt(timeout));
+        response= reqReplyProducer.getResponse(request, ident, 1000 * Long.parseLong(timeout));
         return SUCCESS;
     }
 
     public String doGetTimeout() throws InterruptedException {
         jsonStatus = new JsonStatus();
-        timeout= "" + initialTimeout;
+        timeout= "" + (initialTimeoutSec);
         
         return SUCCESS;
     }
@@ -124,13 +124,14 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         this.timeout = timeout;
     }
 
-    public int getInitialTimeout() {
-        return initialTimeout;
+    public int getInitialTimeoutSec() {
+        return initialTimeoutSec;
     }
 
-    public void setInitialTimeout(int initialTimeout) {
-        this.initialTimeout = initialTimeout;
+    public void setInitialTimeoutSec(int initialTimeoutSec) {
+        this.initialTimeoutSec = initialTimeoutSec;
     }
+
 
 
 
