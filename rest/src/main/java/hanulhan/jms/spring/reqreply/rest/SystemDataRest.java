@@ -15,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.POST;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -62,6 +63,7 @@ public class SystemDataRest implements ApplicationContextAware  {
         //TODO return proper representation object
         if ((aReqReply != null) && (aReqReply.getRequest() != null)) {
             result= "OK";
+            LOGGER.log(Level.DEBUG, "RestCall receive response [msgId: " + aReqReply.getMessageid() + ", ident: " + aReqReply.getIdent());
             reqReplyConsumer.sendResponse(aReqReply.getIdent(), aReqReply.getResponse(), aReqReply.getMessageid());
         }
         return result;

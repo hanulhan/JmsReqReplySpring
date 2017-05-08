@@ -48,7 +48,7 @@ public class SystemAliveRest implements ApplicationContextAware {
     @Context
     private UriInfo context;
     private String ident;
-    
+
     @Context
     HttpServletResponse resp;
 
@@ -72,30 +72,34 @@ public class SystemAliveRest implements ApplicationContextAware {
         GregorianCalendar gregory = new GregorianCalendar();
         Response myResponse = Response.status(Status.BAD_REQUEST).build();
         gregory.setTime(new Date());
-        myRequestObj= new RequestObject(ident);
-        if (ident == null)  {
-            return Response.status(Status.BAD_REQUEST).build();
+        myRequestObj = new RequestObject(ident);
+
+        try {
+            if (ident == null) {
+                return Response.status(Status.BAD_REQUEST).build();
 //            throw new WebApplicationException(Response.Status.FORBIDDEN);
-        }
-        
-        if (reqReplyConsumer.ConnectSystem(myRequestObj)) {
-            synchronized (myRequestObj) {
-                try {
-                    LOGGER.log(Level.TRACE, "System ["+ ident + "] waits " + holdTimeSec + "s for notify");
-                    myRequestObj.wait(holdTimeSec * 1000);
-                    if (myRequestObj.isBusy()) {
-                        LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
-                        myResponse= Response.ok(myRequestObj.getReqReply()).build();
-                    } else {
-                        LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect and returns: " + Status.NO_CONTENT);
-                        myResponse= Response.status(Status.NO_CONTENT).build();
-                    }
-                } catch (InterruptedException ex) {
-                    LOGGER.log(Level.ERROR, ex);
-                    myResponse= Response.status(Status.INTERNAL_SERVER_ERROR).build();
-                }
             }
 
+            if (reqReplyConsumer.ConnectSystem(myRequestObj)) {
+                synchronized (myRequestObj) {
+
+                    LOGGER.log(Level.TRACE, "System [" + ident + "] waits " + holdTimeSec + "s for notify");
+                    myRequestObj.wait(holdTimeSec * 1000);
+                    if (myRequestObj.isBusy()) {
+//                        LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
+                        myResponse = Response.ok(myRequestObj.getReqReply()).build();
+                    } else {
+//                        LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect and returns: " + Status.NO_CONTENT);
+                        myResponse = Response.status(Status.NO_CONTENT).build();
+                    }
+
+                }
+
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.ERROR, ex);
+            myResponse = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
             reqReplyConsumer.DisconnectSystem(ident);
         }
         return myResponse;
@@ -113,9 +117,6 @@ public class SystemAliveRest implements ApplicationContextAware {
         this.holdTimeSec = holdTimeSec;
     }
 
-
-
-    
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
         this.applicationContext = ac;

@@ -75,7 +75,7 @@ public class ReqReplyConsumer implements MessageListener {
         if (filterMap.IsFilterInMap(myFilterValue)) {
             return false;
         }
-        LOGGER.log(Level.DEBUG, "ReqReplyConsumer::ConnectSystem()");
+        LOGGER.log(Level.TRACE, "ReqReplyConsumer::ConnectSystem()");
         filterMap.put(myFilterValue, aReqObj);
         return true;
     }
@@ -86,7 +86,7 @@ public class ReqReplyConsumer implements MessageListener {
 
     public void DisconnectSystem(String aFilterValue) {
         if (filterMap.IsFilterInMap(aFilterValue)) {
-            LOGGER.log(Level.DEBUG, "ReqReplyConsumer::DisconnectSystem()");
+            LOGGER.log(Level.TRACE, "ReqReplyConsumer::DisconnectSystem()");
             filterMap.delete(aFilterValue);
             
         }

@@ -12,6 +12,7 @@
         <module>core</module>
         <module>client</module>
         <module>rest</module>
+        <module>simClient</module>
     </modules>
 
     <properties>
@@ -28,7 +29,6 @@
         <jms.broker.data.directory>${project.build.directory}/ActiveMQ-Data</jms.broker.data.directory>        
         <jms.broker.send.timeout></jms.broker.send.timeout>
 
-        <hold.time.systemAlive>30</hold.time.systemAlive>
         <log4j.logpath>/var/log/tomcat7</log4j.logpath>
 
         <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -357,15 +357,15 @@
             <properties>
                 <topic.name.request>vmReqTopic.dev</topic.name.request>
                 <topic.name.response>vmReplyTopic.dev</topic.name.response>
-                <client.id>DE-WS-16</client.id>
-                <server.id>B2B-1</server.id>
-                <message.length>50</message.length>
+                <client.id>DE-WS-16-dev</client.id>
+                <server.id>B2B-1-DEV</server.id>
+                <message.length>2048</message.length>
                 <request.durable.subscriber.name>DEV-REQ-SUBSCRIBER</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>DEV-REPLY-SUBSCRIBER</reply.durable.subscriber.name>
-                <hold.time.systemAlive>10</hold.time.systemAlive>
+                <hold.time.systemAlive>30</hold.time.systemAlive>
                 <broker.url>tcp://192.168.20.12:61616</broker.url>
                 <!--                <broker.url>tcp://localhost:61616</broker.url>-->
-                <!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
+<!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
                 <log4j.logpath>${project.build.directory}/log</log4j.logpath>                
             </properties>    
         </profile>
@@ -375,14 +375,14 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <topic.name.request>vmReqTopic.dev</topic.name.request>
-                <topic.name.response>vmReplyTopic.dev</topic.name.response>
-                <client.id>DE-WS-16</client.id>
+                <topic.name.request>vmReqTopic</topic.name.request>
+                <topic.name.response>vmReplyTopic</topic.name.response>
+                <client.id>CloudDev-1</client.id>
                 <server.id>B2B-1</server.id>
-                <message.length>50</message.length>
+                <message.length>2048</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER</reply.durable.subscriber.name>
-
+                <hold.time.systemAlive>30</hold.time.systemAlive>
                 <broker.url>tcp://192.168.20.12:61616</broker.url>
                 <!--                <broker.url>tcp://localhost:61616</broker.url>-->
                 <!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
