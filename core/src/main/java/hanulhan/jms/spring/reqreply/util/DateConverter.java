@@ -9,7 +9,6 @@ package hanulhan.jms.spring.reqreply.util;
  *
  * @author UHansen
  */
-import com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,11 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
 import org.joda.time.Seconds;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;

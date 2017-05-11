@@ -69,6 +69,18 @@
             <artifactId>joda-time</artifactId>
         </dependency>
 
+        <!-- Internal   -->
+        <dependency>
+            <groupId>hanulhan.jms.spring.reqreply</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.acentic.cloudservices</groupId>
+            <artifactId>webutil</artifactId>
+            <type>war</type>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -81,54 +93,81 @@
                     <debug>true</debug>
                 </configuration>
             </plugin>
-   <plugin>
+            
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <id>package-jar-with-dependencies</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <archive>
-                                <manifest>
-                                    <mainClass>hanulhan.jms.reqreply.queue.Server</mainClass>
-                                </manifest>
-                            </archive>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>hanulhan.jms.spring.websession.sim.WebSimulation</mainClass>
+                                </transformer>
+                            </transformers>
                         </configuration>
                     </execution>
                 </executions>
-</plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>${basedir}/target/dependency</directory>
-            </resource>
+            </plugin>
+        <!--            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>package-jar-with-dependencies</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <appendAssemblyId>false</appendAssemblyId>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <archive>
+                            <manifest>
+                                <mainClass>hanulhan.jms.spring.websession.sim.WebSimulation</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>-->
+    </plugins>
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+        <resource>
+            <directory>${basedir}/target/dependency</directory>
+        </resource>
 
-            <!--            <resource>
-                <directory>src/main/webapp/WEB-INF</directory>
-                <filtering>true</filtering>
-            </resource>-->
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
+        <!--            <resource>
+            <directory>src/main/webapp/WEB-INF</directory>
+            <filtering>true</filtering>
+        </resource>-->
+    </resources>
+    <testResources>
+        <testResource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+        </testResource>
+        <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+        </testResource>
+    </testResources>
     </build>
 </project>

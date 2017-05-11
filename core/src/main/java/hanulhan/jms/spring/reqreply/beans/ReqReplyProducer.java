@@ -75,7 +75,7 @@ public class ReqReplyProducer implements MessageListener {
             return messageStorage.getResponse(myMessageId);
         } else {
             //ReqReplyMessageObject myMsgObj= messageStorage.getMsgObj(myMessageId);
-            LOGGER.log(Level.ERROR, "################ RESPONSE is null #####################");
+//            LOGGER.log(Level.ERROR, "################ RESPONSE is null #####################");
             //LOGGER.log(Level.ERROR, myMsgObj.toString());
         }
         return null;

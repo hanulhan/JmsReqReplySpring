@@ -17,15 +17,20 @@
     </logger>    
 
     <logger name="hanulhan.jms.spring">
-        <level value="DEBUG" />
-    </logger>    
+        <level value="INFO" />
+    </logger>
+    
+        <logger name="hanulhan.jms.spring.websession.sim">
+        <level value="INFO" />
+    </logger>
+    
 
     <logger name="org.springframework.jms">
-        <level value="DEBUG" />
+        <level value="INFO" />
     </logger>    
 
     <logger name="javax.jms">
-        <level value="DEBUG" />
+        <level value="INFO" />
     </logger>    
 
 

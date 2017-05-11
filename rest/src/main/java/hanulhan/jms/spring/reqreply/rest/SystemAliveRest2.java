@@ -5,6 +5,7 @@
  */
 package hanulhan.jms.spring.reqreply.rest;
 
+import com.sun.jersey.api.client.ClientResponse;
 import hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer;
 import hanulhan.jms.spring.reqreply.util.*;
 import java.util.Date;
@@ -32,9 +33,9 @@ import org.springframework.stereotype.Component;
  *
  * @author UHansen
  */
-@Path("/rest/systemalive")
+@Path("/rest/systemalive2")
 @Component
-public class SystemAliveRest implements ApplicationContextAware {
+public class SystemAliveRest2 implements ApplicationContextAware {
 
     // injected stuff
     private ApplicationContext applicationContext;
@@ -54,64 +55,49 @@ public class SystemAliveRest implements ApplicationContextAware {
     /**
      * Creates a new instance of SystemAlive
      */
-    public SystemAliveRest() {
+    public SystemAliveRest2() {
     }
 
-    /**
-     * Retrieves representation of an instance of
-     * hanulhan.jms.spring.reqreply.topic.SystemAlive
-     *
-     * @param ident
-     * @return an instance of java.lang.String
-     */
+
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response SystemAlive(@QueryParam("ident") String ident) {
+    public void SystemAlive2(@QueryParam("ident") String ident) {
         RequestObject myRequestObj;
         GregorianCalendar gregory = new GregorianCalendar();
-        Response myResponse = Response.status(Status.BAD_REQUEST).build();
         gregory.setTime(new Date());
         myRequestObj = new RequestObject(ident);
-        Boolean fLogMe= false;
 
         if (ident == null) {
             throw new WebApplicationException(Response.Status.FORBIDDEN);
-        } else if (ident.equals("VIDEOSYS")) {
-            fLogMe= true;
         }
+        
+        LOGGER.log(Level.DEBUG, "System [" + ident + "] call Rest service. Total connection: " +  reqReplyConsumer.getQuantityConnected());
 
         if (reqReplyConsumer.ConnectSystem(myRequestObj)) {
-            LOGGER.log(Level.INFO, "System [" + ident + "] connected. Total connections: " +  reqReplyConsumer.getQuantityConnected());
             synchronized (myRequestObj) {
-                
+
                 LOGGER.log(Level.TRACE, "System [" + ident + "] waits " + holdTimeSec + "s for notify");
+                
                 try {
                     myRequestObj.wait(holdTimeSec * 1000);
-                    if (myRequestObj.isBusy()) {
-                        if (fLogMe) {
-                            LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
-                        }
-                        myResponse = Response.ok(myRequestObj.getReqReply()).build();
-                    } else {
-                        if (fLogMe) {
-                            LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect and returns: " + Status.NO_CONTENT);
-                        }
-                        myResponse = Response.status(Status.NO_CONTENT).build();
-                    }
                 } catch (InterruptedException ex) {
-                    myResponse = Response.status(Status.INTERNAL_SERVER_ERROR).build();
                     LOGGER.log(Level.ERROR, ex);
-                } finally  {
-                    reqReplyConsumer.DisconnectSystem(ident);
-                    LOGGER.log(Level.INFO, "System [" + ident + "] disconnected. Total connections: " +  reqReplyConsumer.getQuantityConnected());
+                    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+
+                }
+                if (myRequestObj.isBusy()) {
+                    LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
+                } else {
+
+                    LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect and returns: " + Status.NO_CONTENT);
+                    throw new WebApplicationException(204);
                 }
 
             }
         }
+        reqReplyConsumer.DisconnectSystem(ident);
 
-        return myResponse;
     }
-
 
     public void setReqReplyConsumer(ReqReplyConsumer reqReplyConsumer) {
         this.reqReplyConsumer = reqReplyConsumer;

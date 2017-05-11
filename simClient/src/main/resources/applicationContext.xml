@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jee="http://www.springframework.org/schema/jee"  
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+      http://www.springframework.org/schema/beans 
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/jms
+      http://www.springframework.org/schema/jms/spring-jms.xsd
+      http://www.springframework.org/schema/context 
+      http://www.springframework.org/schema/context/spring-context-3.0.xsd
+      http://www.springframework.org/schema/util 
+      http://www.springframework.org/schema/util/spring-util.xsd      
+      http://www.springframework.org/schema/task 
+      http://www.springframework.org/schema/task/spring-task-3.0.xsd      
+      http://www.springframework.org/schema/jee  
+      http://www.springframework.org/schema/jee/spring-jee-3.0.xsd      
+      http://www.springframework.org/schema/tx 
+      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
+>
+
+    <!--######################################################################
+    #                   applicationContext of WebSessionSimulation console application
+    #########################################################################-->
+
+    <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
+        <property name="reqDestination"        ref="bean_vmReqTopic" />
+        <property name="reqDestinationName"    value="${topic.name.request}" />
+        <property name="replyDestination"      ref="bean_vmReplyTopic" />
+        <property name="maxMessageLength"   value="${message.length}" />
+        <property name="serverId"           value="${server.id}" />
+        <property name="filterPropertyName" value="SYSTEM_IDENT" />
+    </bean>
+
+    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="singleton" >
+        <description>
+            Message Producer to send Requests to the VM-Req Topic
+            and awaiting the Respnse
+        </description>
+        <property name="requestDestination" ref="bean_vmReqTopic" />
+        <property name="replyDestination"   ref="bean_vmReplyTopic" />
+        <property name="jmsTemplate"        ref="bean_jmsTopicTemplate" />
+        <property name="filterName"         value="SYSTEM_IDENT" />        
+    </bean>
+
+    <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${broker.url}" />
+        <property name="sendTimeout" value="0" />
+    </bean>
+
+    <bean id="bean_CachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <description> 
+            The CachingConnectionFactory extends the functionality of SingleConnectionFactory 
+            and adds the caching of Sessions, MessageProducers, and MessageConsumers. 
+            The initial cache size is set to 1, use the property sessionCacheSize 
+            to increase the number of cached sessions. Note that the number of actual 
+            cached sessions will be more than that number as sessions are cached based 
+            on their acknowledgment mode, so there can be up to 4 cached session instances 
+            when sessionCacheSize is set to one, one for each acknowledgment mode. 
+            MessageProducers and MessageConsumers are cached within their owning session 
+            and also take into account the unique properties of the producers 
+            and consumers when caching. MessageProducers are cached based on their 
+            destination. MessageConsumers are cached based on a key composed of the 
+            destination, selector, noLocal delivery flag, and the durable subscription 
+            name (if creating durable consumers).
+            
+            Note that the number of actual cached sessions will be more than that number as sessions 
+            are cached based on their acknowledgment mode, so there can be up to 4 cached session instances 
+            when sessionCacheSize is set to one.
+        </description>
+
+        <constructor-arg ref="bean_amqConnectionFactory" />
+        <property name="reconnectOnException" value="true" />
+        <!--        <property name="exceptionListener" ref="bean_brokerExceptionListenerBean" /> -->
+        <property name="sessionCacheSize" value="10" />
+    </bean>
+
+    <bean id="bean_SingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+        <description>
+            This SingleConnectionFactory is useful for testing and standalone 
+            environments so that the same connection can be used for multiple 
+            JmsTemplate calls that may span any number of transactions
+        </description>
+        <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
+        <property name="reconnectOnException" value="true" />
+        <!--        <property name="clientId" value="${client.id}" />-->
+        <property name="clientId" value="ACS-Web-Session-Simulation" />
+    </bean>
+    
+    <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
+    
+    <!-- Which connectionFactory should be used -->
+    <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
+       
+    <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="pubSubDomain" value="true" />
+        <property name="connectionFactory" ref="bean_DefaultConnectionFactory" />
+    </bean>
+    
+
+    <bean id="bean_vmReqTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
+        <description>The Topic to send requests to the systems</description>
+        <constructor-arg value="${topic.name.request}" />
+    </bean>
+    
+    <bean id="bean_vmReplyTopic" class="org.apache.activemq.command.ActiveMQTopic" scope="singleton" >
+        <description>The Topic to receive the response from the system</description>
+        <constructor-arg value="${topic.name.response}" />
+    </bean>
+
+
+
+    <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReqErrorHandler" />
+
+
+    
+    <bean id="bean_jmsReplyListenerContainer" 
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+          p:connectionFactory-ref="bean_SingleConnectionFactory"
+          p:destinationName="${topic.name.response}"
+          p:messageListener-ref="bean_vmReqReplyProducer"
+          p:pubSubDomain="true"
+          p:subscriptionDurable="false"
+          p:durableSubscriptionName="${reply.durable.subscriber.name}"
+          p:errorHandler-ref="bean_jmsErrorHandler"
+          p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
+
+    
+    <bean id="bean_WebSimulation" class="hanulhan.jms.spring.websession.sim.WebSimulation" >
+        <property name="timeoutSec"    value="45" />
+        <property name="identList"     ref="identList1"/>
+        <property name="identQuantity" value="100" />
+    </bean>    
+    
+    <util:list id="identList1" value-type="java.lang.String">
+        <value>00000001</value>
+        <value>00000002</value>
+        <value>00000003</value>
+        <value>00000004</value>
+        <value>00000005</value>
+        <value>00000006</value>
+        <value>00000007</value>
+        <value>00000008</value>
+        <value>00000009</value>
+        <value>00000010</value>
+        <value>00000011</value>
+        <value>00000012</value>
+        <value>00000013</value>
+        <value>00000014</value>
+        <value>00000015</value>
+        <value>00000016</value>
+        <value>00000017</value>
+        <value>00000018</value>
+        <value>00000019</value>
+        <value>00000020</value>
+        <value>00000021</value>
+        <value>00000022</value>
+        <value>00000023</value>
+        <value>00000024</value>
+        <value>00000025</value>
+        <value>00000026</value>
+        <value>00000027</value>
+        <value>00000028</value>
+        <value>00000029</value>
+        <value>00000030</value>
+        <value>00000031</value>
+        <value>00000032</value>
+        <value>00000033</value>
+        <value>00000034</value>
+        <value>00000035</value>
+        <value>00000036</value>
+        <value>00000037</value>
+        <value>00000038</value>
+        <value>00000039</value>
+        <value>00000040</value>
+        <value>00000041</value>
+        <value>00000042</value>
+        <value>00000043</value>
+        <value>00000044</value>
+        <value>00000045</value>
+        <value>00000046</value>
+        <value>00000047</value>
+        <value>00000048</value>
+        <value>00000049</value>
+        <value>00000050</value>
+        <value>00000051</value>
+        <value>00000052</value>
+        <value>00000053</value>
+        <value>00000054</value>
+        <value>00000055</value>
+        <value>00000056</value>
+        <value>00000057</value>
+        <value>00000058</value>
+        <value>00000059</value>
+        <value>00000060</value>
+        <value>00000061</value>
+        <value>00000062</value>
+        <value>00000063</value>
+        <value>00000064</value>
+        <value>00000065</value>
+        <value>00000066</value>
+        <value>00000067</value>
+        <value>00000068</value>
+        <value>00000069</value>
+        <value>00000070</value>
+        <value>00000071</value>
+        <value>00000072</value>
+        <value>00000073</value>
+        <value>00000074</value>
+        <value>00000075</value>
+        <value>00000076</value>
+        <value>00000077</value>
+        <value>00000078</value>
+        <value>00000079</value>
+        <value>00000080</value>
+        <value>00000081</value>
+        <value>00000082</value>
+        <value>00000083</value>
+        <value>00000084</value>
+        <value>00000085</value>
+        <value>00000086</value>
+        <value>00000087</value>
+        <value>00000088</value>
+        <value>00000089</value>
+        <value>00000090</value>
+        <value>00000091</value>
+        <value>00000092</value>
+        <value>00000093</value>
+        <value>00000094</value>
+        <value>00000095</value>
+        <value>00000096</value>
+        <value>00000097</value>
+        <value>00000098</value>
+        <value>00000099</value>
+        <value>00000100</value>
+    </util:list>
+    
+    <util:list id="identList2" value-type="java.lang.String">
+        <value>VIDEOSYS</value>
+        <value>QMWCHEST</value>
+        <value>N4B3WSXA</value>
+        <value>1ID00010</value>
+        <value>VMS01114</value>
+        <value>T4B3C83G</value>
+        <value>VMS00173</value>
+        <value>YSACLZWB</value>
+        <value>1ID00123</value>
+        <value>W4BGNKFD</value>
+        <value>PTALWKCB</value>
+        <value>0ID00149</value>
+        <value>RRB2MOZA</value>
+        <value>0ID00119</value>
+        <value>JGBFU7RZ</value>
+        <value>TUCAN001</value>
+        <value>VMS01097</value>
+        <value>NZBB0XYD</value>
+        <value>VMS00291</value>
+        <value>1ID00041</value>
+        <value>1ID00186</value>
+        <value>1ID00055</value>
+        <value>1ID00056</value>
+        <value>1ID00188</value>
+        <value>1ID00089</value>
+        <value>0ID00084</value>
+        <value>MABE0801</value>
+        <value>0ID00088</value>
+        <value>JTAXVYEB</value>
+        <value>HLWALDOR</value>
+        <value>HLCALEDI</value>
+        <value>0ID00127</value>
+        <value>1ID00102</value>
+        <value>1ID00052</value>
+        <value>LMRUSSEL</value>
+        <value>1ID00133</value>
+        <value>OWAVLATC</value>
+        <value>WCBFNE6D</value>
+        <value>INPALACE</value>
+        <value>DXA8PQ1F</value>
+        <value>0ID00130</value>
+        <value>BZBG7FLC</value>
+        <value>1ID00069</value>
+        <value>01D00177</value>
+        <value>G4BU8P1C</value>
+        <value>0ID00017</value>
+        <value>HDKENSI0</value>
+        <value>ORBCB0GD</value>
+        <value>ASBUWZFB</value>
+        <value>1ID00098</value>
+        <value>1ID00120</value>
+        <value>OWA4CAYE</value>
+        <value>INCELMAN</value>
+        <value>DECAVEND</value>
+        <value>0ID00129</value>
+        <value>1ID00040</value>
+        <value>HLBASING</value>
+        <value>UKTEST09</value>
+        <value>UKTEST07</value>
+        <value>UKTEST06</value>
+        <value>UKTEST05</value>
+        <value>UKTEST04</value>
+        <value>UKTEST03</value>
+        <value>UKTEST02</value>
+        <value>UKTEST01</value>
+        <value>DGB33X5F</value>
+        <value>STSRACK2</value>
+        <value>STSRACK1</value>
+        <value>L8B36Q29</value>
+        <value>STSIPSYS</value>
+        <value>L8BW5619</value>
+        <value>DEMOSBM0</value>
+        <value>PHILIPS2</value>
+        <value>PHILIPS1</value>
+        <value>MOBIWARS</value>
+        <value>INVIDEOT</value>
+        <value>UKTEST08</value>
+        <value>VI-LIGHT</value>
+        <value>IPTV-SYS</value>
+        <value>MERACK01</value>
+        <value>0ID00032</value>
+        <value>OKB2Y14G</value>
+        <value>LWA7OZBD</value>
+        <value>CENT-DVB</value>
+        <value>USMB0004</value>
+        <value>USMB0003</value>
+        <value>USMB0002</value>
+        <value>USMB0001</value>
+        <value>MARITIM3</value>
+        <value>MARITIM2</value>
+        <value>MARITIM1</value>
+        <value>NNBULE7C</value>
+        <value>0ID00136</value>
+        <value>0ID00163</value>
+        <value>SCBEXKKE</value>
+        <value>XFBABNYB</value>
+        <value>COB1BFRA</value>
+        <value>0ID00128</value>
+        <value>0ID00212</value>
+        <value>0ID00118</value>
+    </util:list>
+</beans>

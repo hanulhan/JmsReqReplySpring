@@ -91,6 +91,10 @@ public class ReqReplyConsumer implements MessageListener {
             
         }
     }
+    
+    public int getQuantityConnected() {
+        return filterMap.size();
+    }
 
     public void sendResponse(String aIdent, String aResponse, String aMessageId) {
         int myMsgCount;

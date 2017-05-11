@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component;
  *
  * @author UHansen
  */
-@Path("/rest/systemdata")
+@Path("/rest/systemdata2")
 @Component
-public class SystemDataRest implements ApplicationContextAware {
+public class SystemDataRest2 implements ApplicationContextAware {
 
     // injected stuff
     private ApplicationContext applicationContext;
@@ -49,7 +49,7 @@ public class SystemDataRest implements ApplicationContextAware {
     /**
      * Creates a new instance of SystemDataRest
      */
-    public SystemDataRest() {
+    public SystemDataRest2() {
     }
 
     /**
@@ -59,27 +59,23 @@ public class SystemDataRest implements ApplicationContextAware {
      * @param aReqReply
      * @return an instance of java.lang.String
      */
+    
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Consumes({"application/xml"})
-    public Response SystemData(ReqReply aReqReply) {
-        Response myResponse = Response.status(Response.Status.BAD_REQUEST).build();        
+    public String SystemData2(ReqReply aReqReply) {
+        String result = "ERROR";
 
         if ((aReqReply != null) && (aReqReply.getRequest() != null)) {
-            if (aReqReply.getIdent().equals("VIDEOSYS")) {
-//                LOGGER.log(Level.DEBUG, "RestCall receive response [msgId: " + aReqReply.getMessageid() + ", ident: " + aReqReply.getIdent());
-                LOGGER.log(Level.DEBUG, "RestCall receive response [msgId: " + aReqReply.getMessageid() + ", ident: VIDEOSYS");
-            }
-            
+            result = "OK";
+            LOGGER.log(Level.DEBUG, "RestCall receive response [msgId: " + aReqReply.getMessageid() + ", ident: " + aReqReply.getIdent());
             reqReplyConsumer.sendResponse(aReqReply.getIdent(), aReqReply.getResponse(), aReqReply.getMessageid());
-
-            myResponse = Response.status(Response.Status.OK).build();
+        } else {
+            throw new WebApplicationException(204);
         }
-        return myResponse;
+        return result;
     }
-    
-    
-    
+
     public void setReqReplyConsumer(ReqReplyConsumer reqReplyConsumer) {
         this.reqReplyConsumer = reqReplyConsumer;
     }
