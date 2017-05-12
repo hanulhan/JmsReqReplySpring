@@ -137,7 +137,7 @@
     <bean id="bean_WebSimulation" class="hanulhan.jms.spring.websession.sim.WebSimulation" >
         <property name="timeoutSec"    value="45" />
         <property name="identList"     ref="identList1"/>
-        <property name="identQuantity" value="100" />
+        <property name="identQuantity" value="10" />
     </bean>    
     
     <util:list id="identList1" value-type="java.lang.String">

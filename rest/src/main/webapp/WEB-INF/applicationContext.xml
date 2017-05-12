@@ -54,7 +54,7 @@
 
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${broker.url.start}" />
+        <property name="brokerURL" value="${broker.url}" />
         <property name="sendTimeout" value="0" />
     </bean>
 

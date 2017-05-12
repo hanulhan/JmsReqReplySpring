@@ -364,11 +364,14 @@
                 <reply.durable.subscriber.name>DEV-REPLY-SUBSCRIBER</reply.durable.subscriber.name>
                 <hold.time.systemAlive>45</hold.time.systemAlive>
 <!--                <broker.url>tcp://192.168.20.12:61616</broker.url>-->
-<!--                <broker.url>tcp://192.168.1.61:61616</broker.url>                -->
+                <broker.url>tcp://192.168.1.61:61616</broker.url>                
 <!--                <broker.url>tcp://localhost:61616</broker.url>-->
 <!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
-                <broker.url>tcp://192.168.1.44:61616</broker.url>
-                <broker.url.start>vm://192.168.1.44?brokerConfig=xbean:activemq.xml</broker.url.start>
+<!--                <broker.url>tcp://localhost:61616</broker.url>-->
+<!--                <broker.url.start>vm://192.168.1.44?brokerConfig=xbean:activemq.xml</broker.url.start>-->
+<!--                <broker.url.start>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url.start>-->
+<!--                <broker.url.start>tcp://192.168.1.44:61616</broker.url.start>-->
+<!--                <broker.url>tcp://192.168.1.44:61616</broker.url>-->
                 <log4j.logpath>${project.build.directory}/log</log4j.logpath>                
             </properties>    
         </profile>
