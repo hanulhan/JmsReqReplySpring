@@ -37,7 +37,7 @@ public class ReqReplyConsumer implements MessageListener {
     private Destination replyDestination;
     private String filterPropertyName;
 
-    private String reqConsumerId;
+    private String clientId;
     private Integer maxMessageLength;
 
     // internal
@@ -173,7 +173,7 @@ public class ReqReplyConsumer implements MessageListener {
                 myRequest = ((TextMessage) aMessage).getText();
                 correlationId = aMessage.getJMSMessageID();
 
-                if (filterMap.addRequest(myIdent, reqConsumerId, myRequest, correlationId, 2000)) {
+                if (filterMap.addRequest(myIdent, clientId, myRequest, correlationId, 2000)) {
 
                     // Send an ACK
                     myResponseDestination = aMessage.getJMSReplyTo();
@@ -283,13 +283,14 @@ public class ReqReplyConsumer implements MessageListener {
         this.filterPropertyName = filterPropertyName;
     }
 
-    public String getReqConsumerId() {
-        return reqConsumerId;
+    public String getClientId() {
+        return clientId;
     }
 
-    public void setReqConsumerId(String reqConsumerId) {
-        this.reqConsumerId = reqConsumerId;
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
+
 
 
 

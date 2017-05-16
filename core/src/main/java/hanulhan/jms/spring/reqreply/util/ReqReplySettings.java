@@ -5,6 +5,8 @@
  */
 package hanulhan.jms.spring.reqreply.util;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import javax.jms.Destination;
 
 /**
@@ -189,8 +191,9 @@ public class ReqReplySettings {
     }
 
 
-    
-    
+    public String getClientId() throws UnknownHostException {
+        return InetAddress.getLocalHost().getHostName();
+    }
     
 
 }

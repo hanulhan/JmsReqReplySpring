@@ -26,7 +26,6 @@
         <property name="reqDestination"         value="#{bean_ReqReplySettings.getReqDestination()}" />
         <property name="filterPropertyName"     value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
         <property name="maxMessageLength"       value="#{bean_ReqReplySettings.getMaxMessageLength()}" />
-        <property name="serverId"               value="#{bean_ReqReplySettings.getServerId()}" />
         <property name="filterPropertyDelegator" ref="bean_FilterPropertyDelegator" />
     </bean>
 
@@ -37,7 +36,7 @@
           p:messageListener-ref="bean_jmsReqReplyConsumer"
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
-          p:durableSubscriptionName="REQ-SUBSCRIBER"
+          p:durableSubscriptionName="${request.durable.subscriber.name}"
           p:errorHandler-ref="bean_jmsErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
     

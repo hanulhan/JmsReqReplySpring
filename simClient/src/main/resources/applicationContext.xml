@@ -35,8 +35,9 @@
         <property name="reqDestination"        ref="bean_vmReqTopic" />
         <property name="reqDestinationName"    value="${topic.name.request}" />
         <property name="replyDestination"      ref="bean_vmReplyTopic" />
-        <property name="maxMessageLength"   value="${message.length}" />
-        <property name="serverId"           value="${server.id}" />
+        <property name="maxMessageLength">
+            <value>${message.length}</value> 
+        </property>
         <property name="filterPropertyName" value="SYSTEM_IDENT" />
     </bean>
 
@@ -56,33 +57,6 @@
         <property name="sendTimeout" value="0" />
     </bean>
 
-    <bean id="bean_CachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-        <description> 
-            The CachingConnectionFactory extends the functionality of SingleConnectionFactory 
-            and adds the caching of Sessions, MessageProducers, and MessageConsumers. 
-            The initial cache size is set to 1, use the property sessionCacheSize 
-            to increase the number of cached sessions. Note that the number of actual 
-            cached sessions will be more than that number as sessions are cached based 
-            on their acknowledgment mode, so there can be up to 4 cached session instances 
-            when sessionCacheSize is set to one, one for each acknowledgment mode. 
-            MessageProducers and MessageConsumers are cached within their owning session 
-            and also take into account the unique properties of the producers 
-            and consumers when caching. MessageProducers are cached based on their 
-            destination. MessageConsumers are cached based on a key composed of the 
-            destination, selector, noLocal delivery flag, and the durable subscription 
-            name (if creating durable consumers).
-            
-            Note that the number of actual cached sessions will be more than that number as sessions 
-            are cached based on their acknowledgment mode, so there can be up to 4 cached session instances 
-            when sessionCacheSize is set to one.
-        </description>
-
-        <constructor-arg ref="bean_amqConnectionFactory" />
-        <property name="reconnectOnException" value="true" />
-        <!--        <property name="exceptionListener" ref="bean_brokerExceptionListenerBean" /> -->
-        <property name="sessionCacheSize" value="10" />
-    </bean>
-
     <bean id="bean_SingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
         <description>
             This SingleConnectionFactory is useful for testing and standalone 
@@ -90,19 +64,15 @@
             JmsTemplate calls that may span any number of transactions
         </description>
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
-        <property name="reconnectOnException" value="true" />
-        <!--        <property name="clientId" value="${client.id}" />-->
-        <property name="clientId" value="ACS-Web-Session-Simulation" />
+        <property name="reconnectOnException"   value="true" />
+        <property name="clientId"               value="ACS-#{bean_ReqReplySettings.getClientId()}" />
     </bean>
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
     
-    <!-- Which connectionFactory should be used -->
-    <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
-       
     <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="pubSubDomain" value="true" />
-        <property name="connectionFactory" ref="bean_DefaultConnectionFactory" />
+        <property name="connectionFactory" ref="bean_SingleConnectionFactory" />
     </bean>
     
 

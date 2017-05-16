@@ -47,11 +47,8 @@
         <property name="replyDestination"       value="#{bean_ReqReplySettings.getReplyDestination()}" />
         <property name="filterPropertyName"     value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
         <property name="maxMessageLength"       value="#{bean_ReqReplySettings.getMaxMessageLength()}" />
-        <property name="clientId"               value="${client.id}" />
+        <property name="clientId"               value="B2B-#{bean_ReqReplySettings.getClientId()}" />
     </bean>
-    
-
-
 
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
@@ -59,32 +56,6 @@
         <property name="sendTimeout" value="0" />
     </bean>
 
-    <bean id="bean_CachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-        <description> 
-            The CachingConnectionFactory extends the functionality of SingleConnectionFactory 
-            and adds the caching of Sessions, MessageProducers, and MessageConsumers. 
-            The initial cache size is set to 1, use the property sessionCacheSize 
-            to increase the number of cached sessions. Note that the number of actual 
-            cached sessions will be more than that number as sessions are cached based 
-            on their acknowledgment mode, so there can be up to 4 cached session instances 
-            when sessionCacheSize is set to one, one for each acknowledgment mode. 
-            MessageProducers and MessageConsumers are cached within their owning session 
-            and also take into account the unique properties of the producers 
-            and consumers when caching. MessageProducers are cached based on their 
-            destination. MessageConsumers are cached based on a key composed of the 
-            destination, selector, noLocal delivery flag, and the durable subscription 
-            name (if creating durable consumers).
-            
-            Note that the number of actual cached sessions will be more than that number as sessions 
-            are cached based on their acknowledgment mode, so there can be up to 4 cached session instances 
-            when sessionCacheSize is set to one.
-        </description>
-
-        <constructor-arg ref="bean_amqConnectionFactory" />
-        <property name="reconnectOnException" value="true" />
-<!--        <property name="exceptionListener" ref="bean_brokerExceptionListenerBean" /> -->
-        <property name="sessionCacheSize" value="10" />
-    </bean>
 
     <bean id="bean_SingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
         <description>
@@ -93,20 +64,15 @@
             JmsTemplate calls that may span any number of transactions
         </description>
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
-        <property name="reconnectOnException" value="true" />
-        <property name="clientId" value="${client.id}" />
+        <property name="reconnectOnException"   value="true" />
+        <property name="clientId"               value="B2B-#{bean_ReqReplySettings.getClientId()}" />
     </bean>
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
     
-    <!-- Which connectionFactory should be used -->
-    <!-- It is recommended to use no caching connection factory for a ListenerContainer -->
-    <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
-
-       
     <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="pubSubDomain" value="true" />
-        <property name="connectionFactory" ref="bean_DefaultConnectionFactory" />
+        <property name="connectionFactory" ref="bean_SingleConnectionFactory" />
     </bean>
     
 
@@ -126,7 +92,7 @@
     
     <bean id="bean_jmsReqListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-          p:connectionFactory-ref="bean_DefaultConnectionFactory"
+          p:connectionFactory-ref="bean_SingleConnectionFactory"
           p:destinationName="#{bean_ReqReplySettings.getReqDestinationName()}"
           p:messageListener-ref="bean_jmsReqReplyConsumer"
           p:pubSubDomain="true"

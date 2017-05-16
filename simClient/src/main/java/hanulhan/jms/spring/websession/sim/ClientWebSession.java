@@ -29,8 +29,8 @@ public class ClientWebSession extends Thread {
     private int errorQuantity = 0;
     private int timeoutQuantity= 0;
 
-    private static final int SLEEP_TIME_MIN = 45000;
-    private static final int SLEEP_TIME_MAX = 60000;
+    private static final int SLEEP_TIME_MIN = 10000;
+    private static final int SLEEP_TIME_MAX = 20000;
 
     /**
      *

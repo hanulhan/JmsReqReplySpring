@@ -7,8 +7,6 @@ package hanulhan.jms.spring.reqreply.websession;
 
 import com.opensymphony.xwork2.ActionSupport;
 import hanulhan.jms.spring.reqreply.beans.ReqReplyProducer;
-import hanulhan.jms.spring.reqreply.util.ReqReply;
-import javax.jms.JMSException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;

@@ -25,8 +25,9 @@
         <property name="reqDestination"        ref="bean_vmReqTopic" />
         <property name="reqDestinationName"    value="vmReqTopic" />
         <property name="replyDestination"      ref="bean_vmReplyTopic" />
-        <property name="maxMessageLength"   value="50" />
-        <property name="serverId"           value="B2B-1" />
+        <property name="maxMessageLength">
+            <value>50</value> 
+        </property>
         <property name="filterPropertyName" value="SYSTEM_IDENT" />
     </bean>
     
@@ -36,12 +37,13 @@
         <property name="reqDestination"         value="#{bean_ReqReplySettings.getReqDestination()}" />
         <property name="replyDestination"       value="#{bean_ReqReplySettings.getReplyDestination()}" />
         <property name="filterPropertyName"     value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
-        <property name="maxMessageLength"       value="#{bean_ReqReplySettings.getMaxMessageLength()}" />
-        <property name="serverId"               value="#{bean_ReqReplySettings.getServerId()}" />
+        <property name="maxMessageLength">
+            <value>50</value> 
+        </property>
     </bean>
     
 
-        <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="singleton" >
+    <bean id="bean_vmReqReplyProducer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyProducer" scope="singleton" >
         <description>
             Message Producer to send Requests to the VM-Req Topic
             and awaiting the Respnse
@@ -94,8 +96,8 @@
             JmsTemplate calls that may span any number of transactions
         </description>
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
-        <property name="reconnectOnException" value="true" />
-        <property name="clientId" value="sampleSubscriber" />
+        <property name="reconnectOnException"   value="true" />
+        <property name="clientId"               value="#{bean_ReqReplySettings.getClientId()}" />
     </bean>
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
@@ -130,20 +132,20 @@
           p:messageListener-ref="bean_jmsReqReplyConsumer1"
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
-          p:durableSubscriptionName="REQ-SUBSCRIBER"
+          p:durableSubscriptionName="${request.durable.subscriber.name}"
           p:errorHandler-ref="bean_jmsErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
 
 
-        <bean id="bean_jmsReplyListenerContainer" 
+    <bean id="bean_jmsReplyListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
           p:connectionFactory-ref="bean_DefaultConnectionFactory"
           p:destinationName="vmReplyTopic"
           p:messageListener-ref="bean_vmReqReplyProducer"
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
-          p:durableSubscriptionName="REPLY-SUBSCRIBER"
+          p:durableSubscriptionName="${reply.durable.subscriber.name}"
           p:errorHandler-ref="bean_jmsErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
     

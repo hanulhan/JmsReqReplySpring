@@ -28,45 +28,18 @@
         <property name="reqDestinationName"    value="vmReqTopic" />
         <property name="replyDestination"      ref="bean_vmReplyTopic" />
         <property name="replyDestinationName"  value="vmReplyTopic" />
-        <property name="maxMessageLength"   value="5" />
-        <property name="serverId"           value="B2B-1" />
+                <property name="maxMessageLength">
+            <value>5</value> 
+        </property>
         <property name="filterPropertyName" value="SYSTEM_IDENT" />
     </bean>
 
     
     <bean id="bean_amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-<!--                <property name="brokerURL" value="tcp://localhost:61616" />-->
-<!--                <property name="brokerURL" value="vm://localhost?brokerConfig=xbean:activemq.xml" />-->
-        <property name="brokerURL" value="tcp://192.168.20.12:61616" />
+        <property name="brokerURL" value="${broker.url}" />
         <property name="sendTimeout" value="0" />
     </bean>
 
-    <bean id="bean_CachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-        <description> 
-            The CachingConnectionFactory extends the functionality of SingleConnectionFactory 
-            and adds the caching of Sessions, MessageProducers, and MessageConsumers. 
-            The initial cache size is set to 1, use the property sessionCacheSize 
-            to increase the number of cached sessions. Note that the number of actual 
-            cached sessions will be more than that number as sessions are cached based 
-            on their acknowledgment mode, so there can be up to 4 cached session instances 
-            when sessionCacheSize is set to one, one for each acknowledgment mode. 
-            MessageProducers and MessageConsumers are cached within their owning session 
-            and also take into account the unique properties of the producers 
-            and consumers when caching. MessageProducers are cached based on their 
-            destination. MessageConsumers are cached based on a key composed of the 
-            destination, selector, noLocal delivery flag, and the durable subscription 
-            name (if creating durable consumers).
-            
-            Note that the number of actual cached sessions will be more than that number as sessions 
-            are cached based on their acknowledgment mode, so there can be up to 4 cached session instances 
-            when sessionCacheSize is set to one.
-        </description>
-
-        <constructor-arg ref="bean_amqConnectionFactory" />
-        <property name="reconnectOnException" value="true" />
-        <property name="exceptionListener" ref="bean_brokerExceptionListenerBean" /> 
-        <property name="sessionCacheSize" value="10" />
-    </bean>
 
     <bean id="bean_SingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
         <description>
@@ -79,12 +52,9 @@
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
     
-    <!-- Which connectionFactory should be used -->
-    <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
-       
     <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="pubSubDomain" value="true" />
-        <property name="connectionFactory" ref="bean_DefaultConnectionFactory" />
+        <property name="connectionFactory" ref="bean_SingleConnectionFactory" />
     </bean>
     
 
@@ -112,12 +82,12 @@
 
     <bean id="bean_jmsReplyListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-          p:connectionFactory-ref="bean_DefaultConnectionFactory"
+          p:connectionFactory-ref="bean_SingleConnectionFactory"
           p:destinationName="vmReplyTopic"
           p:messageListener-ref="bean_vmReqReplyProducer"
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
-          p:durableSubscriptionName="REPLY-SUBSCRIBER"
+          p:durableSubscriptionName="${reply.durable.subscriber.name}"
           p:errorHandler-ref="bean_jmsErrorHandler"
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
