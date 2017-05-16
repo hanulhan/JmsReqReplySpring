@@ -33,20 +33,21 @@
         <property name="reqDestination"        ref="bean_vmReqTopic" />
         <property name="reqDestinationName"    value="${topic.name.request}" />
         <property name="replyDestination"      ref="bean_vmReplyTopic" />
-        <property name="maxMessageLength"   value="${message.length}" />
-        <property name="serverId"           value="${server.id}" />
-        <property name="filterPropertyName" value="SYSTEM_IDENT" />
-        <property name="holdTimeSec"        value="${hold.time.systemAlive}" />
+        <property name="maxMessageLength">
+            <value>${message.length}</value>
+        </property>
+        <property name="filterPropertyName"  value="SYSTEM_IDENT" />
+        <property name="holdTimeSec"         value="${hold.time.systemAlive}" />
     </bean>
     
     
-    <bean   id="bean_jmsReqReplyConsumer1" class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer" scope="singleton" >
+    <bean   id="bean_jmsReqReplyConsumer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer" scope="singleton" >
         <property name="jmsTemplate"            ref="bean_jmsTopicTemplate" />
         <property name="reqDestination"         value="#{bean_ReqReplySettings.getReqDestination()}" />
         <property name="replyDestination"       value="#{bean_ReqReplySettings.getReplyDestination()}" />
         <property name="filterPropertyName"     value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
         <property name="maxMessageLength"       value="#{bean_ReqReplySettings.getMaxMessageLength()}" />
-        <property name="serverId"               value="#{bean_ReqReplySettings.getServerId()}" />
+        <property name="clientId"               value="${client.id}" />
     </bean>
     
 
@@ -93,13 +94,15 @@
         </description>
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
         <property name="reconnectOnException" value="true" />
-        <property name="clientId" value="B2B-1" />
+        <property name="clientId" value="${client.id}" />
     </bean>
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />
     
     <!-- Which connectionFactory should be used -->
+    <!-- It is recommended to use no caching connection factory for a ListenerContainer -->
     <alias name="bean_SingleConnectionFactory" alias="bean_DefaultConnectionFactory" />
+
        
     <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="pubSubDomain" value="true" />
@@ -123,9 +126,9 @@
     
     <bean id="bean_jmsReqListenerContainer" 
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-          p:connectionFactory-ref="bean_SingleConnectionFactory"
+          p:connectionFactory-ref="bean_DefaultConnectionFactory"
           p:destinationName="#{bean_ReqReplySettings.getReqDestinationName()}"
-          p:messageListener-ref="bean_jmsReqReplyConsumer1"
+          p:messageListener-ref="bean_jmsReqReplyConsumer"
           p:pubSubDomain="true"
           p:subscriptionDurable="false"
           p:durableSubscriptionName="${request.durable.subscriber.name}"

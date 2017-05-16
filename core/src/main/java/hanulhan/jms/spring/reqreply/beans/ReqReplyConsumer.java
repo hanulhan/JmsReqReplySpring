@@ -12,7 +12,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
-import hanulhan.jms.spring.reqreply.util.ReqReplyFilterInterface;
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterMap;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
@@ -38,7 +37,7 @@ public class ReqReplyConsumer implements MessageListener {
     private Destination replyDestination;
     private String filterPropertyName;
 
-    private String consumerId;
+    private String reqConsumerId;
     private Integer maxMessageLength;
 
     // internal
@@ -174,7 +173,7 @@ public class ReqReplyConsumer implements MessageListener {
                 myRequest = ((TextMessage) aMessage).getText();
                 correlationId = aMessage.getJMSMessageID();
 
-                if (filterMap.addRequest(myIdent, consumerId, myRequest, correlationId, 2000)) {
+                if (filterMap.addRequest(myIdent, reqConsumerId, myRequest, correlationId, 2000)) {
 
                     // Send an ACK
                     myResponseDestination = aMessage.getJMSReplyTo();
@@ -284,21 +283,16 @@ public class ReqReplyConsumer implements MessageListener {
         this.filterPropertyName = filterPropertyName;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getServerId() {
-        return consumerId;
+    public String getReqConsumerId() {
+        return reqConsumerId;
     }
 
-    /**
-     *
-     * @param serverId
-     */
-    public void setServerId(String serverId) {
-        this.consumerId = serverId;
+    public void setReqConsumerId(String reqConsumerId) {
+        this.reqConsumerId = reqConsumerId;
     }
+
+
+
 
     /**
      *

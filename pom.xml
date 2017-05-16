@@ -350,7 +350,7 @@
     
     <profiles>
         <profile>
-            <id>DE-WS-16</id>
+            <id>BROKER-UH</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -360,8 +360,8 @@
                 <client.id>DE-WS-16-dev</client.id>
                 <server.id>B2B-1-DEV</server.id>
                 <message.length>4096</message.length>
-                <request.durable.subscriber.name>DEV-REQ-SUBSCRIBER</request.durable.subscriber.name>
-                <reply.durable.subscriber.name>DEV-REPLY-SUBSCRIBER</reply.durable.subscriber.name>
+                <request.durable.subscriber.name>REQ-SUBSCRIBER-DEV</request.durable.subscriber.name>
+                <reply.durable.subscriber.name>REPLY-SUBSCRIBER-DEV</reply.durable.subscriber.name>
                 <hold.time.systemAlive>45</hold.time.systemAlive>
 <!--                <broker.url>tcp://192.168.20.12:61616</broker.url>-->
                 <broker.url>tcp://192.168.1.61:61616</broker.url>                
@@ -376,15 +376,15 @@
             </properties>    
         </profile>
         <profile>
-            <id>CoudDev-1</id>
+            <id>BROKER-DEV-EW</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <topic.name.request>vmReqTopic</topic.name.request>
-                <topic.name.response>vmReplyTopic</topic.name.response>
+                <topic.name.request>vmReqTopic.dev</topic.name.request>
+                <topic.name.response>vmReplyTopic.dev</topic.name.response>
                 <client.id>CloudDev-1</client.id>
-                <server.id>B2B-1</server.id>
+                <req.consumer.id>B2B-1</req.consumer.id>
                 <message.length>2048</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER</reply.durable.subscriber.name>

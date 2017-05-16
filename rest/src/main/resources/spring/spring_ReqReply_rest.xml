@@ -27,20 +27,13 @@
 >
 
     <bean id="bean_SysemAliveRest" class="hanulhan.jms.spring.reqreply.rest.SystemAliveRest" scope="prototype">
-        <property name="reqReplyConsumer" ref="bean_jmsReqReplyConsumer1" />
+        <property name="reqReplyConsumer" ref="bean_jmsReqReplyConsumer" />
         <property name="holdTimeSec" value="#{bean_ReqReplySettings.getHoldTimeSec()}" />
     </bean>
 
-    <bean id="bean_SysemAliveRest2" class="hanulhan.jms.spring.reqreply.rest.SystemAliveRest2" scope="prototype">
-        <property name="reqReplyConsumer" ref="bean_jmsReqReplyConsumer1" />
-        <property name="holdTimeSec" value="#{bean_ReqReplySettings.getHoldTimeSec()}" />
-    </bean>
     
     <bean id="bean_SysemDataRest" class="hanulhan.jms.spring.reqreply.rest.SystemDataRest" scope="prototype">
-        <property name="reqReplyConsumer" ref="bean_jmsReqReplyConsumer1" />
+        <property name="reqReplyConsumer" ref="bean_jmsReqReplyConsumer" />
     </bean>
     
-    <bean id="bean_SysemDataRest2" class="hanulhan.jms.spring.reqreply.rest.SystemDataRest" scope="prototype">
-        <property name="reqReplyConsumer" ref="bean_jmsReqReplyConsumer1" />
-    </bean>
 </beans>

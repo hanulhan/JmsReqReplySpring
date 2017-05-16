@@ -45,8 +45,6 @@ public class ReqReplySettings {
     private String      replyDestinationName;
 
     private int         maxMessageLength;
-    private String      serverId;
-    private String      clientId;
     private String      filterPropertyName;
     
     private String      reqSubscriberName;
@@ -132,38 +130,6 @@ public class ReqReplySettings {
      */
     public void setMaxMessageLength(int maxMessageLength) {
         this.maxMessageLength = maxMessageLength;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getServerId() {
-        return serverId;
-    }
-
-    /**
-     *
-     * @param serverId
-     */
-    public void setServerId(String serverId) {
-        this.serverId = serverId;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getClientId() {
-        return clientId;
-    }
-
-    /**
-     *
-     * @param clientId
-     */
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
     }
 
     /**
