@@ -124,7 +124,7 @@ public class ReqReplyConsumer implements MessageListener {
 
             LOGGER.log(Level.DEBUG, "Server send response "
                     + (i + 1) + "/" + myMsgCount
-                    + ", Ident: " + aResponse
+                    + ", Ident: " + aIdent
                     + ", msgId: " + aMessageId);
 
             jmsTemplate.send(replyDestination, myResponseCreator);

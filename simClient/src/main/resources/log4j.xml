@@ -19,23 +19,16 @@
         </layout>
     </appender>    
 
-    
+
+    <logger name="hanulhan.jms.spring">
+        <level value="INFO" />
+        <appender-ref ref="simReqReply" />
+    </logger>    
     
     <logger name="org.apache.activemq">
         <level value="INFO" />
         <appender-ref ref="simReqReply" />
     </logger>    
-
-    <logger name="hanulhan.jms.spring">
-        <level value="INFO" />
-        <appender-ref ref="simReqReply" />
-    </logger>
-    
-        <logger name="hanulhan.jms.spring.websession.sim">
-        <level value="INFO" />
-        <appender-ref ref="simReqReply" />
-    </logger>
-    
 
     <logger name="org.springframework.jms">
         <level value="INFO" />
@@ -54,11 +47,11 @@
     </logger>
 
     
-<!--    <logger name="org.springframework.beans">
+    <!--    <logger name="org.springframework.beans">
         <level value="WARN" />
     </logger>-->
 
-<!--    <logger name="org.springframework.xbean">
+    <!--    <logger name="org.springframework.xbean">
         <level value="DEBUG" />
     </logger>-->
 

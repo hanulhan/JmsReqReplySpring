@@ -29,7 +29,7 @@
         <jms.broker.data.directory>${project.build.directory}/ActiveMQ-Data</jms.broker.data.directory>        
         <jms.broker.send.timeout></jms.broker.send.timeout>
 
-        <log4j.logpath>/var/log/tomcat7</log4j.logpath>
+        <log4j.logpath>/var/log/userLog</log4j.logpath>
 
         <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 DEPENDENCY VERSION

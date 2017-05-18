@@ -23,6 +23,7 @@ public class WebSimulation {
     private static int timeoutSec;
     private static List<String> identList;
     private static int identQuantity;
+    private static int startIndex, endIndex;
     private static final Logger LOGGER = Logger.getLogger(WebSimulation.class);
 
     public WebSimulation() {
@@ -37,19 +38,31 @@ public class WebSimulation {
         List<ClientWebSession> clientSimList = new ArrayList();
 
         if (args.length > 0 && args[0].equals("?")) {
-            LOGGER.log(Level.TRACE, "java -jar ClientWebSession <identQuantity | ?> ");
-        } else if (args.length > 0) {
-            identQuantity = Integer.parseInt(args[0]);
-//            if (args.length > 1) {
-//                myDoReply = Boolean.parseBoolean(args[1]);
-//            }
+            LOGGER.log(Level.TRACE, "java -jar ClientWebSession <startIndex, endIndex | ?> ");
+            System.exit(0);
+        } else if (args.length > 1) {
+            startIndex= Integer.parseInt(args[0]);
+            endIndex= Integer.parseInt(args[1]);
 
+        } else {
+            LOGGER.log(Level.ERROR, "java -jar ClientWebSession <startIndex, endIndex | ?> ");
+            System.exit(0);
         }
-
+        
+        if (startIndex < 1) {
+            LOGGER.log(Level.ERROR, "startIndex > 0");
+            System.exit(0);
+        }
+        if (endIndex > 500) {
+            LOGGER.log(Level.ERROR, "endIndex < 501");
+            System.exit(0);
+        }
+        
+        WebSimulation.identQuantity= (WebSimulation.endIndex - WebSimulation.startIndex + 1);
         LOGGER.log(Level.DEBUG, "identList.size()= " + identList.size());
         LOGGER.log(Level.DEBUG, "identQuantity= " + WebSimulation.identQuantity);
 
-        for (int i = 0; i < WebSimulation.identQuantity; i++) {
+        for (int i = (WebSimulation.startIndex - 1); i < WebSimulation.endIndex; i++) {
             clientSimList.add(new ClientWebSession(reqReplyProducer, identList.get(i), timeoutSec));
         }
 

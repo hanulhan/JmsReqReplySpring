@@ -206,11 +206,11 @@ public class ReqReplyMessageStorage {
      * @param myMessageId
      * @return
      */
-    public synchronized boolean isResponseReceived(String myMessageId) {
+    public synchronized boolean isResponseReceived(String aMessageId) {
         boolean myReturn = false;
         try {
             available.acquire();
-            myReturn = msgMap.get(myMessageId).isFinished();
+            myReturn = msgMap.get(aMessageId).isFinished();
 
         } catch (InterruptedException interruptedException) {
             LOGGER.log(Level.ERROR, interruptedException);

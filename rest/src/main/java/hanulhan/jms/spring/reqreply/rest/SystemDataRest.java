@@ -38,7 +38,7 @@ public class SystemDataRest implements ApplicationContextAware {
     private ReqReplyConsumer reqReplyConsumer;
 
     // internal
-    private static final Logger LOGGER = Logger.getLogger(SystemAliveRest.class);
+    private static final Logger LOGGER = Logger.getLogger(SystemDataRest.class);
 
     @Context
     private UriInfo context;
@@ -66,14 +66,12 @@ public class SystemDataRest implements ApplicationContextAware {
         Response myResponse = Response.status(Response.Status.BAD_REQUEST).build();        
 
         if ((aReqReply != null) && (aReqReply.getRequest() != null)) {
-            if (aReqReply.getIdent().equals("VIDEOSYS")) {
-//                LOGGER.log(Level.DEBUG, "RestCall receive response [msgId: " + aReqReply.getMessageid() + ", ident: " + aReqReply.getIdent());
-                LOGGER.log(Level.DEBUG, "RestCall receive response [msgId: " + aReqReply.getMessageid() + ", ident: VIDEOSYS");
-            }
-            
+            LOGGER.log(Level.DEBUG, "SystemData Response to: " + aReqReply.getRequest());
             reqReplyConsumer.sendResponse(aReqReply.getIdent(), aReqReply.getResponse(), aReqReply.getMessageid());
 
             myResponse = Response.status(Response.Status.OK).build();
+        } else {
+            LOGGER.log(Level.DEBUG, "SystemData return BAD_REQUEST");
         }
         return myResponse;
     }

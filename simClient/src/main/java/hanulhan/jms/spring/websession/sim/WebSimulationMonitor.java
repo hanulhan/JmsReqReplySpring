@@ -20,6 +20,7 @@ public class WebSimulationMonitor extends Thread {
     List<ClientWebSession> clientList;
     private int totalRequestCount;
     private int totalErrorCount;
+    private long avgResponseTime;
 
     public WebSimulationMonitor(List<ClientWebSession> aClientSimList) {
         super();
@@ -39,23 +40,29 @@ public class WebSimulationMonitor extends Thread {
                 Thread.sleep(15000);
                 totalRequestCount = 0;
                 totalErrorCount = 0;
+                avgResponseTime = 0;
                 int timeoutCount = 0;
                 int activeSessions = 0;
                 for (ClientWebSession temp : clientList) {
                     totalRequestCount += temp.getRequestQuantity();
                     totalErrorCount += temp.getErrorQuantity();
                     timeoutCount += temp.getTimeoutQuantity();
+                    avgResponseTime += temp.getAvgResponseTime();
+                    
                     if (!temp.isTerminated()) {
                         activeSessions++;
                     }
 
                 }
-
+                avgResponseTime= avgResponseTime / clientList.size();
+                
                 LOGGER.log(Level.INFO, "####################################################");
                 LOGGER.log(Level.INFO, "No of active Sessions: " + activeSessions);
                 LOGGER.log(Level.INFO, "No of total Request:   " + totalRequestCount);
                 LOGGER.log(Level.INFO, "No of total Errors:    " + totalErrorCount);
                 LOGGER.log(Level.INFO, "No of timeout Errors:  " + timeoutCount);
+                
+                LOGGER.log(Level.INFO, "Avg. Response time:    " + avgResponseTime + "ms");
                 if (totalRequestCount > 0 ) {
                     LOGGER.log(Level.INFO, "Error rate:            " + (totalErrorCount * 100) / totalRequestCount + "%");
                 }
