@@ -5,7 +5,9 @@
  */
 package hanulhan.jms.spring.websession.sim;
 
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -21,6 +23,7 @@ public class WebSimulationMonitor extends Thread {
     private int totalRequestCount;
     private int totalErrorCount;
     private long avgResponseTime;
+    private long startTime= new Date().getTime();
 
     public WebSimulationMonitor(List<ClientWebSession> aClientSimList) {
         super();
@@ -35,6 +38,8 @@ public class WebSimulationMonitor extends Thread {
     @SuppressWarnings("SleepWhileInLoop")
     public void run() {
         this.active = true;
+        long now= new Date().getTime();
+        long milliSeconds;
         while (active) {
             try {
                 Thread.sleep(15000);
@@ -55,8 +60,15 @@ public class WebSimulationMonitor extends Thread {
 
                 }
                 avgResponseTime= avgResponseTime / clientList.size();
+                milliSeconds= now- startTime;
                 
                 LOGGER.log(Level.INFO, "####################################################");
+                long myHours = TimeUnit.MILLISECONDS.toHours(milliSeconds);
+                long myMinutes= TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toSeconds(myHours);
+                long mySeconds= TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(myMinutes);
+                
+                String myTime= String.format("%d min, %d sec", myHours, myMinutes, mySeconds);
+                LOGGER.log(Level.INFO, "Run time             : " + myTime);
                 LOGGER.log(Level.INFO, "No of active Sessions: " + activeSessions);
                 LOGGER.log(Level.INFO, "No of total Request:   " + totalRequestCount);
                 LOGGER.log(Level.INFO, "No of total Errors:    " + totalErrorCount);

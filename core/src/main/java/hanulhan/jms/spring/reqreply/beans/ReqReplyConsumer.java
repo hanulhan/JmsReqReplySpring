@@ -206,7 +206,8 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
                     jmsTemplate.send(myResponseDestination, myResponseCreator);
                     LOGGER.log(Level.DEBUG, "Consumer send ACK"
                             + ", Ident: " + myIdent
-                            + ", msgId: " + correlationId);
+                            + ", msgId: " + correlationId
+                            + ", request: " + myRequest);
                 } else {
                     LOGGER.log(Level.ERROR, "Add to filterMap (" + myRequest + ") ERROR");
                 }

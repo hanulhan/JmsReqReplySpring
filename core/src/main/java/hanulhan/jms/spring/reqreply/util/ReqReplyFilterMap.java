@@ -96,13 +96,13 @@ public class ReqReplyFilterMap {
             try {
                 startDateTime.setTime(new Date());
                 if (available.tryAcquire(myAquireTimeMs, TimeUnit.MILLISECONDS)) {
-                    LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " aquire identMap");
+                    LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " aquire identMap for request: " + aRequest );
                     if (filterMap.containsKey(aIdent) && !filterMap.get(aIdent).isBusy()) {
                         RequestObject myObj = filterMap.get(aIdent);
 
                         synchronized (myObj) {
                             myObj.setNewRequest(aRequest, aMessageId, aConsumerId, DateConverter.createXmlGregorianCalendar(startDateTime));
-                            LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " NOTIFY Object");
+                            LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " NOTIFY Object for request: " + aRequest);
                             retValue = true;
                             filterMap.remove(aIdent);
                             myObj.notify();

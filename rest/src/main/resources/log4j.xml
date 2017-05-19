@@ -49,7 +49,7 @@
 
     
     <logger name="org.springframework.beans">
-        <level value="TRACE" />
+        <level value="INFO" />
     </logger>
 
 <!--    <logger name="org.springframework.xbean">
@@ -57,7 +57,7 @@
     </logger>-->
 
     <logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
-        <level value="TRACE" />
+        <level value="INFO" />
     </logger>
     
 
