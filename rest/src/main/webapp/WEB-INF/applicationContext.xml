@@ -33,11 +33,13 @@
         <property name="reqDestination"        ref="bean_vmReqTopic" />
         <property name="reqDestinationName"    value="${topic.name.request}" />
         <property name="replyDestination"      ref="bean_vmReplyTopic" />
-        <property name="maxMessageLength">
+        <property name="maxMessageLength"      value="${message.length}" />
+        <!--        <property name="maxMessageLength">
             <value>${message.length}</value>
-        </property>
+        </property>-->
         <property name="filterPropertyName"  value="SYSTEM_IDENT" />
         <property name="holdTimeSec"         value="${hold.time.systemAlive.sec}" />
+        <property name="awaitingConnectionTimeoutMsec" value= "${awaiting.connection.timeout.msec}" />
     </bean>
     
     
@@ -47,6 +49,7 @@
         <property name="replyDestination"       value="#{bean_ReqReplySettings.getReplyDestination()}" />
         <property name="filterPropertyName"     value="#{bean_ReqReplySettings.getFilterPropertyName()}" />
         <property name="maxMessageLength"       value="#{bean_ReqReplySettings.getMaxMessageLength()}" />
+        <property name="awaitingConnectionTimeoutMsec"       value="#{bean_ReqReplySettings.getAwaitingConnectionTimeoutMsec()}" />        
         <property name="clientId"               value="B2B-#{bean_ReqReplySettings.getClientId()}" />
     </bean>
 

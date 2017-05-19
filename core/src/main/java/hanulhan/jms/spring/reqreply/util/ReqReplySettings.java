@@ -8,6 +8,7 @@ package hanulhan.jms.spring.reqreply.util;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.jms.Destination;
+import org.springframework.jms.core.JmsTemplate;
 
 /**
  *
@@ -57,9 +58,6 @@ public class ReqReplySettings {
     private long        holdTimeSec;
     
     private Integer     maxMessageLength;
-    private Integer     maxMessageLength2;
-    private long        maxMessageLength3;
-    private Long        maxMessageLength4;
 
     /**
      *

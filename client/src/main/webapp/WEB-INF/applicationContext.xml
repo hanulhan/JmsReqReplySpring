@@ -31,7 +31,7 @@
     #                   applicationContext of JMS-WebClient
     #########################################################################-->
 
-    <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
+    <bean id="bean_ReqReplySettingsX" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
         <property name="reqDestination"        ref="bean_vmReqTopic" />
         <property name="reqDestinationName"    value="${topic.name.request}" />
         <property name="replyDestination"      ref="bean_vmReplyTopic" />
@@ -65,7 +65,7 @@
         </description>
         <property name="targetConnectionFactory" ref="bean_amqConnectionFactory" />
         <property name="reconnectOnException" value="true" />
-        <property name="clientId"             value="ACS-#{bean_ReqReplySettings.getClientId()}" />
+        <property name="clientId"             value="ACS-#{bean_ReqReplySettingsX.getClientId()}" />
     </bean>
     
     <bean id="bean_brokerExceptionListenerBean" class="com.acentic.cloudservices.messagebroker.beans.BrokerExceptionListenerBean" />

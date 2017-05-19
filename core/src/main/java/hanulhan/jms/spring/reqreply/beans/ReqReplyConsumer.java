@@ -20,6 +20,7 @@ import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * This class has a MessageListener to the jms REQUEST-Topic.
@@ -28,7 +29,7 @@ import javax.jms.MessageListener;
  *
  * @author uhansen
  */
-public class ReqReplyConsumer implements MessageListener {
+public class ReqReplyConsumer implements MessageListener, ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
@@ -39,9 +40,8 @@ public class ReqReplyConsumer implements MessageListener {
     private String filterPropertyName;
     private String clientId;
     private Integer     maxMessageLength;
-
     private long awaitingConnectionTimeoutMsec;
-
+    
     // internal
     private static final Logger LOGGER = Logger.getLogger(ReqReplyConsumer.class);
     private ReqReplyFilterMap filterMap = new ReqReplyFilterMap();
@@ -150,6 +150,7 @@ public class ReqReplyConsumer implements MessageListener {
      * @param aMessage
      *
      */
+
     @Override
     public void onMessage(Message aMessage) {
 
@@ -220,63 +221,7 @@ public class ReqReplyConsumer implements MessageListener {
         }
     }
 
-    /*
-    private void handleMessage(Message aMessage) {
 
-        LOGGER.log(Level.TRACE, "ReqReplyConsumer::handleMessage()");
-        String myResponseText;
-        String myIdent = null;
-        try {
-            if (aMessage.getJMSReplyTo() != null) {
-
-                String correlationId = aMessage.getJMSMessageID();
-                Destination myResponseDestination = aMessage.getJMSReplyTo();
-
-                ReqReplyMessageCreator myResponseCreator = new ReqReplyMessageCreator("ACK", correlationId);
-                myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK);
-                myResponseCreator.setStringProperty(filterPropertyName, myIdent);
-                jmsTemplate.send(myResponseDestination, myResponseCreator);
-                LOGGER.log(Level.DEBUG, "Server send ACK"
-                        + ", Ident: " + myIdent
-                        + ", msgId: " + correlationId);
-
-                myResponseText = filterPropertyDelegator.getPropertyFilterResult(myIdent);
-                int myMsgCount;
-                myMsgCount = (int) Math.ceil((double) myResponseText.length() / maxMessageLength);
-
-                LOGGER.log(Level.TRACE, "Split Response into " + myMsgCount + " pieces");
-
-                int myStartIndex;
-                int myEndIndex;
-                String myMessagePart;
-
-                for (int i = 0; i < myMsgCount; i++) {
-                    myStartIndex = i * maxMessageLength;
-                    myEndIndex = ((i + 1) * maxMessageLength) - 1;
-                    if (myEndIndex >= myResponseText.length()) {
-                        myEndIndex = myResponseText.length() - 1;
-                    }
-                    myMessagePart = myResponseText.substring(myStartIndex, myEndIndex + 1);
-
-                    myResponseCreator = new ReqReplyMessageCreator(myMessagePart, correlationId);
-                    myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT, myMsgCount);
-                    myResponseCreator.setIntProperty(ReqReplySettings.PROPERTY_NAME_COUNT, i + 1);
-                    myResponseCreator.setStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE, ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD);
-                    myResponseCreator.setStringProperty(filterPropertyName, myIdent);
-
-                    LOGGER.log(Level.DEBUG, "Server send response "
-                            + (i + 1) + "/" + myMsgCount
-                            + ", Ident: " + myIdent
-                            + ", msgId: " + correlationId);
-
-                    jmsTemplate.send(myResponseDestination, myResponseCreator);
-                }
-            }
-        } catch (JMSException jMSException) {
-            LOGGER.log(Level.ERROR, jMSException);
-        }
-    }
-     */
     /**
      *
      * @return
@@ -362,9 +307,12 @@ public class ReqReplyConsumer implements MessageListener {
         return applicationContext;
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
+
+
 
 
 
