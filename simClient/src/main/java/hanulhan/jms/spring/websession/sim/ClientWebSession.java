@@ -34,31 +34,27 @@ public class ClientWebSession extends Thread {
     private long maxResponseTime= 0;
     private long avgResponseTime= 0;
 
-    private static final int SLEEP_TIME_MIN = 5000;
-    private static final int SLEEP_TIME_MAX = 10000;
+    private static final int SLEEP_TIME_MIN = 10000;
+    private static final int SLEEP_TIME_MAX = 20000;
+    private final int clientId;
 
     /**
      *
      * @param aMessageProducer
      * @param aIdent
+     * @param aClientId
+     * @param aTimeoutSec
      */
-    public ClientWebSession(ReqReplyProducer aMessageProducer, String aIdent) {
-        this.ident = aIdent;
-        this.reqReplyProducer = aMessageProducer;
-        this.sleepTimeMsec = 2000;
-    }
 
-    public ClientWebSession(ReqReplyProducer aMessageProducer, String aIdent, int aTimeoutSec) {
+    public ClientWebSession(ReqReplyProducer aMessageProducer, String aIdent, int aClientId, int aTimeoutSec) {
         this.ident = aIdent;
         this.reqReplyProducer = aMessageProducer;
         this.timeoutSec = aTimeoutSec;
+        this.clientId= aClientId;
         this.sleepTimeMsec = RandomUtils.getRandomLong(SLEEP_TIME_MIN, SLEEP_TIME_MAX);
 
     }
 
-    public ClientWebSession(String aIdent) {
-        this.ident = aIdent;
-    }
 
     public void terminate() {
         this.active = false;
@@ -78,7 +74,7 @@ public class ClientWebSession extends Thread {
         try {
             Thread.sleep(RandomUtils.getRandomLong(1000, 45000));
             while (active) {
-                myRequest= "REQ-" + ident + "-" + requestQuantity;
+                myRequest= "REQ-" + clientId + "-" + ident + "-" + requestQuantity;
                 LOGGER.log(Level.TRACE, "Send Request: " + myRequest + ", Ident: " + ident + ", Timeout: " + timeoutSec + "s");
                 requestQuantity++;
                 now= new Date().getTime();

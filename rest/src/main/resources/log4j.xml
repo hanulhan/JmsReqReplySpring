@@ -11,7 +11,7 @@
     </appender>
 
     <appender name="reqreply" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="${log4j.logpath}/reqreply-rest.log"/>
+        <param name="File" value="${log4j.tomcat.logpath}/reqreply-rest.log"/>
         <param name="MaxFileSize" value="10MB"/>
         <param name="MaxBackupIndex" value="5"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -23,38 +23,42 @@
     
     <logger name="org.apache.activemq">
         <level value="INFO" />
+        <appender-ref ref="reqreply" />
     </logger>    
 
     <logger name="hanulhan.jms.spring.reqreply">
-        <level value="DEBUG" />
+        <level value="TRACE" />
         <appender-ref ref="reqreply" />
     </logger>    
 
     <logger name="org.springframework.jms">
         <level value="DEBUG" />
+        <appender-ref ref="reqreply" />
     </logger>    
 
     <logger name="javax.jms">
         <level value="DEBUG" />
+        <appender-ref ref="reqreply" />
     </logger>    
 
 
     <logger name="org.apache.activemq.util.ThreadPoolUtils">
         <level value="INFO"/>
+        <appender-ref ref="reqreply" />
     </logger>
 
     
-<!--    <logger name="org.springframework.beans">
-        <level value="WARN" />
-    </logger>-->
+    <logger name="org.springframework.beans">
+        <level value="TRACE" />
+    </logger>
 
 <!--    <logger name="org.springframework.xbean">
         <level value="DEBUG" />
     </logger>-->
 
-<!--    <logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
-        <level value="DEBUG" />
-    </logger>-->
+    <logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
+        <level value="TRACE" />
+    </logger>
     
 
     <root>

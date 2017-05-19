@@ -46,13 +46,20 @@ public class ReqReplySettings {
     private Destination replyDestination;
     private String      replyDestinationName;
 
-    private int         maxMessageLength;
+    
     private String      filterPropertyName;
     
     private String      reqSubscriberName;
     private String      replySubscriberName;
     
+    private long        awaitingConnectionTimeoutMsec;
+    
     private long        holdTimeSec;
+    
+    private Integer     maxMessageLength;
+    private Integer     maxMessageLength2;
+    private long        maxMessageLength3;
+    private Long        maxMessageLength4;
 
     /**
      *
@@ -122,22 +129,6 @@ public class ReqReplySettings {
      *
      * @return
      */
-    public int getMaxMessageLength() {
-        return maxMessageLength;
-    }
-
-    /**
-     *
-     * @param maxMessageLength
-     */
-    public void setMaxMessageLength(int maxMessageLength) {
-        this.maxMessageLength = maxMessageLength;
-    }
-
-    /**
-     *
-     * @return
-     */
     public String getFilterPropertyName() {
         return filterPropertyName;
     }
@@ -194,6 +185,23 @@ public class ReqReplySettings {
     public String getClientId() throws UnknownHostException {
         return InetAddress.getLocalHost().getHostName();
     }
-    
 
+    public long getAwaitingConnectionTimeoutMsec() {
+        return awaitingConnectionTimeoutMsec;
+    }
+
+    public void setAwaitingConnectionTimeoutMsec(long awaitingConnectionTimeoutMsec) {
+        this.awaitingConnectionTimeoutMsec = awaitingConnectionTimeoutMsec;
+    }
+
+    public Integer getMaxMessageLength() {
+        return maxMessageLength;
+    }
+
+    public void setMaxMessageLength(Integer maxMessageLength) {
+        this.maxMessageLength = maxMessageLength;
+    }
+
+
+    
 }

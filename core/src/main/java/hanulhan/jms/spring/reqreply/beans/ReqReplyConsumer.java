@@ -16,6 +16,7 @@ import hanulhan.jms.spring.reqreply.util.ReqReplyFilterMap;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.RequestObject;
+import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
@@ -36,9 +37,10 @@ public class ReqReplyConsumer implements MessageListener {
     private Destination reqDestination;
     private Destination replyDestination;
     private String filterPropertyName;
-
     private String clientId;
-    private Integer maxMessageLength;
+    private Integer     maxMessageLength;
+
+    private long awaitingConnectionTimeoutMsec;
 
     // internal
     private static final Logger LOGGER = Logger.getLogger(ReqReplyConsumer.class);
@@ -48,18 +50,27 @@ public class ReqReplyConsumer implements MessageListener {
      *
      */
     @PostConstruct
-    public void postConstruct() {
+    public void postConstructIt() {
         LOGGER.log(Level.TRACE, "ReqReplyConsuer:postConstuct");
         LOGGER.log(Level.TRACE, "Req-Destination: " + reqDestination.toString());
         LOGGER.log(Level.TRACE, "jmsTemplate: " + jmsTemplate.toString());
         LOGGER.log(Level.TRACE, "filterPropertyName: " + filterPropertyName);
         LOGGER.log(Level.TRACE, "maxMessageLength: " + maxMessageLength);
+        LOGGER.log(Level.TRACE, "awaitingConnectionTimeoutMsec: " + awaitingConnectionTimeoutMsec);
     }
 
+    public ReqReplyConsumer() {
+        super();
+    }
+
+    
+    
     /**
      *
      */
-    public ReqReplyConsumer() {
+    public ReqReplyConsumer(long aAwaitingConnectionTimeoutMsec) {
+        super();
+        awaitingConnectionTimeoutMsec= aAwaitingConnectionTimeoutMsec;
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::ReqReplyConsumer()");
     }
 
@@ -87,10 +98,10 @@ public class ReqReplyConsumer implements MessageListener {
         if (filterMap.IsFilterInMap(aFilterValue)) {
             LOGGER.log(Level.TRACE, "ReqReplyConsumer::DisconnectSystem()");
             filterMap.delete(aFilterValue);
-            
+
         }
     }
-    
+
     public int getQuantityConnected() {
         return filterMap.size();
     }
@@ -145,6 +156,8 @@ public class ReqReplyConsumer implements MessageListener {
         String myIdent;
         String myRequest;
         String correlationId;
+        long milliSeconds = 0;
+        long startTime = 0;
         Destination myResponseDestination;
         ReqReplyMessageCreator myResponseCreator;
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::onReceive()");
@@ -163,17 +176,25 @@ public class ReqReplyConsumer implements MessageListener {
                 return;
             }
 
-            LOGGER.log(Level.TRACE, "Filter property in Message: " + aMessage.getStringProperty(filterPropertyName));
             myIdent = aMessage.getStringProperty(filterPropertyName);
+            myRequest = ((TextMessage) aMessage).getText();
 
+            LOGGER.log(Level.TRACE, "onMessage(" + myRequest + ")");
+
+            startTime = new Date().getTime();
+
+            while (!IsSystemConnected(myIdent) && milliSeconds < awaitingConnectionTimeoutMsec) {
+                milliSeconds = new Date().getTime() - startTime;
+                Thread.sleep(500);
+            }
 
             if (IsSystemConnected(myIdent)) {
 
                 // Block the system and send ACK
-                myRequest = ((TextMessage) aMessage).getText();
                 correlationId = aMessage.getJMSMessageID();
 
                 if (filterMap.addRequest(myIdent, clientId, myRequest, correlationId, 2000)) {
+                    LOGGER.log(Level.TRACE, "Add to filterMap (" + myRequest + ")");
 
                     // Send an ACK
                     myResponseDestination = aMessage.getJMSReplyTo();
@@ -185,11 +206,17 @@ public class ReqReplyConsumer implements MessageListener {
                     LOGGER.log(Level.DEBUG, "Consumer send ACK"
                             + ", Ident: " + myIdent
                             + ", msgId: " + correlationId);
+                } else {
+                    LOGGER.log(Level.ERROR, "Add to filterMap (" + myRequest + ") ERROR");
                 }
+            } else {
+                LOGGER.log(Level.ERROR, "Cound not add to filterMap (" + myRequest + ") after " + milliSeconds + "ms. System not connected");
             }
 
         } catch (JMSException jMSException) {
             LOGGER.log(Level.ERROR, jMSException);
+        } catch (InterruptedException ex) {
+            java.util.logging.Logger.getLogger(ReqReplyConsumer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
     }
 
@@ -249,8 +276,7 @@ public class ReqReplyConsumer implements MessageListener {
             LOGGER.log(Level.ERROR, jMSException);
         }
     }
-    */
-
+     */
     /**
      *
      * @return
@@ -292,25 +318,6 @@ public class ReqReplyConsumer implements MessageListener {
     }
 
 
-
-
-
-    /**
-     *
-     * @return
-     */
-    public Integer getMaxMessageLength() {
-        return maxMessageLength;
-    }
-
-    /**
-     *
-     * @param maxMessageLength
-     */
-    public void setMaxMessageLength(Integer maxMessageLength) {
-        this.maxMessageLength = maxMessageLength;
-    }
-
     /**
      *
      * @return
@@ -335,5 +342,33 @@ public class ReqReplyConsumer implements MessageListener {
         this.replyDestination = replyDestination;
     }
 
+    public Integer getMaxMessageLength() {
+        return maxMessageLength;
+    }
+
+    public void setMaxMessageLength(Integer maxMessageLength) {
+        this.maxMessageLength = maxMessageLength;
+    }
+
+    public long getAwaitingConnectionTimeoutMsec() {
+        return awaitingConnectionTimeoutMsec;
+    }
+
+    public void setAwaitingConnectionTimeoutMsec(long awaitingConnectionTimeoutMsec) {
+        this.awaitingConnectionTimeoutMsec = awaitingConnectionTimeoutMsec;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+
+
+
+    
     
 }

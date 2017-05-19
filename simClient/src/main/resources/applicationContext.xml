@@ -105,9 +105,9 @@
 
     
     <bean id="bean_WebSimulation" class="hanulhan.jms.spring.websession.sim.WebSimulation" >
-        <property name="timeoutSec"    value="45" />
+        <property name="timeoutSec"    value="30" />
         <property name="identList"     ref="identList1"/>
-        <property name="identQuantity" value="10" />
+        <property name="logpath"       value="${log4j.logpath}" />
     </bean>    
     
     <util:list id="identList1" value-type="java.lang.String">

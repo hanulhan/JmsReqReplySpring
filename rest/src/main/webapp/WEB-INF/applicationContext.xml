@@ -37,7 +37,7 @@
             <value>${message.length}</value>
         </property>
         <property name="filterPropertyName"  value="SYSTEM_IDENT" />
-        <property name="holdTimeSec"         value="${hold.time.systemAlive}" />
+        <property name="holdTimeSec"         value="${hold.time.systemAlive.sec}" />
     </bean>
     
     

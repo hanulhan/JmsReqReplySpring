@@ -27,9 +27,12 @@
         <jms.broker.mbean.objectName></jms.broker.mbean.objectName>
         
         <jms.broker.data.directory>${project.build.directory}/ActiveMQ-Data</jms.broker.data.directory>        
-        <jms.broker.send.timeout></jms.broker.send.timeout>
 
-        <log4j.logpath>/var/log/userLog</log4j.logpath>
+        <awaiting.connection.timeout.msec>3000</awaiting.connection.timeout.msec>
+        <hold.time.systemAlive.sec>30</hold.time.systemAlive.sec>
+        <log4j.tomcat.logpath>/var/log/tomcat7</log4j.tomcat.logpath>
+        
+        <log4j.user.logpath>/var/log/userLog</log4j.user.logpath>
 
         <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 DEPENDENCY VERSION
@@ -360,8 +363,7 @@
                 <message.length>4096</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER-DEV</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER-DEV</reply.durable.subscriber.name>
-                
-                <hold.time.systemAlive>45</hold.time.systemAlive>
+                <hold.time.systemAlive.sec>45</hold.time.systemAlive.sec>
 <!--                <broker.url>tcp://192.168.20.12:61616</broker.url>-->
                 <broker.url>tcp://192.168.1.61:61616</broker.url>                
 <!--                <broker.url>tcp://localhost:61616</broker.url>-->
@@ -372,6 +374,8 @@
 <!--                <broker.url.start>tcp://192.168.1.44:61616</broker.url.start>-->
 <!--                <broker.url>tcp://192.168.1.44:61616</broker.url>-->
                 <log4j.logpath>${project.build.directory}/log</log4j.logpath>                
+                <log4j.tomcat.logpath>${project.build.directory}/log/tomcat7</log4j.tomcat.logpath>
+                <log4j.user.logpath>${project.build.directory}/log/userLog</log4j.user.logpath>
             </properties>    
         </profile>
         <profile>
@@ -385,7 +389,7 @@
                 <message.length>2048</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER</reply.durable.subscriber.name>
-                <hold.time.systemAlive>30</hold.time.systemAlive>
+                <hold.time.systemAlive.sec>30</hold.time.systemAlive.sec>
                 <broker.url>tcp://192.168.20.12:61616</broker.url>
                 <!--                <broker.url>tcp://localhost:61616</broker.url>-->
                 <!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
@@ -402,7 +406,6 @@
                 <message.length>2048</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER</reply.durable.subscriber.name>
-                <hold.time.systemAlive>30</hold.time.systemAlive>
                 <broker.url>tcp://172.30.0.52:61616</broker.url>
             </properties>    
         </profile>

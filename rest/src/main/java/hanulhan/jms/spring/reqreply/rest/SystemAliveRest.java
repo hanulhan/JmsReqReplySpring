@@ -72,38 +72,30 @@ public class SystemAliveRest implements ApplicationContextAware {
         Response myResponse = Response.status(Status.BAD_REQUEST).build();
         gregory.setTime(new Date());
         myRequestObj = new RequestObject(ident);
-        Boolean fLogMe= false;
 
         if (ident == null) {
             throw new WebApplicationException(Response.Status.FORBIDDEN);
-        } else if (ident.equals("VIDEOSYS")) {
-            fLogMe= true;
         }
 
         if (reqReplyConsumer.ConnectSystem(myRequestObj)) {
-            LOGGER.log(Level.INFO, "System [" + ident + "] connected. Total connections: " +  reqReplyConsumer.getQuantityConnected());
+            LOGGER.log(Level.INFO, "System [" + ident + "] connected. Total connections: " + reqReplyConsumer.getQuantityConnected());
             synchronized (myRequestObj) {
-                
+
                 LOGGER.log(Level.TRACE, "System [" + ident + "] waits " + holdTimeSec + "s for notify");
                 try {
                     myRequestObj.wait(holdTimeSec * 1000);
                     if (myRequestObj.isBusy()) {
-                        if (fLogMe) {
-                            LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
-                        }
+                        LOGGER.log(Level.TRACE, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
                         myResponse = Response.ok(myRequestObj.getReqReply()).build();
                     } else {
-                        if (fLogMe) {
-                            LOGGER.log(Level.DEBUG, "System [" + ident + "] disconnect and returns: " + Status.NO_CONTENT);
-                        }
                         myResponse = Response.status(Status.NO_CONTENT).build();
                     }
                 } catch (InterruptedException ex) {
                     myResponse = Response.status(Status.INTERNAL_SERVER_ERROR).build();
                     LOGGER.log(Level.ERROR, ex);
-                } finally  {
+                } finally {
                     reqReplyConsumer.DisconnectSystem(ident);
-                    LOGGER.log(Level.INFO, "Total connections: " +  reqReplyConsumer.getQuantityConnected());
+                    LOGGER.log(Level.INFO, "System [" + ident + "] disconnected. Total connections: " + reqReplyConsumer.getQuantityConnected());
                 }
 
             }
@@ -111,7 +103,6 @@ public class SystemAliveRest implements ApplicationContextAware {
 
         return myResponse;
     }
-
 
     public void setReqReplyConsumer(ReqReplyConsumer reqReplyConsumer) {
         this.reqReplyConsumer = reqReplyConsumer;
