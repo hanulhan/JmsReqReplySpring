@@ -23,11 +23,12 @@ public class WebSimulationMonitor extends Thread {
     private int totalRequestCount;
     private int totalErrorCount;
     private long avgResponseTime;
-    private long startTime= new Date().getTime();
+    private long startTime;
 
     public WebSimulationMonitor(List<ClientWebSession> aClientSimList) {
         super();
         this.clientList = aClientSimList;
+        startTime= new Date().getTime();
     }
 
     public void terminate() {
@@ -38,7 +39,6 @@ public class WebSimulationMonitor extends Thread {
     @SuppressWarnings("SleepWhileInLoop")
     public void run() {
         this.active = true;
-        long now= new Date().getTime();
         long milliSeconds;
         while (active) {
             try {
@@ -60,14 +60,22 @@ public class WebSimulationMonitor extends Thread {
 
                 }
                 avgResponseTime= avgResponseTime / clientList.size();
-                milliSeconds= now- startTime;
+                milliSeconds= new Date().getTime() - startTime;
                 
                 LOGGER.log(Level.INFO, "####################################################");
                 long myHours = TimeUnit.MILLISECONDS.toHours(milliSeconds);
-                long myMinutes= TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toSeconds(myHours);
-                long mySeconds= TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(myMinutes);
+                long myMinutes= TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(myHours);
+                long mySeconds= TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.HOURS.toSeconds(myHours) - TimeUnit.MINUTES.toSeconds(myMinutes);
                 
-                String myTime= String.format("%d min, %d sec", myHours, myMinutes, mySeconds);
+                String myTime;
+                if (myHours > 0)    {
+                    myTime= String.format("%d h, %d min, %d s", myHours, myMinutes, mySeconds);
+                } else if (myMinutes > 0)   {
+                    myTime= String.format("%d min, %d s", myMinutes, mySeconds);
+                } else {
+                    myTime= String.format("%d s", mySeconds);
+                }
+                
                 LOGGER.log(Level.INFO, "Run time             : " + myTime);
                 LOGGER.log(Level.INFO, "No of active Sessions: " + activeSessions);
                 LOGGER.log(Level.INFO, "No of total Request:   " + totalRequestCount);

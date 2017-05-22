@@ -28,7 +28,7 @@
         
         <jms.broker.data.directory>${project.build.directory}/ActiveMQ-Data</jms.broker.data.directory>        
 
-        <awaiting.connection.timeout.msec>3000</awaiting.connection.timeout.msec>
+        <awaiting.connection.timeout.msec>5000</awaiting.connection.timeout.msec>
         <hold.time.systemAlive.sec>30</hold.time.systemAlive.sec>
         <log4j.tomcat.logpath>/var/log/tomcat7</log4j.tomcat.logpath>
         
