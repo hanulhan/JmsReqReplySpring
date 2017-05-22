@@ -34,22 +34,22 @@
     </logger>
 
     <logger name="hanulhan.jms.spring.reqreply">
-        <level value="DEBUG" />
+        <level value="INFO" />
         <appender-ref ref="reqreply" />
     </logger>
     
     <logger name="org.apache.activemq">
-        <level value="DEBUG" />
+        <level value="INFO" />
         <appender-ref ref="reqreply" />
     </logger>    
 
     <logger name="org.springframework.jms">
-        <level value="DEBUG" />
+        <level value="INFO" />
         <appender-ref ref="reqreply" />
     </logger>    
 
     <logger name="javax.jms">
-        <level value="DEBUG" />
+        <level value="INFO" />
         <appender-ref ref="reqreply" />
     </logger>    
 
