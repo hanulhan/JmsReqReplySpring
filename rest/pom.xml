@@ -158,11 +158,20 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.acentic.cloudservices</groupId>
+            <artifactId>message-broker</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.acentic.cloudservices</groupId>
             <artifactId>webutil</artifactId>
             <type>war</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
         </dependency>
 
         <!-- internal -->

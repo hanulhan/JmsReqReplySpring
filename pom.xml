@@ -16,6 +16,9 @@
     </modules>
 
     <properties>
+        <use.basic.auth.start></use.basic.auth.start>
+        <use.basic.auth.end></use.basic.auth.end>
+        
         <rmi.registry.port>1099</rmi.registry.port>
         <jmx.rmi.server.port>1098</jmx.rmi.server.port>
         
@@ -61,7 +64,7 @@
         <version.org.apache.geronimo.specs>1.1.1</version.org.apache.geronimo.specs>
         
         <!-- CloudServices  -->
-        <version.com.acentic.cloudservices>1.1.62</version.com.acentic.cloudservices>
+        <version.com.acentic.cloudservices>1.1.75</version.com.acentic.cloudservices>
         
         <!-- Jersey -->
         <version.com.sun.jersey>1.9.1</version.com.sun.jersey>
@@ -90,6 +93,7 @@
                 <version>${version.javaee-api}</version>
             </dependency>
             
+         
             <!-- SPRING -->
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -209,6 +213,14 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>2.3</version>
+            </dependency>
+
+
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.9</version>
             </dependency>
 
 

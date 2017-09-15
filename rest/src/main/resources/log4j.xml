@@ -31,6 +31,11 @@
         <appender-ref ref="reqreply" />
     </logger>    
 
+    <logger name="hanulhan.jms.spring.reqreply.basic">
+        <level value="TRACE" />
+        <appender-ref ref="reqreply" />
+    </logger>    
+
     <logger name="org.springframework.jms">
         <level value="INFO" />
         <appender-ref ref="reqreply" />

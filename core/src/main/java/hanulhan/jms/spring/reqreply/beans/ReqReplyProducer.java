@@ -9,7 +9,6 @@ import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageStorage;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
-import javax.annotation.PostConstruct;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -18,8 +17,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 

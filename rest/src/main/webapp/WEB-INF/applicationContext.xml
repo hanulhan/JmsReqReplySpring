@@ -90,6 +90,11 @@
     </bean>
 
 
+    <bean id="beanAPIUserBaiscAuthFilter" class="hanulhan.jms.spring.reqreply.basic.APIUserBasicAuthFilter" scope="prototype">
+          <property name="username" value="test" />
+          <property name="password" value="test" />
+    </bean>
+
 
     <bean id="bean_jmsErrorHandler" class="hanulhan.jms.spring.reqreply.util.JMSReqErrorHandler" />
     

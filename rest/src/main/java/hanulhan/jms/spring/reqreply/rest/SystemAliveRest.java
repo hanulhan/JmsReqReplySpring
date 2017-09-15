@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  * @author UHansen
  */
-@Path("/rest/systemalive")
+@Path("/rest/basic/systemalive")
 @Component
 public class SystemAliveRest implements ApplicationContextAware {
 

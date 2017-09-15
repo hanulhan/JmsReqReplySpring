@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  *
  * @author UHansen
  */
-@Path("/rest/systemdata")
+@Path("/rest/basic/systemdata")
 @Component
 public class SystemDataRest implements ApplicationContextAware {
 

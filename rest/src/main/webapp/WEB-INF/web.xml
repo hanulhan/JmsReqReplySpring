@@ -25,6 +25,17 @@
         <welcome-file>reqreply/index-reqreply-rest.jsp</welcome-file>
     </welcome-file-list>
 
+    ${use.basic.auth.start}
+    <filter>
+        <filter-name>APIUserBaiscAuthFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetBeanName</param-name>
+            <param-value>beanAPIUserBaiscAuthFilter</param-value>
+        </init-param>    
+    </filter>    
+    ${use.basic.auth.end}
+
 
     <filter>
         <filter-name>jersey</filter-name>
@@ -40,6 +51,14 @@
             </param-value>
         </init-param>
     </filter>
+
+    ${use.basic.auth.start}
+    <filter-mapping>
+        <filter-name>APIUserBaiscAuthFilter</filter-name>
+        <url-pattern>/rest/basic/*</url-pattern>
+    </filter-mapping>
+    ${use.basic.auth.end}
+
     <filter-mapping>
         <filter-name>jersey</filter-name>
         <url-pattern>/rest/*</url-pattern>
