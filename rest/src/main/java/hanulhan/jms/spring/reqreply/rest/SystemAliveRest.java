@@ -95,13 +95,12 @@ public class SystemAliveRest implements ApplicationContextAware {
                     LOGGER.log(Level.ERROR, ex);
                 } finally {
                     reqReplyConsumer.DisconnectSystem(ident);
-                    LOGGER.log(Level.INFO, "System [" + ident + "] disconnected. Total connections: " + reqReplyConsumer.getQuantityConnected());
                 }
-
+                LOGGER.log(Level.INFO, "System [" + ident + "] close connection with Status " + myResponse.getStatus() + " disconnected. Total connections: " + reqReplyConsumer.getQuantityConnected());
+                return myResponse;
             }
         }
-
-        return myResponse;
+        return Response.status(Status.BAD_REQUEST).build();
     }
 
     public void setReqReplyConsumer(ReqReplyConsumer reqReplyConsumer) {
