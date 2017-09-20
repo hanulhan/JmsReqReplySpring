@@ -4,7 +4,7 @@
     <parent>
         <groupId>hanulhan.jms.spring.reqreply</groupId>
         <artifactId>reqreplyspring-master</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
     </parent>
 	
     <artifactId>web-client</artifactId>
@@ -49,6 +49,29 @@
             <artifactId>sitemesh</artifactId>
         </dependency>            
 
+        <!-- ACTIVE-MQ  -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+            <type>jar</type>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jms_1.1_spec</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.sun.messaging.mq</groupId>
+            <artifactId>imq</artifactId>
+        </dependency>
+
         <!-- Internal   -->
         <dependency>
             <groupId>hanulhan.jms.spring.reqreply</groupId>
@@ -61,10 +84,15 @@
             <type>war</type>
         </dependency>
 
+        <dependency>
+            <groupId>com.acentic.cloudservices</groupId>
+            <artifactId>message-broker</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
-<!--        <finalName>${project.artifactId}</finalName>-->
+        <!--        <finalName>${project.artifactId}</finalName>-->
         <finalName>reqreply-web</finalName>
         <resources>
             <resource>
