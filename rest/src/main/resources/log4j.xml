@@ -27,7 +27,7 @@
     </logger>    
 
     <logger name="hanulhan.jms.spring.reqreply">
-        <level value="INFO" />
+        <level value="TRACE" />
         <appender-ref ref="reqreply" />
     </logger>    
 
