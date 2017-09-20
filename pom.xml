@@ -4,7 +4,7 @@
     
     <groupId>hanulhan.jms.spring.reqreply</groupId>
     <artifactId>reqreplyspring-master</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <name>JmsReqReply :: Spring :: Master</name>
     <packaging>pom</packaging>
     
@@ -16,8 +16,8 @@
     </modules>
 
     <properties>
-        <use.basic.auth.start></use.basic.auth.start>
-        <use.basic.auth.end></use.basic.auth.end>
+        <use.basic.auth.start>&lt;!--</use.basic.auth.start>
+        <use.basic.auth.end>--&gt;</use.basic.auth.end>
         
         <rmi.registry.port>1099</rmi.registry.port>
         <jmx.rmi.server.port>1098</jmx.rmi.server.port>
@@ -273,6 +273,12 @@
             </dependency>
             <dependency>
                 <groupId>hanulhan.jms.spring.reqreply</groupId>
+                <artifactId>simClient</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>hanulhan.jms.spring.reqreply</groupId>
                 <artifactId>rest</artifactId>
                 <version>${project.version}</version>
                 <type>war</type>
@@ -375,7 +381,6 @@
                 <message.length>4096</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER-DEV</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER-DEV</reply.durable.subscriber.name>
-                <hold.time.systemAlive.sec>45</hold.time.systemAlive.sec>
 <!--                <broker.url>tcp://192.168.20.12:61616</broker.url>-->
                 <broker.url>tcp://192.168.1.61:61616</broker.url>                
 <!--                <broker.url>tcp://localhost:61616</broker.url>-->
@@ -401,7 +406,6 @@
                 <message.length>2048</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER</reply.durable.subscriber.name>
-                <hold.time.systemAlive.sec>30</hold.time.systemAlive.sec>
                 <broker.url>tcp://192.168.20.12:61616</broker.url>
                 <!--                <broker.url>tcp://localhost:61616</broker.url>-->
                 <!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
