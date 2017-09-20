@@ -157,6 +157,8 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
         String myIdent;
         String myRequest;
         String correlationId;
+        String myCommand;
+        int myPort;
         long milliSeconds = 0;
         long startTime = 0;
         Destination myResponseDestination;
@@ -178,6 +180,8 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
             }
 
             myIdent = aMessage.getStringProperty(filterPropertyName);
+            myCommand = aMessage.getStringProperty(ReqReplySettings.PROPERTY_VALUE_COMMAND);
+            myPort    = aMessage.getIntProperty(ReqReplySettings.PROPERTY_VALUE_PORT);
             myRequest = ((TextMessage) aMessage).getText();
 
             LOGGER.log(Level.TRACE, "onMessage(" + myRequest + ")");
@@ -194,7 +198,7 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
                 // Block the system and send ACK
                 correlationId = aMessage.getJMSMessageID();
 
-                if (filterMap.addRequest(myIdent, clientId, myRequest, correlationId, 2000)) {
+                if (filterMap.addRequest(myIdent, clientId, myRequest, myCommand, myPort, correlationId, 2000)) {
                     LOGGER.log(Level.TRACE, "Add to filterMap (" + myRequest + ")");
 
                     // Send an ACK

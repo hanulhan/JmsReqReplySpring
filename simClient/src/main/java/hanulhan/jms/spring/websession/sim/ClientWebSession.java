@@ -78,7 +78,7 @@ public class ClientWebSession extends Thread {
                 LOGGER.log(Level.TRACE, "Send Request: " + myRequest + ", Ident: " + ident + ", Timeout: " + timeoutSec + "s");
                 requestQuantity++;
                 now= new Date().getTime();
-                myResponse = reqReplyProducer.getResponse(myRequest, ident, (long) (1000 * timeoutSec));
+                myResponse = reqReplyProducer.getResponse(myRequest, "SY", 1234, ident, (long) (1000 * timeoutSec));
                 if (myResponse != null) {
                     milliSeconds= new Date().getTime() - now;
                     if (milliSeconds < minResponseTime) {

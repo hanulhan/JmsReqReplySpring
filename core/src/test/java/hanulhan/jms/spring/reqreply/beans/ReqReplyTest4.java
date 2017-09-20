@@ -183,7 +183,7 @@ public class ReqReplyTest4 implements ApplicationContextAware {
                     rndIndex = (int)randomNumber(0, REQUEST_QUANTITY - 1);
                     myRequest= requestResponse.getRequest(rndIndex);
                     
-                    myResponse = producer.getResponse(myRequest, SYSTEM_IDENT, 2000);
+                    myResponse = producer.getResponse(myRequest, "SY", 1234, SYSTEM_IDENT, 2000);
                     if (myResponse != null) {
                         LOGGER.log(Level.DEBUG, "Response received: " + myResponse);
                         if (!myResponse.equals(requestResponse.getResponse(rndIndex)))  {

@@ -182,6 +182,24 @@ public class ReqReplyMessageStorage {
         return myReturn;
     }
 
+    
+        public synchronized ReqReplyMessageObject getResponseObj(String myMessageId) {
+        ReqReplyMessageObject myReturn = null;
+        try {
+            available.acquire();
+            if (msgMap.containsKey(myMessageId)) {
+                myReturn = msgMap.get(myMessageId);
+                msgMap.remove(myMessageId);
+            }
+
+        } catch (InterruptedException interruptedException) {
+            LOGGER.log(Level.ERROR, interruptedException);
+        } finally {
+            available.release();
+        }
+
+        return myReturn;
+    }
     /**
      *
      * @param aMessageId

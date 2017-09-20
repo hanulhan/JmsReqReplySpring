@@ -7,6 +7,7 @@ package hanulhan.jms.spring.reqreply.websession;
 
 import com.opensymphony.xwork2.ActionSupport;
 import hanulhan.jms.spring.reqreply.beans.ReqReplyProducer;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -27,7 +28,7 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
     // Action input/output
     private int clientId;
     private JsonStatus jsonStatus;
-    private String ident, request, response, timeout, port, command;
+    private String ident, request, response, timeout, port, command, duration;
 
     // Internal
     private static final Logger LOGGER = Logger.getLogger(JmsReqReplyActions.class);
@@ -48,24 +49,39 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         return SUCCESS;
     }
 
+//    public String doSendMessage() throws InterruptedException {
+//        jsonStatus = new JsonStatus();
+//        LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSendMessage()");
+//        reqReplyProducer= (ReqReplyProducer)applicationContext.getBean("bean_vmReqReplyProducer");
+//        
+//        LOGGER.log(Level.DEBUG, "Request: " + request + ", Ident: " + ident + ", Timeout: " + timeout + "s");
+//        
+//        response= reqReplyProducer.getResponse(request, command, Integer.parseInt(port), ident, 1000 * Long.parseLong(timeout));
+//        
+//        return SUCCESS;
+//    }
     public String doSendMessage() throws InterruptedException {
+        ReqReplyMessageObject myMsgObj;
         jsonStatus = new JsonStatus();
         LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSendMessage()");
-        reqReplyProducer= (ReqReplyProducer)applicationContext.getBean("bean_vmReqReplyProducer");
-        
+        reqReplyProducer = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer");
+
         LOGGER.log(Level.DEBUG, "Request: " + request + ", Ident: " + ident + ", Timeout: " + timeout + "s");
+
+        myMsgObj = reqReplyProducer.getResponseObj(request, command, Integer.parseInt(port), ident, 1000 * Long.parseLong(timeout));
+        response= myMsgObj.getResponse();
+        duration= String.valueOf(myMsgObj.getResponseTime());
         
-        response= reqReplyProducer.getResponse(request, ident, 1000 * Long.parseLong(timeout));
         return SUCCESS;
     }
 
     public String doGetTimeout() throws InterruptedException {
         jsonStatus = new JsonStatus();
-        timeout= "" + (initialTimeoutSec);
-        
+        timeout = "" + (initialTimeoutSec);
+
         return SUCCESS;
     }
-    
+
     public int getClientId() {
         return clientId;
     }
@@ -146,10 +162,16 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
         this.command = command;
     }
 
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
 
 
-
-
+    
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
         this.applicationContext = ac;

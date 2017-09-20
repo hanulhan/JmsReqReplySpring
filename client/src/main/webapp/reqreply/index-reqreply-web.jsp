@@ -24,7 +24,7 @@
                                     Request:
                                 </label>
                                 <div class="col-md-3">
-                                    <input class="form-control" id="idRequest" name="idRequest" value="Request-1" autocomplete="off" type="text">
+                                    <input class="form-control" id="idRequest" name="idRequest" value="EQ|CMGETCHARGES|TYC|FR20100101|TO20180101" autocomplete="off" type="text">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -33,9 +33,9 @@
                                 </label>
                                 <div class="col-md-3">
                                     <select id="idIdent" name="ident" class="input-sm" data-style="btn-primary" required="" >
-                                        <option selected >00000100</option>
+                                        <option selected >VIDEOSYS</option>
+                                        <option >00000100</option>
                                         <option >00000101</option>
-                                        <option >VIDEOSYS</option>
                                         <option >ACSIP</option>
                                         <option >AAA</option>
                                     </select>
@@ -55,7 +55,7 @@
                                     Port:
                                 </label>
                                 <div class="col-md-3">
-                                    <input class="form-control" id="idPort" name="idPort" value="" autocomplete="off" type="text">
+                                    <input class="form-control" id="idPort" name="idPort" value="5102" autocomplete="off" type="text">
                                 </div>
                             </div>
 
@@ -98,13 +98,25 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-9">
+                        <label class="control-label col-md-2" for="idResponseTime">
+                            ResponseTime:
+                        </label>
+                        <div class="col-md-1">
+                            <div class="form-control" id="idResponseTime" name="responseTime" value="" autocomplete="off" type="text">
+                            </div>
+                        </div>
+                        <label class="control-label col-md-2" for="idResponseTime">
+                            ms
+                        </label>
+                    </div>                    
                     <div class="row">
                         <div class="col-md-9">
                             <div class="form-group">
                                 <label class="control-label" for="idResponse">
                                     Response                                   
                                 </label>
-                                <textarea id="idResponse" readonly="readonly" required="required" class="form-control" name="response" data-parsley-trigger="keyup" data-parsley-minlength="20" data-parsley-maxlength="500" data-parsley-minlength-message="Come on! You need to enter at least a 20 caracters long comment.." data-parsley-validation-threshold="10"></textarea>
+                                <textarea id="idResponse" rows="10" readonly="readonly" required="required" class="form-control" name="response" data-parsley-trigger="keyup" data-parsley-minlength="20" data-parsley-maxlength="5000" data-parsley-minlength-message="Come on! You need to enter at least a 20 caracters long comment.." data-parsley-validation-threshold="10"></textarea>
                             </div>
                         </div>
                     </div>
@@ -175,7 +187,7 @@
                             function doClear() {
                                 $("#idResponse").text("");
                                 $("#idResponseLength").text("");
-
+                                $("#idResponseTime").text("");
                                 $("#btn_submit").prop('disabled', false);
                                 $("#btn_submit").attr('class', 'btn btn-success');
                                 $("#btn_clear").prop('disabled', true);
@@ -191,8 +203,8 @@
 
                                 var request = $("#idRequest").val();
                                 var ident = $("#idIdent").val();
-                                var command= $("#idCommand").val();
-                                var port   = $("#idPort").val();
+                                var command = $("#idCommand").val();
+                                var port = $("#idPort").val();
                                 var timeout = $("#idTimeout").val();
                                 var surl = "<s:url action='doSendMessage.action' namespace='/jmsReqReply'/>?ident=" + ident + "&request=" + request + "&timeout=" + timeout + "&command=" + command + "&port=" + port;
 
@@ -220,9 +232,9 @@
 
                                             if (html.response != null) {
 
-                                                var array = html.response.split(",");
-                                                $("#idResponseLength").text(array[0]);
-                                                $("#idResponse").text(array[1]);
+                                                $("#idResponseLength").text(html.response.length);
+                                                $("#idResponseTime").text(html.duration);
+                                                $("#idResponse").text(html.response);
 
                                             } else {
                                                 $("#idResponse").text("TIMEOUT");

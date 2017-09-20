@@ -115,7 +115,7 @@ public class ReqReplyTest2 implements ApplicationContextAware {
                 String myResponse = null;
 
                 try {
-                    myResponse = myReqReply.getResponse("REQUEST", hotel.getSystemIdent(), 2000);
+                    myResponse = myReqReply.getResponse("REQUEST", "SY", 1234, hotel.getSystemIdent(), 2000);
                 } catch (InterruptedException ex) {
                     LOGGER.log(Level.ERROR, ex);
                 }

@@ -89,11 +89,10 @@ public class ReqReplyFilterMap {
      * @return
      */
     @SuppressWarnings("SleepWhileInLoop")
-    public boolean addRequest(String aIdent, String aConsumerId, String aRequest, String aMessageId, long aTimeout) {
+    public boolean addRequest(String aIdent, String aConsumerId, String aRequest, String aCommand, int aPort, String aMessageId, long aTimeout) {
 
         boolean retValue = false;
         GregorianCalendar startDateTime = new GregorianCalendar();
-        //GregorianCalendar gregory = new GregorianCalendar();
         XMLGregorianCalendar xmlGregory;
         long myMilliSeconds;
         long myAquireTimeMs = aTimeout / 10;
@@ -107,7 +106,7 @@ public class ReqReplyFilterMap {
 
                         synchronized (myObj) {
                             xmlGregory= DateConverter.createXmlGregorianCalendar(startDateTime);
-                            myObj.setNewRequest(aRequest, aMessageId, aConsumerId, xmlGregory);
+                            myObj.setNewRequest(aRequest, aCommand, aPort, aMessageId, aConsumerId, xmlGregory);
                             LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " NOTIFY Object for request: " + aRequest);
                             retValue = true;
                             filterMap.remove(aIdent);

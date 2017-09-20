@@ -40,6 +40,10 @@ public class ReqReplySettings {
      *
      */
     public static final String PROPERTY_VALUE_MSG_TYPE_PAYLOAD = "PAYLOAD";
+
+    public static final String PROPERTY_VALUE_COMMAND = "COMMAND";
+    
+    public static final String PROPERTY_VALUE_PORT = "PORT";
     
     private Destination reqDestination;
     private String      reqDestinationName;

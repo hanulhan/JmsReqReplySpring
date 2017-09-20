@@ -47,7 +47,7 @@ public class ReqReplyTest1 implements ApplicationContextAware {
             ReqReplyProducer myReqReply = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer");
             ReqReplyTest1_FilterDelegator myFilterDelegator = new ReqReplyTest1_FilterDelegator();
             String myResponse = null;
-            myResponse = myReqReply.getResponse("My Message", "AAAA", 2000);
+            myResponse = myReqReply.getResponse("My Message", "SY", 1234, "AAAA", 2000);
 
 
             LOGGER.log(Level.DEBUG, "Wait 2 seconds");

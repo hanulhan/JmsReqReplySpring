@@ -6,7 +6,9 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageStorage;
+import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
 import javax.jms.Destination;
@@ -49,18 +51,20 @@ public class ReqReplyProducer implements MessageListener {
      * Check the "messageStorage wether a response is received within "aTimeoutMilliSec" 
      * for the given Filter (aFilterValue)
      * @param aRequest
+     * @param aCommand
+     * @param aPort
      * @param aFilterValue
      * @param aTimeoutMilliSec
      * @return the JMS-messageId or null
      * @throws InterruptedException 
      */
     @SuppressWarnings("SleepWhileInLoop")
-    public String getResponse(String aRequest, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
+    public String getResponse(String aRequest, String aCommand, int aPort, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
         Date startTime = new Date();
         int myMilliSeconds;
         String myMessageId;
         
-        myMessageId= sendRequest(aRequest, aFilterValue);
+        myMessageId= sendRequest(aRequest, aCommand, aPort, aFilterValue);
 
         // Wait 
         do {
@@ -77,6 +81,30 @@ public class ReqReplyProducer implements MessageListener {
         }
         return null;
     }
+
+    @SuppressWarnings("SleepWhileInLoop")
+    public ReqReplyMessageObject getResponseObj(String aRequest, String aCommand, int aPort, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
+        Date startTime = new Date();
+        int myMilliSeconds;
+        String myMessageId;
+        
+        myMessageId= sendRequest(aRequest, aCommand, aPort, aFilterValue);
+
+        // Wait 
+        do {
+            myMilliSeconds = (int) ((new Date().getTime() - startTime.getTime()));
+            Thread.sleep(10);
+        } while (myMilliSeconds < aTimeoutMilliSec && !messageStorage.isResponseReceived(myMessageId));
+
+        if (messageStorage.isResponseReceived(myMessageId))  {
+            return messageStorage.getResponseObj(myMessageId);
+        } else {
+            //ReqReplyMessageObject myMsgObj= messageStorage.getMsgObj(myMessageId);
+//            LOGGER.log(Level.ERROR, "################ RESPONSE is null #####################");
+            //LOGGER.log(Level.ERROR, myMsgObj.toString());
+        }
+        return null;
+    }
     
     /**
      * Send the Request to a Queue/Topic, add Property information for FilterValue
@@ -85,10 +113,12 @@ public class ReqReplyProducer implements MessageListener {
      * @param aFilterValue
      * @return the JMS-MessageId or null
      */
-    public String sendRequest(String aMessageText, String aFilterValue) {
-        String myMessageId= null;
+    public String sendRequest(String aMessageText, String aCommand, int aPort, String aFilterValue) {
+        String myMessageId;
         ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessageText, replyDestination);
         myReqMessage.setStringProperty(filterName, aFilterValue);
+        myReqMessage.setStringProperty(ReqReplySettings.PROPERTY_VALUE_COMMAND, aCommand);
+        myReqMessage.setIntProperty(ReqReplySettings.PROPERTY_VALUE_PORT, aPort);
 
         try {
             jmsTemplate.send(requestDestination, myReqMessage);

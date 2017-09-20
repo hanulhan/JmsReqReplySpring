@@ -49,13 +49,17 @@ public class RequestObject extends Object {
      * Put a request to this filterValue (ident)
      *
      * @param aRequest
+     * @param aCommand
+     * @param aPort
      * @param aMessageId
      * @param aConsumerId
      */
-    public void setNewRequest(String aRequest, String aMessageId, String aConsumerId) {
+    public void setNewRequest(String aRequest, String aCommand, int aPort, String aMessageId, String aConsumerId) {
         this.busy = true;
         this.reqReply.setRequest(aRequest);
         this.reqReply.setMessageid(aMessageId);
+        this.reqReply.setCommand(aCommand);
+        this.reqReply.setPort(aPort);
 
     }
 
@@ -67,19 +71,13 @@ public class RequestObject extends Object {
      * @param aConsumerId
      * @param aStartDateTime
      */
-    public void setNewRequest(String aRequest, String aMessageId, String aConsumerId, XMLGregorianCalendar aStartDateTime) {
+    public void setNewRequest(String aRequest, String aCommand, int aPort, String aMessageId, String aConsumerId, XMLGregorianCalendar aStartDateTime) {
         this.busy = true;
         this.reqReply.setRequest(aRequest);
         this.reqReply.setMessageid(aMessageId);
         this.reqReply.setCreated(aStartDateTime);
-//        GregorianCalendar gcal = (GregorianCalendar) GregorianCalendar.getInstance();
-//        gcal.setTime(aStartTime);
-//        try {
-//            XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
-//            this.reqReply.setCreated(xgcal);
-//        } catch (DatatypeConfigurationException e) {
-//            LOGGER.log(Level.ERROR, e);
-//        }
+        this.reqReply.setCommand(aCommand);
+        this.reqReply.setPort(aPort);
     }
 
     /**
