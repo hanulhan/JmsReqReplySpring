@@ -24,6 +24,8 @@ and open the template in the editor.
                     <xs:attribute name="messageid" type="xs:string" use="required" />
                     <xs:attribute name="consumderid"  type="xs:string" />
                     <xs:attribute name="created"   type="xs:dateTime" />
+                    <xs:attribute name="command"   type="xs:string"  />
+                    <xs:attribute name="port"      type="xs:int"      />
                 </xs:restriction>
             </xs:complexContent>
         </xs:complexType>

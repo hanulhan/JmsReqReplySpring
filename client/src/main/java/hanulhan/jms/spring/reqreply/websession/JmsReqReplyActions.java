@@ -27,7 +27,7 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
     // Action input/output
     private int clientId;
     private JsonStatus jsonStatus;
-    private String ident, request, response, timeout;
+    private String ident, request, response, timeout, port, command;
 
     // Internal
     private static final Logger LOGGER = Logger.getLogger(JmsReqReplyActions.class);
@@ -128,6 +128,22 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
 
     public void setInitialTimeoutSec(int initialTimeoutSec) {
         this.initialTimeoutSec = initialTimeoutSec;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public void setCommand(String command) {
+        this.command = command;
     }
 
 

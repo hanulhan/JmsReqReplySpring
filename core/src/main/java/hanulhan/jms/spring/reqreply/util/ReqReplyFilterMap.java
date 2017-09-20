@@ -12,12 +12,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
- * A synchronized map to store the systemIdents as soon as the system is connected.
- * 
+ * A synchronized map to store the systemIdents as soon as the system is
+ * connected.
+ *
  * @author uhansen
  */
 public class ReqReplyFilterMap {
@@ -89,19 +93,21 @@ public class ReqReplyFilterMap {
 
         boolean retValue = false;
         GregorianCalendar startDateTime = new GregorianCalendar();
-        GregorianCalendar gregory = new GregorianCalendar();
+        //GregorianCalendar gregory = new GregorianCalendar();
+        XMLGregorianCalendar xmlGregory;
         long myMilliSeconds;
         long myAquireTimeMs = aTimeout / 10;
         do {
             try {
                 startDateTime.setTime(new Date());
                 if (available.tryAcquire(myAquireTimeMs, TimeUnit.MILLISECONDS)) {
-                    LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " aquire identMap for request: " + aRequest );
+                    LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " aquire identMap for request: " + aRequest);
                     if (filterMap.containsKey(aIdent) && !filterMap.get(aIdent).isBusy()) {
                         RequestObject myObj = filterMap.get(aIdent);
 
                         synchronized (myObj) {
-                            myObj.setNewRequest(aRequest, aMessageId, aConsumerId, DateConverter.createXmlGregorianCalendar(startDateTime));
+                            xmlGregory= DateConverter.createXmlGregorianCalendar(startDateTime);
+                            myObj.setNewRequest(aRequest, aMessageId, aConsumerId, xmlGregory);
                             LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " NOTIFY Object for request: " + aRequest);
                             retValue = true;
                             filterMap.remove(aIdent);
@@ -116,9 +122,9 @@ public class ReqReplyFilterMap {
             } finally {
                 available.release();
                 LOGGER.log(Level.TRACE, "Consumer: " + aConsumerId + " release identMap");
-                myMilliSeconds= DateConverter.elapsedMilliSeconds(startDateTime);
+                myMilliSeconds = DateConverter.elapsedMilliSeconds(startDateTime);
             }
-           
+
         } while (retValue == false && myMilliSeconds < aTimeout);
 
         if (myMilliSeconds >= aTimeout) {
@@ -126,7 +132,6 @@ public class ReqReplyFilterMap {
         }
         return retValue;
     }
-
 
     /**
      *
