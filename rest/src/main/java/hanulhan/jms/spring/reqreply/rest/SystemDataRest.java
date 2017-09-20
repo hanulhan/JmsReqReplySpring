@@ -65,7 +65,7 @@ public class SystemDataRest implements ApplicationContextAware {
         Response myResponse = Response.status(Response.Status.BAD_REQUEST).build();        
 
         if ((aReqReply != null) && (aReqReply.getRequest() != null)) {
-            LOGGER.log(Level.DEBUG, "SystemData Response to: " + aReqReply.getRequest());
+            LOGGER.log(Level.DEBUG, "SystemData Response to: " + aReqReply.getRequest() + "is : " + aReqReply.getResponse());
             reqReplyConsumer.sendResponse(aReqReply.getIdent(), aReqReply.getResponse(), aReqReply.getMessageid());
 
             myResponse = Response.status(Response.Status.OK).build();
