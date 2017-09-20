@@ -19,14 +19,7 @@
 
                     <div class="row">
                         <div class="col-md-9">
-                            <div class="form-group">
-                                <label class="control-label col-md-2" for="idRequest">
-                                    Request:
-                                </label>
-                                <div class="col-md-3">
-                                    <input class="form-control" id="idRequest" name="idRequest" value="EQ|CMGETCHARGES|TYC|FR20100101|TO20180101" autocomplete="off" type="text">
-                                </div>
-                            </div>
+
                             <div class="form-group">
                                 <label class="control-label col-md-2" for="ident">
                                     Ident: 
@@ -41,6 +34,28 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-2" for="action">
+                                    Action: 
+                                </label>
+                                <div class="col-md-3">
+                                    <select id="idAction" name="action" class="input-sm" data-style="btn-primary" required="" >
+                                        <option selected>Charges</option>
+                                        <option >HotelList</option>
+                                        <option >New</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-2" for="idRequest">
+                                    Request:
+                                </label>
+                                <div class="col-md-3">
+                                    <input class="form-control" id="idRequest" name="idRequest" value="EQ|CMGETCHARGES|TYC|FR20100101|TO20180101" autocomplete="off" type="text">
+                                </div>
+                            </div>                            
 
                             <div class="form-group">
                                 <label class="control-label col-md-2" for="idCommand">
@@ -154,6 +169,27 @@
 
                                 $("#idLoader").hide();
 
+
+                                //var sel = document.getElementById('idAction');
+
+                                // sel.onchange = function() {
+                                $("#idAction").change(function () {
+
+                                    doClear()
+                                    if ($("#idAction").val() == "HotelList") {
+                                        $("#idRequest").val("EQ|CMGETCHARGES|TYC|FR20100101|TO20180101");
+                                        $("#idPort").val("5102");
+                                    } else if ($("#idAction").val() == "Charges") {
+                                        $("#idRequest").val("EQ|CMROOMLIST|FLBASE");
+                                        $("#idPort").val("5116");
+                                    } else {
+                                        $("#idRequest").val("");
+                                        $("#idPort").val("");
+                                    }
+                                });
+
+                                //$("#idAction").bind('click', {self:this}, this.ActionChange);
+
                                 var surl = "<s:url action='doGetTimeout.action' namespace='/jmsReqReply'/>";
 
                                 var ret = null;
@@ -195,6 +231,7 @@
 
                             }
 
+
                             function doSubmit() {
                                 // validate user form
                                 var valid = $("#inputform").parsley().validate();
@@ -230,7 +267,7 @@
                                             $("#btn_clear").prop('disabled', false);
                                             $("#btn_clear").attr('class', 'btn btn-success');
 
-                                            if (html.response != null) {
+                                            if (html.response !== null) {
 
                                                 $("#idResponseLength").text(html.response.length);
                                                 $("#idResponseTime").text(html.duration);
