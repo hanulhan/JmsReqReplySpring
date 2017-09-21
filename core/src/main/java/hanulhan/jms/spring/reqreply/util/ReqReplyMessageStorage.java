@@ -23,7 +23,7 @@ public class ReqReplyMessageStorage {
     private final Map<String, ReqReplyMessageObject> msgMap;
     private final Semaphore available = new Semaphore(1, true);
     static final Logger LOGGER = Logger.getLogger(ReqReplyMessageStorage.class);
-    private String filterName;
+    private final String filterName;
 
     /**
      *
@@ -183,7 +183,7 @@ public class ReqReplyMessageStorage {
     }
 
     
-        public synchronized ReqReplyMessageObject getResponseObj(String myMessageId) {
+    public synchronized ReqReplyMessageObject getResponseObj(String myMessageId) {
         ReqReplyMessageObject myReturn = null;
         try {
             available.acquire();
