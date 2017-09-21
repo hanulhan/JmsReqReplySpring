@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  *
  * @author uhansen
  */
-public class ReqReplyMessageObject {
+public class ReqReplyMessageContainer {
 
     // vars static for the object
     private String messageId = null;
@@ -34,7 +34,7 @@ public class ReqReplyMessageObject {
     private int totalCount = 0;
 
     private ReqReplyStatusCode statusCode = ReqReplyStatusCode.STATUS_ERROR;
-    static final Logger LOGGER = Logger.getLogger(ReqReplyMessageObject.class);
+    static final Logger LOGGER = Logger.getLogger(ReqReplyMessageContainer.class);
 
     /**
      *
@@ -42,7 +42,7 @@ public class ReqReplyMessageObject {
      * @param aFilterName
      * @param aFilterValue
      */
-    public ReqReplyMessageObject(String aMessageId, String aFilterName, String aFilterValue) {
+    public ReqReplyMessageContainer(String aMessageId, String aFilterName, String aFilterValue) {
         super();
         this.messageId = aMessageId;
         this.filterName = aFilterName;

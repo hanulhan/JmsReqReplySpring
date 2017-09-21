@@ -6,8 +6,8 @@
 package hanulhan.jms.spring.reqreply.beans;
 
 import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageStorage;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageContainer;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageStore;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
@@ -39,7 +39,7 @@ public class ReqReplyProducer implements MessageListener {
     private String filterName;
 
     // internal
-    private ReqReplyMessageStorage messageStorage;
+    private ReqReplyMessageStore messageStorage;
     static final Logger LOGGER = Logger.getLogger(ReqReplyProducer.class);
 
     public ReqReplyProducer() {
@@ -83,7 +83,7 @@ public class ReqReplyProducer implements MessageListener {
     }
 
     @SuppressWarnings("SleepWhileInLoop")
-    public ReqReplyMessageObject getResponseObj(String aRequest, String aCommand, int aPort, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
+    public ReqReplyMessageContainer getResponseObj(String aRequest, String aCommand, int aPort, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
         Date startTime = new Date();
         int myMilliSeconds;
         String myMessageId;
@@ -140,7 +140,7 @@ public class ReqReplyProducer implements MessageListener {
 
     /**
      * Spring/JMS Default Message Listener Container.
-     * Receive the response from the Reply TOPIC and put it to the "messageStorage"
+     * Receive a response from the Reply TOPIC and put it to the "messageStorage" 
      * @param aMessage 
      */
     @Override
@@ -200,10 +200,10 @@ public class ReqReplyProducer implements MessageListener {
 
     public void setFilterName(String filterName) {
         this.filterName = filterName;
-        messageStorage = new ReqReplyMessageStorage(filterName);
+        messageStorage = new ReqReplyMessageStore(filterName);
     }
 
-    public ReqReplyMessageStorage getMessageStorage() {
+    public ReqReplyMessageStore getMessageStorage() {
         return messageStorage;
     }
 }

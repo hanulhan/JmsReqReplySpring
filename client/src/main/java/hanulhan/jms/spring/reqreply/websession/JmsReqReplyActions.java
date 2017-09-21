@@ -7,7 +7,7 @@ package hanulhan.jms.spring.reqreply.websession;
 
 import com.opensymphony.xwork2.ActionSupport;
 import hanulhan.jms.spring.reqreply.beans.ReqReplyProducer;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageObject;
+import hanulhan.jms.spring.reqreply.util.ReqReplyMessageContainer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -61,7 +61,7 @@ public class JmsReqReplyActions extends ActionSupport implements ApplicationCont
 //        return SUCCESS;
 //    }
     public String doSendMessage() throws InterruptedException {
-        ReqReplyMessageObject myMsgObj;
+        ReqReplyMessageContainer myMsgObj;
         jsonStatus = new JsonStatus();
         LOGGER.log(Level.TRACE, "JmsReqReplyActions.doSendMessage()");
         reqReplyProducer = (ReqReplyProducer) applicationContext.getBean("bean_vmReqReplyProducer");

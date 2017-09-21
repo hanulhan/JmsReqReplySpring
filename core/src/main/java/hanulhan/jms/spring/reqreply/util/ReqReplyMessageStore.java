@@ -18,21 +18,21 @@ import org.apache.log4j.Logger;
  *
  * @author uhansen
  */
-public class ReqReplyMessageStorage {
+public class ReqReplyMessageStore {
 
-    private final Map<String, ReqReplyMessageObject> msgMap;
+    private final Map<String, ReqReplyMessageContainer> msgMap;
     private final Semaphore available = new Semaphore(1, true);
-    static final Logger LOGGER = Logger.getLogger(ReqReplyMessageStorage.class);
+    static final Logger LOGGER = Logger.getLogger(ReqReplyMessageStore.class);
     private final String filterName;
 
     /**
      *
      * @param aFilterName
      */
-    public ReqReplyMessageStorage(String aFilterName) {
+    public ReqReplyMessageStore(String aFilterName) {
         super();
         this.filterName = aFilterName;
-        msgMap = Collections.synchronizedMap(new HashMap<String, ReqReplyMessageObject>());
+        msgMap = Collections.synchronizedMap(new HashMap<String, ReqReplyMessageContainer>());
     }
 
 //    public synchronized ReqReplyStatusCode add(Message aMessage) throws JMSException {
@@ -80,15 +80,15 @@ public class ReqReplyMessageStorage {
 //    }
 
     /**
-     *
+     * Add the response from the Response-Topic to the MessageStore. 
      * @param aMessage
-     * @return
+     * @return ReqReplyStatusCode
      * @throws JMSException
      */
     public synchronized ReqReplyStatusCode add(Message aMessage) throws JMSException {
         String myMessageId;
         ReqReplyStatusCode myStatus = ReqReplyStatusCode.STATUS_ERROR;
-        ReqReplyMessageObject myMsgObj;
+        ReqReplyMessageContainer myMsgObj;
         try {
             myMessageId = aMessage.getJMSCorrelationID();
             available.acquire();
@@ -98,7 +98,7 @@ public class ReqReplyMessageStorage {
                 myMsgObj = msgMap.get(myMessageId);
                 
             } else {
-                myMsgObj= new ReqReplyMessageObject(aMessage.getJMSCorrelationID(), this.filterName, aMessage.getStringProperty(filterName));
+                myMsgObj= new ReqReplyMessageContainer(aMessage.getJMSCorrelationID(), this.filterName, aMessage.getStringProperty(filterName));
             }
             
             myStatus = myMsgObj.add(aMessage);
@@ -147,7 +147,7 @@ public class ReqReplyMessageStorage {
                 myStatus = ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
                 LOGGER.log(Level.TRACE, "Add new message [" + aMessageId + "] should not exist in storage");
             } else {
-                msgMap.put(aMessageId, new ReqReplyMessageObject(aMessageId, this.filterName, aFilterValue));
+                msgMap.put(aMessageId, new ReqReplyMessageContainer(aMessageId, this.filterName, aFilterValue));
                 LOGGER.log(Level.TRACE, "Add new message [" + aMessageId + "] to storage");
             }
         } catch (InterruptedException interruptedException) {
@@ -165,7 +165,7 @@ public class ReqReplyMessageStorage {
      */
     public synchronized String getResponse(String myMessageId) {
         String myReturn = null;
-        ReqReplyMessageObject myMsgObj;
+        ReqReplyMessageContainer myMsgObj;
         try {
             available.acquire();
             if (msgMap.containsKey(myMessageId)) {
@@ -183,8 +183,8 @@ public class ReqReplyMessageStorage {
     }
 
     
-    public synchronized ReqReplyMessageObject getResponseObj(String myMessageId) {
-        ReqReplyMessageObject myReturn = null;
+    public synchronized ReqReplyMessageContainer getResponseObj(String myMessageId) {
+        ReqReplyMessageContainer myReturn = null;
         try {
             available.acquire();
             if (msgMap.containsKey(myMessageId)) {
@@ -205,8 +205,8 @@ public class ReqReplyMessageStorage {
      * @param aMessageId
      * @return
      */
-    public synchronized ReqReplyMessageObject getMsgObj(String aMessageId) {
-        ReqReplyMessageObject myMsgObj = null;
+    public synchronized ReqReplyMessageContainer getMsgObj(String aMessageId) {
+        ReqReplyMessageContainer myMsgObj = null;
 
         try {
             available.acquire();
@@ -243,7 +243,7 @@ public class ReqReplyMessageStorage {
      *
      * @return
      */
-    public Map<String, ReqReplyMessageObject> getMsgMap() {
+    public Map<String, ReqReplyMessageContainer> getMsgMap() {
         return msgMap;
     }
 

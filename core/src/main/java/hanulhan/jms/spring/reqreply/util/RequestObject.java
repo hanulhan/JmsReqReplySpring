@@ -21,7 +21,7 @@ public class RequestObject extends Object {
 
     private ReqReply reqReply;
     private boolean busy = false;
-    static final Logger LOGGER = Logger.getLogger(ReqReplyMessageObject.class);
+    static final Logger LOGGER = Logger.getLogger(ReqReplyMessageContainer.class);
 
     /**
      * Create a new object with the FilterValue (ident)

@@ -23,7 +23,7 @@ import javax.jms.MessageListener;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * This class has a MessageListener to the jms REQUEST-Topic.
+ * This class has a MessageListener for the Response-Topic (Return path)
  *
  * The request will be validated
  *
