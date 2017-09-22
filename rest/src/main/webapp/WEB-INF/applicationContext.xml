@@ -28,7 +28,7 @@
 >
 
     <import resource="classpath:/spring/spring_ReqReply_rest.xml" />
-    <import resource="classpath*:/spring/spring_jmsReqReplyConsumer.xml" />      
+<!--    <import resource="classpath*:/spring/spring_jmsReqReplyConsumer.xml" />      -->
     
     
     <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
@@ -78,7 +78,7 @@
     <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="pubSubDomain" value="true" />
         <property name="connectionFactory" ref="bean_SingleConnectionFactory" />
-        <property name="messageConverter"  ref="oxmMessageConverter" />
+<!--        <property name="messageConverter"  ref="oxmMessageConverter" />-->
     </bean>
     
 
