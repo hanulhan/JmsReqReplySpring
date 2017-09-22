@@ -3,8 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package hanulhan.jms.spring.reqreply.util;
+package hanulhan.jms.spring.reqreply.message;
 
+import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
+import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
+import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -18,9 +21,10 @@ import org.apache.log4j.Logger;
  */
 public class ReqReplyMessageContainer {
 
+    MessageObj messageObj;
+
     // vars static for the object
-    private String messageId = null;
-    private String filterValue = null;
+//    private String messageId = null;
     private String filterName = null;
     private final Date startTime = new Date();
     private long responseTime = 0;
@@ -44,12 +48,24 @@ public class ReqReplyMessageContainer {
      */
     public ReqReplyMessageContainer(String aMessageId, String aFilterName, String aFilterValue) {
         super();
-        this.messageId = aMessageId;
         this.filterName = aFilterName;
-        this.filterValue = aFilterValue;
         this.msgBitMask= 0;
+
+        this.messageObj= new MessageObj();
+        this.messageObj.setMessageid(aMessageId);
+        this.messageObj.setIdent(aFilterValue);
+        this.messageObj.setMessageid(aMessageId);
+        
     }
 
+    public ReqReplyMessageContainer(String aFilterName, MessageObj aMessage) {    
+        super();
+        this.filterName = aFilterName;
+        this.msgBitMask= 0;
+        
+        this.messageObj= aMessage;
+    }
+    
     /**
      *
      * @param aMessage
@@ -124,10 +140,10 @@ public class ReqReplyMessageContainer {
             return ReqReplyStatusCode.STATUS_TIMEOUT;
         }
 
-        if (!(aMessage instanceof TextMessage)) {
-            LOGGER.log(Level.ERROR, "Message is not a TextMessage");
-            return ReqReplyStatusCode.STATUS_MESSAGE_ERROR;
-        }
+//        if (!(aMessage instanceof TextMessage)) {
+//            LOGGER.log(Level.ERROR, "Message is not a TextMessage");
+//            return ReqReplyStatusCode.STATUS_MESSAGE_ERROR;
+//        }
 
         // Check if Property: <FilterName>  exists
         if (!aMessage.propertyExists(this.filterName)) {
@@ -136,7 +152,7 @@ public class ReqReplyMessageContainer {
         }
 
         // Check content of Property: <FilterName>
-        if (!aMessage.getStringProperty(this.filterName).equals(this.filterValue)) {
+        if (!aMessage.getStringProperty(this.filterName).equals(this.messageObj.getIdent())) {
             LOGGER.log(Level.ERROR, "PropertyName: " + this.filterName + " missmatch");
             return ReqReplyStatusCode.STATUS_HEADER_ERROR;
         }
@@ -148,33 +164,30 @@ public class ReqReplyMessageContainer {
         }
 
         // MsgType ACK or Payload check
-        if (aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE).equals(ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD)) {
-            if (!aMessage.propertyExists(ReqReplySettings.PROPERTY_NAME_COUNT)) {
-                LOGGER.log(Level.ERROR, "PropertyName: " + ReqReplySettings.PROPERTY_NAME_COUNT + "missing in response");
+        switch (aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE)) {
+            case ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_PAYLOAD:
+                if (!aMessage.propertyExists(ReqReplySettings.PROPERTY_NAME_COUNT)) {
+                    LOGGER.log(Level.ERROR, "PropertyName: " + ReqReplySettings.PROPERTY_NAME_COUNT + "missing in response");
+                    return ReqReplyStatusCode.STATUS_HEADER_ERROR;
+                }   if (!aMessage.propertyExists(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT)) {
+                    LOGGER.log(Level.ERROR, "PropertyName: " + ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT + "missing in reponse");
+                    return ReqReplyStatusCode.STATUS_HEADER_ERROR;
+                }   // if it's not the first message, check the total count
+                if (this.payload != null && aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT) != this.totalCount) {
+                    LOGGER.log(Level.ERROR, "PropertyName: " + ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT + "missmatch");
+                    return ReqReplyStatusCode.STATUS_HEADER_ERROR;
+                }   this.msgTypeAck = false;
+                break;
+            case ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK:
+                this.msgTypeAck = true;
+                break;
+            default:
+                LOGGER.log(Level.ERROR, "PropertyName: " + ReqReplySettings.PROPERTY_NAME_MSG_TYPE + "not valid");
                 return ReqReplyStatusCode.STATUS_HEADER_ERROR;
-            }
-            if (!aMessage.propertyExists(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT)) {
-                LOGGER.log(Level.ERROR, "PropertyName: " + ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT + "missing in reponse");
-                return ReqReplyStatusCode.STATUS_HEADER_ERROR;
-            }
-
-            // if it's not the first message, check the total count
-            if (this.payload != null && aMessage.getIntProperty(ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT) != this.totalCount) {
-                LOGGER.log(Level.ERROR, "PropertyName: " + ReqReplySettings.PROPERTY_NAME_TOTAL_COUNT + "missmatch");
-                return ReqReplyStatusCode.STATUS_HEADER_ERROR;
-            }
-
-            this.msgTypeAck = false;
-
-        } else if (aMessage.getStringProperty(ReqReplySettings.PROPERTY_NAME_MSG_TYPE).equals(ReqReplySettings.PROPERTY_VALUE_MSG_TYPE_ACK)) {
-            this.msgTypeAck = true;
-        } else {
-            LOGGER.log(Level.ERROR, "PropertyName: " + ReqReplySettings.PROPERTY_NAME_MSG_TYPE + "not valid");
-            return ReqReplyStatusCode.STATUS_HEADER_ERROR;
         }
 
         // Check if Properties fit to the new Message
-        if (!aMessage.getJMSCorrelationID().equals(this.messageId)) {
+        if (!aMessage.getJMSCorrelationID().equals(this.messageObj.getMessageid())) {
             LOGGER.log(Level.ERROR, "MessageId missmatch ");
             return ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
         }
@@ -190,13 +203,6 @@ public class ReqReplyMessageContainer {
         return statusCode == ReqReplyStatusCode.STATUS_OK;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getMessageId() {
-        return messageId;
-    }
 
     /**
      *
@@ -204,14 +210,6 @@ public class ReqReplyMessageContainer {
      */
     public int getMsgBitMask() {
         return msgBitMask;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getFilterValue() {
-        return filterValue;
     }
 
     /**
@@ -262,10 +260,14 @@ public class ReqReplyMessageContainer {
         return statusCode;
     }
 
+    public String getIdent()    {
+        return messageObj.getIdent();
+    }
+    
     @Override
     public String toString()    {
-        return  "MsgObj: {id: " + this.messageId
-                        + ", filter: " + this.filterValue
+        return  "MsgObj: {id: " + this.messageObj.getMessageid()
+                        + ", Ident: " + this.messageObj.getIdent()
                         + ", count: " + this.msgCount
                         + ", totalCount: " + this.totalCount
                         + ", bitMask: " + this.msgBitMask

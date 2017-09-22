@@ -27,7 +27,9 @@
       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
 >
 
-    <import resource="classpath:/spring/spring_ReqReply_rest.xml" />      
+    <import resource="classpath:/spring/spring_ReqReply_rest.xml" />
+    <import resource="classpath*:/spring/spring_jmsReqReplyConsumer.xml" />      
+    
     
     <bean id="bean_ReqReplySettings" class="hanulhan.jms.spring.reqreply.util.ReqReplySettings">
         <property name="reqDestination"        ref="bean_vmReqTopic" />
@@ -76,6 +78,7 @@
     <bean id="bean_jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="pubSubDomain" value="true" />
         <property name="connectionFactory" ref="bean_SingleConnectionFactory" />
+        <property name="messageConverter"  ref="oxmMessageConverter" />
     </bean>
     
 
@@ -91,8 +94,8 @@
 
     ${use.basic.auth.start}
     <bean id="beanAPIUserBaiscAuthFilter" class="hanulhan.jms.spring.reqreply.basic.APIUserBasicAuthFilter" scope="prototype">
-          <property name="username" value="test" />
-          <property name="password" value="test" />
+        <property name="username" value="test" />
+        <property name="password" value="test" />
     </bean>
     ${use.basic.auth.end}
 
@@ -111,5 +114,6 @@
           p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>
 
 
+    
 
 </beans>

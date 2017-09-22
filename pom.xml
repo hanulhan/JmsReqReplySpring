@@ -106,7 +106,11 @@
                 <artifactId>spring-context</artifactId>
                 <version>${version.org.springframework}</version>
             </dependency>
-            
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-oxm</artifactId>
+                <version>${version.org.springframework}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jms</artifactId>
@@ -195,6 +199,11 @@
                 <version>${version.opensymphony.sitemesh}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>2.2.6</version>
+            </dependency>
 
             <dependency>
                 <groupId>junit</groupId>
@@ -381,15 +390,15 @@
                 <message.length>4096</message.length>
                 <request.durable.subscriber.name>REQ-SUBSCRIBER-DEV</request.durable.subscriber.name>
                 <reply.durable.subscriber.name>REPLY-SUBSCRIBER-DEV</reply.durable.subscriber.name>
-<!--                <broker.url>tcp://192.168.20.12:61616</broker.url>-->
+                <!--                <broker.url>tcp://192.168.20.12:61616</broker.url>-->
                 <broker.url>tcp://192.168.1.61:61616</broker.url>                
-<!--                <broker.url>tcp://localhost:61616</broker.url>-->
-<!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
-<!--                <broker.url>tcp://localhost:61616</broker.url>-->
-<!--                <broker.url.start>vm://192.168.1.44?brokerConfig=xbean:activemq.xml</broker.url.start>-->
-<!--                <broker.url.start>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url.start>-->
-<!--                <broker.url.start>tcp://192.168.1.44:61616</broker.url.start>-->
-<!--                <broker.url>tcp://192.168.1.44:61616</broker.url>-->
+                <!--                <broker.url>tcp://localhost:61616</broker.url>-->
+                <!--                <broker.url>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url>-->
+                <!--                <broker.url>tcp://localhost:61616</broker.url>-->
+                <!--                <broker.url.start>vm://192.168.1.44?brokerConfig=xbean:activemq.xml</broker.url.start>-->
+                <!--                <broker.url.start>vm://localhost?brokerConfig=xbean:activemq.xml</broker.url.start>-->
+                <!--                <broker.url.start>tcp://192.168.1.44:61616</broker.url.start>-->
+                <!--                <broker.url>tcp://192.168.1.44:61616</broker.url>-->
                 <log4j.logpath>${project.build.directory}/log</log4j.logpath>                
                 <log4j.tomcat.logpath>${project.build.directory}/log/tomcat7</log4j.tomcat.logpath>
                 <log4j.user.logpath>${project.build.directory}/log/userLog</log4j.user.logpath>

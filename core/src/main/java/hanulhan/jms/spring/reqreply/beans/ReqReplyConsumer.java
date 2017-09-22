@@ -5,6 +5,7 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
+import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.TextMessage;
@@ -13,13 +14,16 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import hanulhan.jms.spring.reqreply.util.ReqReplyFilterMap;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
+import hanulhan.jms.spring.reqreply.message.ReqReplyMessageCreator;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.RequestObject;
+import java.io.Serializable;
 import java.util.Date;
 import javax.annotation.PostConstruct;
+import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
 import org.springframework.context.ApplicationContextAware;
 
 /**
@@ -155,7 +159,7 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
     public void onMessage(Message aMessage) {
 
         String myIdent;
-        String myRequest;
+        String myRequest = null;
         String correlationId;
         String myCommand;
         int myPort;
@@ -165,10 +169,10 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
         ReqReplyMessageCreator myResponseCreator;
         LOGGER.log(Level.TRACE, "ReqReplyConsumer::onReceive()");
         try {
-            if (!(aMessage instanceof TextMessage)) {
-                LOGGER.log(Level.ERROR, "Message received, but not a TextMessage");
-                return;
-            }
+//            if (!(aMessage instanceof BytesMessage)) {
+//                LOGGER.log(Level.ERROR, "Message received, but not a TextMessage");
+//                return;
+//            }
 
             if (filterPropertyName == null || filterPropertyName.trim().isEmpty()) {
                 LOGGER.log(Level.ERROR, "No Filter property set");
@@ -182,7 +186,16 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
             myIdent = aMessage.getStringProperty(filterPropertyName);
             myCommand = aMessage.getStringProperty(ReqReplySettings.PROPERTY_VALUE_COMMAND);
             myPort    = aMessage.getIntProperty(ReqReplySettings.PROPERTY_VALUE_PORT);
-            myRequest = ((TextMessage) aMessage).getText();
+            
+            Class<? extends Message> aClass = aMessage.getClass();
+
+            if (aMessage instanceof TextMessage)    {
+                myRequest = ((TextMessage) aMessage).getText();
+            } else if (aMessage instanceof ObjectMessage) {
+                MessageObj myMsgObj;
+                myMsgObj= (MessageObj)((ObjectMessage) aMessage).getObject();
+                myRequest= myMsgObj.getRequest();
+            }
 
             LOGGER.log(Level.TRACE, "onMessage(" + myRequest + ")");
 
@@ -219,10 +232,8 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
                 LOGGER.log(Level.ERROR, "Cound not add to filterMap (" + myRequest + ") after " + milliSeconds + "ms. System not connected");
             }
 
-        } catch (JMSException jMSException) {
+        } catch (JMSException | InterruptedException jMSException) {
             LOGGER.log(Level.ERROR, jMSException);
-        } catch (InterruptedException ex) {
-            java.util.logging.Logger.getLogger(ReqReplyConsumer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
     }
 

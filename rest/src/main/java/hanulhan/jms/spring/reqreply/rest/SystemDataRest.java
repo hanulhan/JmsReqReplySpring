@@ -6,7 +6,7 @@
 package hanulhan.jms.spring.reqreply.rest;
 
 import hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer;
-import hanulhan.jms.spring.reqreply.util.ReqReply;
+import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
@@ -55,18 +55,18 @@ public class SystemDataRest implements ApplicationContextAware {
      * Retrieves representation of an instance of
      * hanulhan.jms.spring.reqreply.rest.SystemDataRest
      *
-     * @param aReqReply
+     * @param aMessage
      * @return an instance of java.lang.String
      */
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Consumes({"application/xml"})
-    public Response SystemData(ReqReply aReqReply) {
+    public Response SystemData(MessageObj aMessage) {
         Response myResponse = Response.status(Response.Status.BAD_REQUEST).build();        
 
-        if ((aReqReply != null) && (aReqReply.getRequest() != null)) {
-            LOGGER.log(Level.DEBUG, "SystemData Response to: " + aReqReply.getRequest() + "is : " + aReqReply.getResponse());
-            reqReplyConsumer.sendResponse(aReqReply.getIdent(), aReqReply.getResponse(), aReqReply.getMessageid());
+        if ((aMessage != null) && (aMessage.getRequest() != null)) {
+            LOGGER.log(Level.DEBUG, "SystemData Response to: " + aMessage.getRequest() + "is : " + aMessage.getResponse());
+            reqReplyConsumer.sendResponse(aMessage.getIdent(), aMessage.getResponse(), aMessage.getMessageid());
 
             myResponse = Response.status(Response.Status.OK).build();
         } else {

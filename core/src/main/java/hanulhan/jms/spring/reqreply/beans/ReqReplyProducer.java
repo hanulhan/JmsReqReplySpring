@@ -5,9 +5,11 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageCreator;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageContainer;
-import hanulhan.jms.spring.reqreply.util.ReqReplyMessageStore;
+import hanulhan.jms.spring.reqreply.jaxb.Convertable;
+import hanulhan.jms.spring.reqreply.message.ReqReplyMessageCreator;
+import hanulhan.jms.spring.reqreply.message.ReqReplyMessageContainer;
+import hanulhan.jms.spring.reqreply.message.ReqReplyMessageStore;
+import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
@@ -38,6 +40,7 @@ public class ReqReplyProducer implements MessageListener {
     private Destination replyDestination;
     private String filterName;
 
+    Convertable msgConverter;
     // internal
     private ReqReplyMessageStore messageStorage;
     static final Logger LOGGER = Logger.getLogger(ReqReplyProducer.class);
@@ -74,14 +77,31 @@ public class ReqReplyProducer implements MessageListener {
 
         if (messageStorage.isResponseReceived(myMessageId))  {
             return messageStorage.getResponse(myMessageId);
-        } else {
-            //ReqReplyMessageObject myMsgObj= messageStorage.getMsgObj(myMessageId);
-//            LOGGER.log(Level.ERROR, "################ RESPONSE is null #####################");
-            //LOGGER.log(Level.ERROR, myMsgObj.toString());
         }
         return null;
     }
 
+    @SuppressWarnings("SleepWhileInLoop")
+    public String getResponse(MessageObj aMessage, long aTimeoutMilliSec) throws InterruptedException {
+        Date startTime = new Date();
+        int myMilliSeconds;
+        String myMessageId;
+        
+        myMessageId= sendRequest(aMessage);
+
+        // Wait 
+        do {
+            myMilliSeconds = (int) ((new Date().getTime() - startTime.getTime()));
+            Thread.sleep(10);
+        } while (myMilliSeconds < aTimeoutMilliSec && !messageStorage.isResponseReceived(myMessageId));
+
+        if (messageStorage.isResponseReceived(myMessageId))  {
+            return messageStorage.getResponse(myMessageId);
+        }
+        return null;        
+    }
+    
+    
     @SuppressWarnings("SleepWhileInLoop")
     public ReqReplyMessageContainer getResponseObj(String aRequest, String aCommand, int aPort, String aFilterValue, long aTimeoutMilliSec) throws InterruptedException {
         Date startTime = new Date();
@@ -89,6 +109,27 @@ public class ReqReplyProducer implements MessageListener {
         String myMessageId;
         
         myMessageId= sendRequest(aRequest, aCommand, aPort, aFilterValue);
+
+        // Wait 
+        do {
+            myMilliSeconds = (int) ((new Date().getTime() - startTime.getTime()));
+            Thread.sleep(10);
+        } while (myMilliSeconds < aTimeoutMilliSec && !messageStorage.isResponseReceived(myMessageId));
+
+        if (messageStorage.isResponseReceived(myMessageId))  {
+            return messageStorage.getResponseObj(myMessageId);
+        }
+        return null;
+    }
+    
+    
+    @SuppressWarnings("SleepWhileInLoop")
+    public ReqReplyMessageContainer getResponseObj(MessageObj aMessage, long aTimeoutMilliSec) throws InterruptedException {
+        Date startTime = new Date();
+        int myMilliSeconds;
+        String myMessageId;
+        
+        myMessageId= sendRequest(aMessage);
 
         // Wait 
         do {
@@ -115,16 +156,26 @@ public class ReqReplyProducer implements MessageListener {
      */
     public String sendRequest(String aMessageText, String aCommand, int aPort, String aFilterValue) {
         String myMessageId;
-        ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessageText, replyDestination);
+
+        MessageObj myMessage= new MessageObj();
+        myMessage.setRequest(aMessageText);
+        myMessage.setCommand(aCommand);
+        myMessage.setPort(aPort);
+        myMessage.setIdent(aFilterValue);
+
+        ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(myMessage, replyDestination);
         myReqMessage.setStringProperty(filterName, aFilterValue);
         myReqMessage.setStringProperty(ReqReplySettings.PROPERTY_VALUE_COMMAND, aCommand);
         myReqMessage.setIntProperty(ReqReplySettings.PROPERTY_VALUE_PORT, aPort);
+        
 
         try {
             jmsTemplate.send(requestDestination, myReqMessage);
+//            jmsTemplate.convertAndSend(requestDestination, myMessage);
             myMessageId = myReqMessage.getMessageId();
             if (myMessageId != null) {
-                messageStorage.add(myMessageId, aFilterValue);
+                //messageStorage.add(myMessageId, aFilterValue);
+                messageStorage.add(myMessageId, myMessage);
             } else {
                 LOGGER.log(Level.ERROR, "messageId is null! ");
             }
@@ -137,6 +188,33 @@ public class ReqReplyProducer implements MessageListener {
         return myMessageId;
     }
 
+
+    public String sendRequest(MessageObj aMessage) {
+        String myMessageId;
+        ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessage.getRequest(), replyDestination);
+        myReqMessage.setStringProperty(filterName, aMessage.getIdent());
+        myReqMessage.setStringProperty(ReqReplySettings.PROPERTY_VALUE_COMMAND, aMessage.getCommand());
+        myReqMessage.setIntProperty(ReqReplySettings.PROPERTY_VALUE_PORT, aMessage.getPort());
+        
+        try {
+            //jmsTemplate.send(requestDestination, myReqMessage);
+            jmsTemplate.convertAndSend(requestDestination, aMessage);
+            myMessageId = myReqMessage.getMessageId();
+            if (myMessageId != null) {
+                //messageStorage.add(myMessageId, aFilterValue);
+                messageStorage.add(myMessageId, aMessage);
+            } else {
+                LOGGER.log(Level.ERROR, "messageId is null! ");
+            }
+            LOGGER.log(Level.DEBUG, "Sending Request [" + myMessageId + "] for Ident: " + aMessage.getIdent());
+
+        } catch (JmsException | JMSException jmsException) {
+            LOGGER.log(Level.ERROR, "Error sending msg! " + jmsException);
+            return null;
+        }
+        return myMessageId;
+    }
+    
 
     /**
      * Spring/JMS Default Message Listener Container.
@@ -206,4 +284,14 @@ public class ReqReplyProducer implements MessageListener {
     public ReqReplyMessageStore getMessageStorage() {
         return messageStorage;
     }
+
+    public Convertable getMsgConverter() {
+        return msgConverter;
+    }
+
+    public void setMsgConverter(Convertable msgConverter) {
+        this.msgConverter = msgConverter;
+    }
+
+
 }

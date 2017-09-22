@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package hanulhan.jms.spring.reqreply.util;
+package hanulhan.jms.spring.reqreply.message;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,10 +27,10 @@ public class ReqReplyMessageCreator implements MessageCreator {
 
     private Destination replyDestination= null;
     private String messageId, correlationId;
-    private TextMessage txtMessage;
+    private Message jmsMessage;
     private Map<String, String> propertyStringMap;
     private Map<String, Integer> propertyIntMap;
-    private final String messageText;
+    private final Object object;
     private static final Logger LOGGER = Logger.getLogger(ReqReplyMessageCreator.class);
 
     /**
@@ -38,10 +39,15 @@ public class ReqReplyMessageCreator implements MessageCreator {
      * @param aReplyDestination
      */
     public ReqReplyMessageCreator(String aMsg, Destination aReplyDestination) {
-        this.messageText = aMsg;
+        this.object = aMsg;
         this.replyDestination= aReplyDestination;
     }
 
+    public ReqReplyMessageCreator(Object aMsg, Destination aReplyDestination) {
+        this.object = aMsg;
+        this.replyDestination= aReplyDestination;
+    }    
+    
     /**
      *
      * @param aMsg
@@ -49,7 +55,7 @@ public class ReqReplyMessageCreator implements MessageCreator {
      */
     public ReqReplyMessageCreator(String aMsg, String aCorrelationId) {
         this.correlationId = aCorrelationId;
-        this.messageText = aMsg;
+        this.object = aMsg;
     }
 //
 //    public ReqReplyMessageCreator(String aMsg, Boolean aDoReply) {
@@ -63,15 +69,20 @@ public class ReqReplyMessageCreator implements MessageCreator {
         String myKey;
 
         LOGGER.log(Level.TRACE, "ReqMessageCreator:createMessage()");
-        txtMessage = aSession.createTextMessage(messageText);
+        if (object instanceof String)   {
+            jmsMessage = aSession.createTextMessage((String)object);
+        } else if (object instanceof Serializable)  {
+            jmsMessage = aSession.createObjectMessage((Serializable)object);
+        }
+
 
         // Use MessageId-Pattern
         // The MessageId of the Req is set to the correlationId of the response
         if (replyDestination == null) {
             // This is a reply
-            txtMessage.setJMSCorrelationID(correlationId);
+            jmsMessage.setJMSCorrelationID(correlationId);
         } else {
-            txtMessage.setJMSReplyTo(replyDestination);
+            jmsMessage.setJMSReplyTo(replyDestination);
         }
 
         if (propertyStringMap != null && !propertyStringMap.isEmpty()) {
@@ -80,7 +91,7 @@ public class ReqReplyMessageCreator implements MessageCreator {
                 Entry thisEntry = (Entry) myEntries.next();
                 myKey = (String) thisEntry.getKey();
                 String myStringValue = (String) thisEntry.getValue();
-                txtMessage.setStringProperty(myKey, myStringValue);
+                jmsMessage.setStringProperty(myKey, myStringValue);
             }
         }
         if (propertyIntMap != null && !propertyIntMap.isEmpty()) {
@@ -89,11 +100,11 @@ public class ReqReplyMessageCreator implements MessageCreator {
                 Entry thisEntry = (Entry) myEntries.next();
                 myKey = (String) thisEntry.getKey();
                 Integer myIntValue = (Integer) thisEntry.getValue();
-                txtMessage.setIntProperty(myKey, myIntValue);
+                jmsMessage.setIntProperty(myKey, myIntValue);
             }
         }
 
-        return txtMessage;
+        return jmsMessage;
     }
 
     /**
@@ -120,13 +131,6 @@ public class ReqReplyMessageCreator implements MessageCreator {
         propertyIntMap.put(aPropertyKey, aPropertyValue);
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getMessageText() {
-        return messageText;
-    }
 
     /**
      *
@@ -134,7 +138,7 @@ public class ReqReplyMessageCreator implements MessageCreator {
      * @throws JMSException
      */
     public String getMessageId() throws JMSException {
-        return txtMessage.getJMSMessageID();
+        return jmsMessage.getJMSMessageID();
     }
 
 }

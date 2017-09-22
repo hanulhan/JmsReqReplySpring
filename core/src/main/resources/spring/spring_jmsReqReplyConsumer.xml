@@ -6,6 +6,7 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:oxm="http://www.springframework.org/schema/oxm"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -17,23 +18,37 @@
         http://www.springframework.org/schema/jms/spring-jms.xsd
         http://www.springframework.org/schema/task 
         http://www.springframework.org/schema/task/spring-task-3.0.xsd
+        http://www.springframework.org/schema/oxm 
+        http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd
     ">
     
     <!-- spring_jmsReqReplyConsumer.xml -->
     
-    <bean   id="bean_jmsReqReplyConsumer5" class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer" scope="singleton" >
-        <property name="reqReplySettings"       ref="bean_ReqReplySettingsX" />
+
+    <!--    <bean id="bean_jmsReqListenerContainer" 
+    class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+    p:connectionFactory-ref="bean_DefaultConnectionFactory"
+    p:destinationName="#{bean_ReqReplySettingsX.getReqDestinationName()}"
+    p:messageListener-ref="bean_jmsReqReplyConsumer5"
+    p:pubSubDomain="true"
+    p:subscriptionDurable="false"
+    p:durableSubscriptionName="${request.durable.subscriber.name}"
+    p:errorHandler-ref="bean_jmsErrorHandler"
+    p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>-->
+    
+    <!-- Spring's JAXB implementation of marshaller - provided a class the JAXB generated class -->
+<!--    <oxm:jaxb2-marshaller id="marshaller">
+        <oxm:class-to-be-bound name="hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj" />
+    </oxm:jaxb2-marshaller>-->
+
+    <!-- Message converter - automatically marshalls and unmarshalls messages using the provided marshaller / unmarshaller-->
+    <bean id="oxmMessageConverter" class="org.springframework.jms.support.converter.MarshallingMessageConverter">
+        <property name="marshaller" ref="marshaller" />
+        <property name="unmarshaller" ref="marshaller" />
     </bean>
 
-<!--    <bean id="bean_jmsReqListenerContainer" 
-              class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-              p:connectionFactory-ref="bean_DefaultConnectionFactory"
-              p:destinationName="#{bean_ReqReplySettingsX.getReqDestinationName()}"
-              p:messageListener-ref="bean_jmsReqReplyConsumer5"
-              p:pubSubDomain="true"
-              p:subscriptionDurable="false"
-              p:durableSubscriptionName="${request.durable.subscriber.name}"
-              p:errorHandler-ref="bean_jmsErrorHandler"
-              p:sessionAcknowledgeModeName="AUTO_ACKNOWLEDGE"/>-->
-    
+    <!-- Spring's JAXB implementation of marshaller - provided a class the JAXB generated class -->
+    <oxm:jaxb2-marshaller id="marshaller">
+        <oxm:class-to-be-bound name="hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj" />
+    </oxm:jaxb2-marshaller>
 </beans>

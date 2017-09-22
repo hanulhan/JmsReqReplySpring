@@ -121,7 +121,7 @@
                                 <include>jaxb/ReqReply/*.xsd</include>
                             </schemaIncludes>
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-ReqReply.episode</episodeFile>
-                            <generatePackage>hanulhan.jms.spring.reqreply.util</generatePackage>
+                            <generatePackage>hanulhan.jms.spring.reqreply.jaxb.generated</generatePackage>
                         </configuration>
                         <id>jaxb-generate-ReqReply</id>
                     </execution>
@@ -132,8 +132,10 @@
                     <forceRegenerate>true</forceRegenerate>
                     <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
                     <verbose>true</verbose>
+                    <bindingDirectory>jaxb/ReqReply</bindingDirectory>
                 </configuration>
             </plugin>
+
         </plugins>
         <resources>
             <resource>
