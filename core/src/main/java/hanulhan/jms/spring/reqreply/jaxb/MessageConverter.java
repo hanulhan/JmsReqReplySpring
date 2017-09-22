@@ -5,7 +5,7 @@
  */
 package hanulhan.jms.spring.reqreply.jaxb;
 
-import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
+import hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import javax.xml.bind.JAXBContext;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author uhansen
  */
-public class MessageConverter implements Convertable<MessageObj> {
+public class MessageConverter implements Convertable<ReqReply> {
  	private static final Logger LOGGER = LoggerFactory.getLogger(MessageConverter.class);
 
 	private final JAXBContext jaxbContext;
@@ -28,14 +28,14 @@ public class MessageConverter implements Convertable<MessageObj> {
 	private final Unmarshaller jaxbUnmarshaller;
 
 	public MessageConverter() throws JAXBException {
-		jaxbContext = JAXBContext.newInstance(MessageObj.class);
+		jaxbContext = JAXBContext.newInstance(ReqReply.class);
 		jaxbMarshaller = jaxbContext.createMarshaller();
 		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 		jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 	}
 
 	@Override
-	public String marshal(MessageObj object) {
+	public String marshal(ReqReply object) {
 		OutputStream stream = new ByteArrayOutputStream();
 		try {
 			jaxbMarshaller.marshal(object, stream);
@@ -46,9 +46,9 @@ public class MessageConverter implements Convertable<MessageObj> {
 	}
 
 	@Override
-	public MessageObj unmarshal(String objectAsString) {
+	public ReqReply unmarshal(String objectAsString) {
 		try {
-			return (MessageObj) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(objectAsString.getBytes()));
+			return (ReqReply) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(objectAsString.getBytes()));
 		} catch (JAXBException e) {
 			LOGGER.error("Exception occured while marshalling", e);
 		}

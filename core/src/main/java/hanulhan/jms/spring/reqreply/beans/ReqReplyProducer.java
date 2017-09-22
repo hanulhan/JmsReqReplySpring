@@ -9,7 +9,7 @@ import hanulhan.jms.spring.reqreply.jaxb.Convertable;
 import hanulhan.jms.spring.reqreply.message.ReqReplyMessageCreator;
 import hanulhan.jms.spring.reqreply.message.ReqReplyMessageContainer;
 import hanulhan.jms.spring.reqreply.message.ReqReplyMessageStore;
-import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
+import hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
@@ -82,7 +82,7 @@ public class ReqReplyProducer implements MessageListener {
     }
 
     @SuppressWarnings("SleepWhileInLoop")
-    public String getResponse(MessageObj aMessage, long aTimeoutMilliSec) throws InterruptedException {
+    public String getResponse(ReqReply aMessage, long aTimeoutMilliSec) throws InterruptedException {
         Date startTime = new Date();
         int myMilliSeconds;
         String myMessageId;
@@ -124,7 +124,7 @@ public class ReqReplyProducer implements MessageListener {
     
     
     @SuppressWarnings("SleepWhileInLoop")
-    public ReqReplyMessageContainer getResponseObj(MessageObj aMessage, long aTimeoutMilliSec) throws InterruptedException {
+    public ReqReplyMessageContainer getResponseObj(ReqReply aMessage, long aTimeoutMilliSec) throws InterruptedException {
         Date startTime = new Date();
         int myMilliSeconds;
         String myMessageId;
@@ -140,7 +140,7 @@ public class ReqReplyProducer implements MessageListener {
         if (messageStorage.isResponseReceived(myMessageId))  {
             return messageStorage.getResponseObj(myMessageId);
         } else {
-            //ReqReplyMessageObject myMsgObj= messageStorage.getMsgObj(myMessageId);
+            //ReqReplyReqReplyect myMsgObj= messageStorage.getMsgObj(myMessageId);
 //            LOGGER.log(Level.ERROR, "################ RESPONSE is null #####################");
             //LOGGER.log(Level.ERROR, myMsgObj.toString());
         }
@@ -157,7 +157,7 @@ public class ReqReplyProducer implements MessageListener {
     public String sendRequest(String aMessageText, String aCommand, int aPort, String aFilterValue) {
         String myMessageId;
 
-        MessageObj myMessage= new MessageObj();
+        ReqReply myMessage= new ReqReply();
         myMessage.setRequest(aMessageText);
         myMessage.setCommand(aCommand);
         myMessage.setPort(aPort);
@@ -189,7 +189,7 @@ public class ReqReplyProducer implements MessageListener {
     }
 
 
-    public String sendRequest(MessageObj aMessage) {
+    public String sendRequest(ReqReply aMessage) {
         String myMessageId;
         ReqReplyMessageCreator myReqMessage = new ReqReplyMessageCreator(aMessage.getRequest(), replyDestination);
         myReqMessage.setStringProperty(filterName, aMessage.getIdent());

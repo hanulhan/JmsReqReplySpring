@@ -5,7 +5,7 @@
  */
 package hanulhan.jms.spring.reqreply.message;
 
-import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
+import hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Collections;
@@ -62,7 +62,7 @@ public class ReqReplyMessageStore {
             }
             
             myStatus = myMessageContainer.add(aJmsMessage);
-            // Add the new Message to the MessageObject
+            // Add the new Message to the ReqReplyect
 
 
             if (myStatus == ReqReplyStatusCode.STATUS_OK) {
@@ -119,7 +119,7 @@ public class ReqReplyMessageStore {
 //        return myStatus;
 //    }
 
-    public synchronized ReqReplyStatusCode add(String aMessageId, MessageObj aMessage) throws JMSException {
+    public synchronized ReqReplyStatusCode add(String aMessageId, ReqReply aMessage) throws JMSException {
         ReqReplyStatusCode myStatus = ReqReplyStatusCode.STATUS_ERROR;
         try {
             available.acquire();

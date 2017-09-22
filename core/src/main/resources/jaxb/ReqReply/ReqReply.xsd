@@ -21,7 +21,7 @@ and open the template in the editor.
         </xs:appinfo>
     </xs:annotation>
     
-    <xs:element  name="MessageObj">
+    <xs:element  name="ReqReply">
 
         <xs:complexType>
             <xs:complexContent>

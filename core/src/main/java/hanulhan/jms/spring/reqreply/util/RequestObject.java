@@ -5,7 +5,7 @@
  */
 package hanulhan.jms.spring.reqreply.util;
 
-import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
+import hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply;
 import hanulhan.jms.spring.reqreply.message.ReqReplyMessageContainer;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.log4j.Logger;
@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
  */
 public class RequestObject extends Object {
 
-    private MessageObj messageObj;
+    private ReqReply ReqReply;
     private boolean busy = false;
     static final Logger LOGGER = Logger.getLogger(ReqReplyMessageContainer.class);
 
@@ -32,8 +32,8 @@ public class RequestObject extends Object {
      */
     public RequestObject(String aIdent) {
         super();
-        this.messageObj= new MessageObj();
-        this.messageObj.setIdent(aIdent);
+        this.ReqReply= new ReqReply();
+        this.ReqReply.setIdent(aIdent);
 
     }
 
@@ -58,10 +58,10 @@ public class RequestObject extends Object {
      */
     public void setNewRequest(String aRequest, String aCommand, int aPort, String aMessageId, String aConsumerId) {
         this.busy = true;
-        this.messageObj.setRequest(aRequest);
-        this.messageObj.setMessageid(aMessageId);
-        this.messageObj.setCommand(aCommand);
-        this.messageObj.setPort(aPort);
+        this.ReqReply.setRequest(aRequest);
+        this.ReqReply.setMessageid(aMessageId);
+        this.ReqReply.setCommand(aCommand);
+        this.ReqReply.setPort(aPort);
 
     }
 
@@ -75,11 +75,11 @@ public class RequestObject extends Object {
      */
     public void setNewRequest(String aRequest, String aCommand, int aPort, String aMessageId, String aConsumerId, XMLGregorianCalendar aStartDateTime) {
         this.busy = true;
-        this.messageObj.setRequest(aRequest);
-        this.messageObj.setMessageid(aMessageId);
-        this.messageObj.setCreated(aStartDateTime);
-        this.messageObj.setCommand(aCommand);
-        this.messageObj.setPort(aPort);
+        this.ReqReply.setRequest(aRequest);
+        this.ReqReply.setMessageid(aMessageId);
+        this.ReqReply.setCreated(aStartDateTime);
+        this.ReqReply.setCommand(aCommand);
+        this.ReqReply.setPort(aPort);
     }
 
     /**
@@ -87,7 +87,7 @@ public class RequestObject extends Object {
      * @return
      */
     public XMLGregorianCalendar getStartDateTime() {
-        return messageObj.getCreated();
+        return ReqReply.getCreated();
     }
 
     /**
@@ -95,7 +95,7 @@ public class RequestObject extends Object {
      * @param aStartDateTime
      */
     public void setStartDateTime(XMLGregorianCalendar aStartDateTime) {
-        this.messageObj.setCreated(aStartDateTime);
+        this.ReqReply.setCreated(aStartDateTime);
 
 //        GregorianCalendar gcal = (GregorianCalendar) GregorianCalendar.getInstance();
 //        gcal.setTime(aStartTime);
@@ -108,39 +108,39 @@ public class RequestObject extends Object {
     }
 
     public String getIdent() {
-        return this.messageObj.getIdent();
+        return this.ReqReply.getIdent();
     }
 
     public String getMessageId() {
-        return this.messageObj.getMessageid();
+        return this.ReqReply.getMessageid();
     }
 
     public void setMessageId(String aMessageId) {
-        this.messageObj.setMessageid(aMessageId);
+        this.ReqReply.setMessageid(aMessageId);
     }
 
     public String getRequest() {
-        return this.messageObj.getRequest();
+        return this.ReqReply.getRequest();
     }
 
-    public MessageObj getMessageObj() {
-        return messageObj;
+    public ReqReply getReqReply() {
+        return ReqReply;
     }
 
-    public void setMessageObj(MessageObj messageObj) {
-        this.messageObj = messageObj;
+    public void setReqReply(ReqReply ReqReply) {
+        this.ReqReply = ReqReply;
     }
 
 
 
     public void setConsumerId(String aId)   {
-        this.messageObj.setConsumderid(aId);
+        this.ReqReply.setConsumderid(aId);
     }
     
     
     @Override
     public String toString() {
-        return "Object [ident:" + this.messageObj.getIdent() + ", request: " + this.messageObj.getRequest() + ", msgId: " + this.messageObj.getMessageid();
+        return "Object [ident:" + this.ReqReply.getIdent() + ", request: " + this.ReqReply.getRequest() + ", msgId: " + this.ReqReply.getMessageid();
 //        return "Object [ident:" + this.reqReply.getIdent() + ", consumer: " + this.reqReply.get + ", request: " + request + ", msgId: " + messageId;
     }
 }

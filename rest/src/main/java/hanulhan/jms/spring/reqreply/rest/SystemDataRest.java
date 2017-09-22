@@ -6,7 +6,7 @@
 package hanulhan.jms.spring.reqreply.rest;
 
 import hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer;
-import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
+import hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
@@ -61,7 +61,7 @@ public class SystemDataRest implements ApplicationContextAware {
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Consumes({"application/xml"})
-    public Response SystemData(MessageObj aMessage) {
+    public Response SystemData(ReqReply aMessage) {
         Response myResponse = Response.status(Response.Status.BAD_REQUEST).build();        
 
         if ((aMessage != null) && (aMessage.getRequest() != null)) {

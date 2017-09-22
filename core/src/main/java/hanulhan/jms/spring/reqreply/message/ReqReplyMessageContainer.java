@@ -5,7 +5,7 @@
  */
 package hanulhan.jms.spring.reqreply.message;
 
-import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
+import hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply;
 import hanulhan.jms.spring.reqreply.util.ReqReplySettings;
 import hanulhan.jms.spring.reqreply.util.ReqReplyStatusCode;
 import java.util.Date;
@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
  */
 public class ReqReplyMessageContainer {
 
-    MessageObj messageObj;
+    ReqReply ReqReply;
 
     // vars static for the object
 //    private String messageId = null;
@@ -51,19 +51,19 @@ public class ReqReplyMessageContainer {
         this.filterName = aFilterName;
         this.msgBitMask= 0;
 
-        this.messageObj= new MessageObj();
-        this.messageObj.setMessageid(aMessageId);
-        this.messageObj.setIdent(aFilterValue);
-        this.messageObj.setMessageid(aMessageId);
+        this.ReqReply= new ReqReply();
+        this.ReqReply.setMessageid(aMessageId);
+        this.ReqReply.setIdent(aFilterValue);
+        this.ReqReply.setMessageid(aMessageId);
         
     }
 
-    public ReqReplyMessageContainer(String aFilterName, MessageObj aMessage) {    
+    public ReqReplyMessageContainer(String aFilterName, ReqReply aMessage) {    
         super();
         this.filterName = aFilterName;
         this.msgBitMask= 0;
         
-        this.messageObj= aMessage;
+        this.ReqReply= aMessage;
     }
     
     /**
@@ -91,7 +91,7 @@ public class ReqReplyMessageContainer {
                     this.totalCount = myTotalCount;
                     this.msgCount = 1;
                     this.payload = new String[this.totalCount];
-//                    LOGGER.log(Level.DEBUG, "ReqReplyMessageObj::add(), create new array with size " + this.totalCount);
+//                    LOGGER.log(Level.DEBUG, "ReqReplyReqReply::add(), create new array with size " + this.totalCount);
                 } else {
                     this.msgCount++;
                 }
@@ -101,7 +101,7 @@ public class ReqReplyMessageContainer {
                 }
 
                 this.payload[lfdMsg] = ((TextMessage) aMessage).getText();
-//                LOGGER.log(Level.DEBUG, "ReqReplyMessageObj::add(), store payload to array[" + lfdMsg + "]");
+//                LOGGER.log(Level.DEBUG, "ReqReplyReqReply::add(), store payload to array[" + lfdMsg + "]");
             }
         }
 
@@ -152,7 +152,7 @@ public class ReqReplyMessageContainer {
         }
 
         // Check content of Property: <FilterName>
-        if (!aMessage.getStringProperty(this.filterName).equals(this.messageObj.getIdent())) {
+        if (!aMessage.getStringProperty(this.filterName).equals(this.ReqReply.getIdent())) {
             LOGGER.log(Level.ERROR, "PropertyName: " + this.filterName + " missmatch");
             return ReqReplyStatusCode.STATUS_HEADER_ERROR;
         }
@@ -187,7 +187,7 @@ public class ReqReplyMessageContainer {
         }
 
         // Check if Properties fit to the new Message
-        if (!aMessage.getJMSCorrelationID().equals(this.messageObj.getMessageid())) {
+        if (!aMessage.getJMSCorrelationID().equals(this.ReqReply.getMessageid())) {
             LOGGER.log(Level.ERROR, "MessageId missmatch ");
             return ReqReplyStatusCode.STATUS_CORRELATION_MISMATCH;
         }
@@ -261,13 +261,13 @@ public class ReqReplyMessageContainer {
     }
 
     public String getIdent()    {
-        return messageObj.getIdent();
+        return ReqReply.getIdent();
     }
     
     @Override
     public String toString()    {
-        return  "MsgObj: {id: " + this.messageObj.getMessageid()
-                        + ", Ident: " + this.messageObj.getIdent()
+        return  "MsgObj: {id: " + this.ReqReply.getMessageid()
+                        + ", Ident: " + this.ReqReply.getIdent()
                         + ", count: " + this.msgCount
                         + ", totalCount: " + this.totalCount
                         + ", bitMask: " + this.msgBitMask

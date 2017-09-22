@@ -38,7 +38,7 @@
     
     <!-- Spring's JAXB implementation of marshaller - provided a class the JAXB generated class -->
 <!--    <oxm:jaxb2-marshaller id="marshaller">
-        <oxm:class-to-be-bound name="hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj" />
+        <oxm:class-to-be-bound name="hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply" />
     </oxm:jaxb2-marshaller>-->
 
     <!-- Message converter - automatically marshalls and unmarshalls messages using the provided marshaller / unmarshaller-->
@@ -49,6 +49,6 @@
 
     <!-- Spring's JAXB implementation of marshaller - provided a class the JAXB generated class -->
     <oxm:jaxb2-marshaller id="marshaller">
-        <oxm:class-to-be-bound name="hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj" />
+        <oxm:class-to-be-bound name="hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply" />
     </oxm:jaxb2-marshaller>
 </beans>

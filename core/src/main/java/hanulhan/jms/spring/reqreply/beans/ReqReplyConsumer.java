@@ -5,7 +5,7 @@
  */
 package hanulhan.jms.spring.reqreply.beans;
 
-import hanulhan.jms.spring.reqreply.jaxb.generated.MessageObj;
+import hanulhan.jms.spring.reqreply.jaxb.generated.ReqReply;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.TextMessage;
@@ -192,8 +192,8 @@ public class ReqReplyConsumer implements MessageListener, ApplicationContextAwar
             if (aMessage instanceof TextMessage)    {
                 myRequest = ((TextMessage) aMessage).getText();
             } else if (aMessage instanceof ObjectMessage) {
-                MessageObj myMsgObj;
-                myMsgObj= (MessageObj)((ObjectMessage) aMessage).getObject();
+                ReqReply myMsgObj;
+                myMsgObj= (ReqReply)((ObjectMessage) aMessage).getObject();
                 myRequest= myMsgObj.getRequest();
             }
 

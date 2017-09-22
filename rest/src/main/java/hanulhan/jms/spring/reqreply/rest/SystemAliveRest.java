@@ -86,7 +86,7 @@ public class SystemAliveRest implements ApplicationContextAware {
                     myRequestObj.wait(holdTimeSec * 1000);
                     if (myRequestObj.isBusy()) {
                         LOGGER.log(Level.TRACE, "System [" + ident + "] disconnect with Response: " + myRequestObj.toString());
-                        myResponse = Response.ok(myRequestObj.getMessageObj()).build();
+                        myResponse = Response.ok(myRequestObj.getReqReply()).build();
                     } else {
                         myResponse = Response.status(Status.NO_CONTENT).build();
                     }
