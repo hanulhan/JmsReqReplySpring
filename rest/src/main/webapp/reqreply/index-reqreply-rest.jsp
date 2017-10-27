@@ -7,7 +7,7 @@
     <script type="text/javascript">
 
 
-        var xml ='<ReqReply ident="VIDEOSYS" messageid="MESSAGE-ID-1" consumderid="B2B-1" created="2017-04-26T17:41:49.173+02:00">' +
+        var xml ='<ReqReply ident="00000002" messageid="MESSAGE-ID-1" consumderid="B2B-1" created="2017-04-26T17:41:49.173+02:00">' +
                 '<request>REQUEST-1</request>' +
                 '<response>RESPONSE-1</response>' +
                 '</ReqReply>';
@@ -16,7 +16,7 @@
         function NavigateSystemAliveRestCall() {
 
             var ctx = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
-            var s = window.location.origin + ctx + "/rest/systemalive" + "?ident=VIDEOSYS";
+            var s = window.location.origin + ctx + "/rest/systemalive" + "?ident=00000002";
             window.open(s);
         }
 

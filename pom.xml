@@ -16,8 +16,10 @@
     </modules>
 
     <properties>
-        <use.basic.auth.start></use.basic.auth.start>
-        <use.basic.auth.end></use.basic.auth.end>
+        <use.basic.auth.start>&lt;!--</use.basic.auth.start>
+        <use.basic.auth.end>--&gt;</use.basic.auth.end>
+        <login.mode.cas.enabled.start>&lt;!--</login.mode.cas.enabled.start>
+        <login.mode.cas.enabled.end>--&gt;</login.mode.cas.enabled.end>
         
         <rmi.registry.port>1099</rmi.registry.port>
         <jmx.rmi.server.port>1098</jmx.rmi.server.port>
