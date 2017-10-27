@@ -21,7 +21,7 @@
     
     <!-- spring_jmsReqReplyConsumer.xml -->
     
-    <bean   id="bean_jmsReqReplyConsumer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyConsumer" scope="singleton" >
+    <bean   id="bean_jmsReqReplyEchoConsumer" class="hanulhan.jms.spring.reqreply.beans.ReqReplyEchoConsumer" scope="singleton" >
         <property name="jmsTemplate"            ref="bean_jmsTopicTemplate" />
         <property name="reqDestination"         value="#{bean_ReqReplySettings.getReqDestination()}" />
         <property name="replyDestination"       value="#{bean_ReqReplySettings.getReplyDestination()}" />

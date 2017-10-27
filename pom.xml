@@ -13,12 +13,14 @@
         <module>client</module>
         <module>rest</module>
         <module>simClient</module>
+        <module>echoConsumer</module>
     </modules>
 
     <properties>
-        <use.basic.auth.start></use.basic.auth.start>
-        <use.basic.auth.end></use.basic.auth.end>
-        
+        <use.basic.auth.start>&lt;!--</use.basic.auth.start>
+        <use.basic.auth.end>--&gt;</use.basic.auth.end>
+
+               
         <rmi.registry.port>1099</rmi.registry.port>
         <jmx.rmi.server.port>1098</jmx.rmi.server.port>
         
